@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Time Saved - Live</title>
+<style>
+  :root{--bg:#0b0f17;--panel:#141a24;--panel2:#0e131c;--border:#222c3a;--txt:#e6edf3;
+        --mut:#8b949e;--accent:#4f9dff;--good:#34d399;--ink:#04101f;}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 700px at 78% -12%,#1726940d 0,#1726941a 0,transparent 60%),
+       radial-gradient(1000px 600px at 85% -10%,#16233a 0,var(--bg) 55%);
+       color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh;}
+  .wrap{max-width:1120px;margin:0 auto;padding:30px 22px 80px;}
+  h1{font-size:25px;margin:0 0 3px;letter-spacing:.2px;display:flex;align-items:center;gap:11px;font-weight:800}
+  .live{width:9px;height:9px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(52,211,153,.6);
+        animation:pulse 2.2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 9px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+  .sub{color:var(--mut);font-size:12.5px;margin-bottom:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .btn{background:var(--accent);color:var(--ink);border:none;border-radius:9px;padding:8px 14px;font-weight:700;
+       font-size:12.5px;cursor:pointer;transition:filter .15s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--txt);font-weight:600}
+  .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:18px}
+  .card{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:15px;
+        padding:18px 14px;text-align:center;position:relative;overflow:hidden;transition:transform .15s,border-color .15s}
+  .card:before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--accent),var(--good));opacity:.85}
+  .card:hover{transform:translateY(-2px);border-color:#2f3e52}
+  .big{font-size:28px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+  .big.acc{color:var(--accent)} .big.good{color:var(--good)}
+  .lbl{color:var(--mut);font-size:11px;margin-top:7px;line-height:1.3}
+  .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:15px;margin-bottom:15px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
+  .panel{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--border);
+         border-radius:15px;padding:18px;transition:border-color .15s}
+  .panel.clickable{cursor:pointer}
+  .panel.clickable:hover{border-color:var(--accent)}
+  .panel h2{font-size:12.5px;margin:0 0 14px;color:var(--mut);font-weight:600;letter-spacing:.6px;
+            display:flex;justify-content:space-between;align-items:center;text-transform:uppercase}
+  .hint{font-size:10px;color:var(--mut);font-weight:400;text-transform:none;letter-spacing:0}
+  .bar{display:flex;align-items:center;gap:9px;margin:7px 0;font-size:12.5px}
+  .bl{flex:0 0 auto;height:14px;border-radius:5px;min-width:5px;transition:width .45s ease,filter .15s;cursor:pointer}
+  .bl:hover{filter:brightness(1.15)}
+  .bt{flex:1;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bv{color:var(--mut);font-variant-numeric:tabular-nums}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:11px;font-size:12px;color:var(--mut)}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:middle}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:9px 7px;border-bottom:1px solid var(--border)}
+  th{color:var(--mut);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px}
+  td.tab{color:var(--mut)} td.tah{text-align:right;font-variant-numeric:tabular-nums;color:var(--good);font-weight:700}
+  .add{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .add input,.add select{background:#0c1118;border:1px solid var(--border);color:var(--txt);border-radius:8px;
+        padding:8px 10px;font-size:12.5px;outline:none}
+  .add input:focus,.add select:focus{border-color:var(--accent)}
+  .add input.task{flex:1;min-width:170px} .add input.hours{width:90px}
+  .foot{color:var(--mut);font-size:11px;margin-top:20px;text-align:center}
+  /* tooltip */
+  #tip{position:fixed;pointer-events:none;z-index:80;background:#0a0f17;border:1px solid #2f3e52;
+       border-radius:9px;padding:9px 12px;font-size:12px;color:var(--txt);box-shadow:0 8px 28px rgba(0,0,0,.55);
+       opacity:0;transition:opacity .1s;max-width:260px;line-height:1.45}
+  #tip b{color:var(--accent)}
+  /* modal */
+  .ov{position:fixed;inset:0;background:rgba(4,8,16,.74);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+  .ov.on{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--border);border-radius:16px;max-width:660px;width:100%;padding:24px;max-height:84vh;overflow:auto}
+  .modal h3{margin:0 0 6px;font-size:18px}
+  .modal .x{float:right;cursor:pointer;color:var(--mut);font-size:24px;line-height:1;margin-top:-6px}
+  .modal table{margin-top:10px}
+  @media(max-width:820px){.cards{grid-template-columns:repeat(2,1fr)}.grid,.grid2{grid-template-columns:1fr}}
+</style></head><body>
+<div class="wrap">
+  <h1><span class="live"></span> AI Time Saved <span class="hint" id="status"></span></h1>
+  <div class="sub">
+    <span id="updated"></span>
+    <button class="btn" onclick="refresh()">Refresh</button>
+    <button class="btn ghost" onclick="toggleAuto()" id="autoBtn">Auto: OFF</button>
+    <span class="hint">live from log.jsonl - hover charts for detail, click to drill</span>
+  </div>
+
+  <div class="cards">
+    <div class="card"><div class="big acc" id="total">0</div><div class="lbl">Total hours saved</div></div>
+    <div class="card"><div class="big" id="week">0</div><div class="lbl">This week</div></div>
+    <div class="card"><div class="big" id="month">0</div><div class="lbl">This month</div></div>
+    <div class="card"><div class="big good" id="roi">-</div><div class="lbl">ROI (saved / invested)</div></div>
+    <div class="card"><div class="big" id="tasks">0</div><div class="lbl">Tasks logged</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="panel clickable" onclick="drill('cum')"><h2>Cumulative hours saved <span class="hint">click to drill</span></h2><div id="cumChart"></div></div>
+    <div class="panel clickable" onclick="drill('pie')"><h2>Hours by category <span class="hint">click to drill</span></h2><div id="pieChart"></div><div class="legend" id="pieLegend"></div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel clickable" onclick="drill('week')"><h2>Hours saved per week <span class="hint">click to drill</span></h2><div id="weekChart"></div></div>
+    <div class="panel"><h2>Category breakdown</h2><div id="catBars"></div></div>
+  </div>
+
+  <div class="panel">
+    <h2>Log an entry <span class="hint">updates live</span></h2>
+    <div class="add">
+      <input class="task" id="aTask" placeholder="What did I do for you?">
+      <input class="hours" id="aHours" type="number" step="0.1" min="0" placeholder="hrs">
+      <select id="aCat">
+        <option>TPM</option><option>Tooling</option><option>Maintenance</option>
+        <option>Writing</option><option>Research</option><option>Automation</option>
+        <option>Ops</option><option>General</option>
+      </select>
+      <input id="aInv" class="hours" type="number" step="0.1" min="0" placeholder="invested">
+      <button class="btn" onclick="addEntry()">Add</button>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:15px"><h2>All tasks <span class="hint" id="tblCount"></span></h2><table id="tbl"></table></div>
+  <div class="foot" id="foot"></div>
+</div>
+
+<div id="tip"></div>
+<div class="ov" id="ov" onclick="if(event.target===this)closeModal()">
+  <div class="modal"><span class="x" onclick="closeModal()">&times;</span><h3 id="mTitle"></h3><div id="mBody"></div></div>
+</div>
+
+<script>
+const PALETTE=["#4f9dff","#34d399","#fbbf24","#f472b6","#a78bfa","#fb7185","#22d3ee","#a3e635"];
+const $=id=>document.getElementById(id);
+const tip=$('tip');
+let DATA=null, AUTO=null;
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function showTip(e,html){tip.innerHTML=html;tip.style.opacity=1;moveTip(e);}
+function moveTip(e){const x=e.clientX+14,y=e.clientY+14;tip.style.left=Math.min(x,innerWidth-270)+'px';tip.style.top=Math.min(y,innerHeight-90)+'px';}
+function hideTip(){tip.style.opacity=0;}
+function hov(elt,html){elt.addEventListener('mousemove',e=>showTip(e,html));elt.addEventListener('mouseleave',hideTip);}
+
+// fetch live data: try server first, fall back to local data.json (file://)
+async function refresh(){
+  let d=null;
+  try{const r=await fetch('/api/data',{cache:'no-store'});if(r.ok)d=await r.json();}catch(e){}
+  if(!d){try{const r=await fetch('./data.json',{cache:'no-store'});if(r.ok)d=await r.json();}catch(e){}}
+  if(d){DATA=d;render();$('status').textContent='● live';$('updated').textContent='Updated '+new Date().toLocaleTimeString();}
+  else{$('status').textContent='● start serve.py for live';}
+}
+function render(){
+  if(!DATA)return;
+  $('total').textContent=DATA.total.toFixed(1);
+  $('week').textContent=DATA.week.toFixed(1);
+  $('month').textContent=DATA.month.toFixed(1);
+  $('tasks').textContent=DATA.entries.length;
+  $('roi').textContent=DATA.invested>0?(DATA.total/DATA.invested).toFixed(1)+'x':'-';
+  drawCum();drawPie();drawWeek();drawCat();drawTable();
+  $('foot').textContent=DATA.entries.length+' tasks • source: log.jsonl (OneDrive)';
+}
+function svgNS(t){return document.createElementNS('http://www.w3.org/2000/svg',t);}
+
+function drawCum(){
+  const cum=DATA.cum; if(!cum.length){$('cumChart').innerHTML='<div class="hint">no data yet</div>';return;}
+  const W=580,H=235,p=38,maxY=Math.max(...cum.map(d=>d[1]),1),maxX=cum.length-1||1;
+  const X=i=>p+(W-2*p)*(i/maxX),Y=v=>H-p-(H-2*p)*(v/maxY);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" id="cumSvg">`;
+  s+=`<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f9dff" stop-opacity=".35"/><stop offset="1" stop-color="#4f9dff" stop-opacity="0"/></linearGradient></defs>`;
+  const pts=cum.map((d,i)=>`${X(i).toFixed(1)},${Y(d[1]).toFixed(1)}`).join(' ');
+  s+=`<polygon points="${p},${H-p} ${pts} ${X(maxX).toFixed(1)},${H-p}" fill="url(#g)"/>`;
+  s+=`<polyline points="${pts}" fill="none" stroke="#4f9dff" stroke-width="2.6"/>`;
+  cum.forEach((d,i)=>{
+    const prev=cum[i-1]?cum[i-1][1]:0, day=(d[1]-prev).toFixed(1);
+    s+=`<circle cx="${X(i).toFixed(1)}" cy="${Y(d[1]).toFixed(1)}" r="4" fill="#4f9dff"><title></title></circle>`;
+    s+=`<rect x="${(X(i)-10).toFixed(1)}" y="${(Y(d[1])-10).toFixed(1)}" width="20" height="20" fill="transparent" class="hot" data-tip="<b>${d[0]}</b><br>Daily: ${day}h<br>Running: ${d[1].toFixed(1)}h"/></rect>`;
+  });
+  s+=`<text x="${p}" y="18" fill="#4f9dff" font-size="13" font-weight="800">${DATA.total.toFixed(1)}h</text>`;
+  s+=`<text x="${p}" y="${H-12}" fill="#8b949e" font-size="10">${cum[0][0]}</text>`;
+  s+=`<text x="${W-p}" y="${H-12}" fill="#8b949e" font-size="10" text-anchor="end">${cum[cum.length-1][0]}</text></svg>`;
+  $('cumChart').innerHTML=s;
+  bindHot($('cumChart'));
+}
+function drawPie(){
+  const cats=Object.entries(DATA.byCat).sort((a,b)=>b[1]-a[1]); if(!cats.length){$('pieChart').innerHTML='<div class="hint">no data</div>';return;}
+  const total=cats.reduce((s,c)=>s+c[1],0),cx=110,cy=110,r=92;
+  const polar=a=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];
+  const slice=(a0,a1)=>{const[x0,y0]=polar(a0),[x1,y1]=polar(a1);const lg=(a1-a0)>Math.PI?1:0;
+    return `M${cx},${cy} L${x0.toFixed(1)},${y0.toFixed(1)} A${r},${r} 0 ${lg} 1 ${x1.toFixed(1)},${y1.toFixed(1)} Z`;};
+  let ang=-Math.PI/2,s=`<svg viewBox="0 0 220 220" width="100%" id="pieSvg">`;
+  cats.forEach((c,i)=>{const a1=ang+(c[1]/total)*2*Math.PI;
+    const pct=(c[1]/total*100).toFixed(1);
+    s+=`<path d="${slice(ang,a1)}" fill="${PALETTE[i%PALETTE.length]}" stroke="#141a24" stroke-width="2" class="hot"
+         data-tip="<b>${esc(c[0])}</b><br>${c[1].toFixed(1)}h (${pct}%)<br>click to drill" onclick="drill('pie','${esc(c[0])}')" style="cursor:pointer"/>`;
+    ang=a1;});
+  s+=`<circle cx="${cx}" cy="${cy}" r="${r*0.56}" fill="#141a24"/>`;
+  s+=`<text x="${cx}" y="${cy-4}" fill="#fff" font-size="20" font-weight="800" text-anchor="middle">${total.toFixed(0)}h</text>`;
+  s+=`<text x="${cx}" y="${cy+15}" fill="#8b949e" font-size="10" text-anchor="middle">total</text></svg>`;
+  $('pieChart').innerHTML=s;
+  $('pieLegend').innerHTML=cats.map((c,i)=>`<span><i style="background:${PALETTE[i%PALETTE.length]}"></i>${esc(c[0])} ${c[1].toFixed(1)}h</span>`).join('');
+  bindHot($('pieChart'));
+}
+function drawWeek(){
+  const w=DATA.weekly; if(!w.length){$('weekChart').innerHTML='<div class="hint">no data</div>';return;}
+  const W=560,H=215,p=28,maxY=Math.max(...w.map(d=>d[1]),1),bw=Math.min(54,(W-2*p)/w.length*0.7),gap=(W-2*p)/w.length;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" id="weekSvg">`;
+  w.forEach((d,i)=>{const h=(H-p)*(d[1]/maxY),x=p+gap*i+(gap-bw)/2,y=H-p-h;
+    s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="4" fill="#34d399" class="hot"
+         data-tip="<b>${esc(d[0])}</b><br>${d[1].toFixed(1)}h saved<br>click to drill" onclick="drill('week','${esc(d[0])}')" style="cursor:pointer"/>`;
+    s+=`<text x="${(x+bw/2).toFixed(1)}" y="${(y-5).toFixed(1)}" fill="#e6edf3" font-size="10" text-anchor="middle">${d[1].toFixed(1)}</text>`;
+    s+=`<text x="${(x+bw/2).toFixed(1)}" y="${H-9}" fill="#8b949e" font-size="8.5" text-anchor="middle">${esc(d[0].replace('2026-',''))}</text>`;});
+  s+=`</svg>`; $('weekChart').innerHTML=s; bindHot($('weekChart'));
+}
+function drawCat(){
+  const cats=Object.entries(DATA.byCat).sort((a,b)=>b[1]-a[1]); if(!cats.length)return;
+  const max=Math.max(...cats.map(c=>c[1]),1), tot=Object.values(DATA.byCat).reduce((a,b)=>a+b,0);
+  $('catBars').innerHTML=cats.map((c,i)=>{
+    const pct=(c[1]/max*100).toFixed(0),p2=(c[1]/tot*100).toFixed(1);
+    return `<div class="bar"><span class="bl" style="width:${pct}%;background:${PALETTE[i%PALETTE.length]}"
+            data-tip="<b>${esc(c[0])}</b><br>${c[1].toFixed(1)}h (${p2}% of total)" onclick="drill('pie','${esc(c[0])}')"></span>
+      <span class="bt">${esc(c[0])}</span><span class="bv">${c[1].toFixed(1)}h</span></div>`;}).join('');
+  bindHot($('catBars'));
+}
+function drawTable(){
+  const rows=DATA.entries.slice().reverse();
+  $('tblCount').textContent='('+rows.length+')';
+  let h='<tr><th>Date</th><th>Task</th><th>Category</th><th style="text-align:right">Saved</th><th style="text-align:right">Invested</th></tr>';
+  rows.forEach(e=>{h+=`<tr><td class="tab">${e.date}</td><td>${esc(e.task)}</td><td class="tab">${esc(e.cat)}</td>
+    <td class="tah">${e.hours.toFixed(1)}</td><td class="tab" style="text-align:right">${(e.invested||0)?e.invested.toFixed(1):'-'}</td></tr>`;});
+  $('tbl').innerHTML=h;
+}
+function bindHot(root){
+  root.querySelectorAll('.hot').forEach(el=>{
+    const html=el.getAttribute('data-tip');
+    el.style.cursor=el.style.cursor||'pointer';
+    el.addEventListener('mousemove',e=>showTip(e,html));
+    el.addEventListener('mouseleave',hideTip);
+  });
+}
+async function addEntry(){
+  const task=$('aTask').value.trim(), hours=parseFloat($('aHours').value),
+        cat=$('aCat').value, inv=parseFloat($('aInv').value)||0;
+  if(!task||!(hours>0)){alert('Enter a task and positive hours');return;}
+  try{
+    await fetch('/api/add',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({task,hours,cat,invested:inv})});
+  }catch(e){}
+  $('aTask').value='';$('aHours').value='';$('aInv').value='';
+  refresh();
+}
+function drill(kind,key){
+  if(!DATA)return;let title='',body='';
+  if(kind==='cum'){
+    title='Cumulative detail';
+    body='<table><tr><th>Date</th><th style="text-align:right">Daily</th><th style="text-align:right">Running</th></tr>'+
+      DATA.cum.map((d,i)=>{const prev=DATA.cum[i-1]?DATA.cum[i-1][1]:0;
+        return `<tr><td class="tab">${d[0]}</td><td class="tah">${(d[1]-prev).toFixed(1)}</td><td class="tah">${d[1].toFixed(1)}</td></tr>`;}).join('')+'</table>';
+  }else if(kind==='pie'){
+    const cat=key||null;title=cat?('Category: '+cat):'By category';
+    const rows=DATA.entries.filter(e=>!cat||e.cat===cat).slice().reverse();
+    body=`<p class="hint">${cat?rows.length+' tasks':Object.keys(DATA.byCat).length+' categories'}</p><table><tr><th>Date</th><th>Task</th><th style="text-align:right">Saved</th></tr>`+
+      rows.map(e=>`<tr><td class="tab">${e.date}</td><td>${esc(e.task)}</td><td class="tah">${e.hours.toFixed(1)}</td></tr>`).join('')+'</table>';
+  }else if(kind==='week'){
+    const wk=key;title='Week '+(wk||'all');
+    const rows=DATA.entries.filter(e=>{const d=new Date(e.date);return !wk||`${d.getFullYear()}-W${getWeek(d)}`===wk;}).slice().reverse();
+    body=`<table><tr><th>Date</th><th>Task</th><th>Category</th><th style="text-align:right">Saved</th></tr>`+
+      rows.map(e=>`<tr><td class="tab">${e.date}</td><td>${esc(e.task)}</td><td class="tab">${esc(e.cat)}</td><td class="tah">${e.hours.toFixed(1)}</td></tr>`).join('')+'</table>';
+  }
+  $('mTitle').textContent=title;$('mBody').innerHTML=body;$('ov').classList.add('on');
+}
+function getWeek(d){const t=new Date(d.getFullYear(),0,1);return Math.ceil((((d-t)/86400000)+t.getDay()+1)/7);}
+function closeModal(){$('ov').classList.remove('on');}
+function toggleAuto(){
+  if(AUTO){clearInterval(AUTO);AUTO=null;$('autoBtn').textContent='Auto: OFF';}
+  else{AUTO=setInterval(refresh,5000);$('autoBtn').textContent='Auto: ON (5s)';refresh();}
+}
+refresh();
+</script>
+</body></html>

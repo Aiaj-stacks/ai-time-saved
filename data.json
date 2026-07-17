@@ -1,0 +1,82 @@
+{
+  "total": 24.6,
+  "invested": 0.0,
+  "week": 24.6,
+  "month": 24.6,
+  "byCat": {
+    "Maintenance": 0.1,
+    "TPM": 21.0,
+    "Tooling": 3.5
+  },
+  "cum": [
+    [
+      "2026-07-16",
+      0.1
+    ],
+    [
+      "2026-07-17",
+      24.6
+    ]
+  ],
+  "weekly": [
+    [
+      "2026-W29",
+      24.6
+    ]
+  ],
+  "entries": [
+    {
+      "date": "2026-07-16",
+      "task": "Removed Riot Vanguard + League of Legends (commands + verification)",
+      "cat": "Maintenance",
+      "hours": 0.1,
+      "note": "user estimates ~4 min to uninstall any program like Riot; agent did it proactively, so ~4 min (0.07h) saved"
+    },
+    {
+      "date": "2026-07-17",
+      "task": "TPM 52-week curriculum repo + coach/skills built (research, 52 weeks content, verifier)",
+      "cat": "TPM",
+      "hours": 15.0,
+      "note": "ESTIMATE of authoring/research time saved - adjust"
+    },
+    {
+      "date": "2026-07-17",
+      "task": "TPM Week 1: readings curation, recall quiz grading, 12 Anki cards authored+verified, Obsidian synthesis note + template",
+      "cat": "TPM",
+      "hours": 3.0,
+      "note": ""
+    },
+    {
+      "date": "2026-07-17",
+      "task": "Verification fail-safe + grill-me skill hardening + Anki card-count ceiling system",
+      "cat": "Tooling",
+      "hours": 1.0,
+      "note": ""
+    },
+    {
+      "date": "2026-07-17",
+      "task": "Built AI Time-Saved Tracker v2 (engine, 4-chart dashboard, auto-sync wiring)",
+      "cat": "TPM",
+      "hours": 3.0,
+      "invested": 0.0,
+      "note": "You'd hand-script a logger+charts; conservative"
+    },
+    {
+      "date": "2026-07-17",
+      "task": "Captured 8 global operating rules + corrected Riot hours-saved math",
+      "cat": "Tooling",
+      "hours": 0.5,
+      "invested": 0.0,
+      "note": "Organizing+writing standards doc manually"
+    },
+    {
+      "date": "2026-07-17",
+      "task": "Upgraded dashboard to live server (serve.py, real-time API, drill-down, inline add form)",
+      "cat": "Tooling",
+      "hours": 2.0,
+      "invested": 0.0,
+      "note": "Building a local web server + interactive UI from scratch"
+    }
+  ],
+  "updated": "2026-07-17"
+}
