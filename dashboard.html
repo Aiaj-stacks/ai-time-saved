@@ -262,6 +262,9 @@ function toggleAuto(){
   if(AUTO){clearInterval(AUTO);AUTO=null;$('autoBtn').textContent='Auto: OFF';}
   else{AUTO=setInterval(refresh,5000);$('autoBtn').textContent='Auto: ON (5s)';refresh();}
 }
+// boot: paint embedded data immediately (works on file:// with no server),
+// then try a live refresh in the background if a server is available.
+if (DATA) { render(); $('status').textContent='● file (embedded)'; $('updated').textContent='Loaded '+new Date().toLocaleTimeString(); }
 refresh();
 </script>
 </body></html>
