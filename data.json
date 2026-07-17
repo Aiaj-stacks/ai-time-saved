@@ -1,13 +1,14 @@
 {
-  "total": 28.5,
+  "total": 30.5,
   "invested": 0.0,
-  "week": 28.5,
-  "month": 28.5,
+  "week": 30.5,
+  "month": 30.5,
   "byCat": {
     "Maintenance": 0.1,
     "TPM": 21.0,
-    "Tooling": 7.0,
-    "Research": 0.4
+    "Tooling": 8.5,
+    "Research": 0.4,
+    "Automation": 0.5
   },
   "cum": [
     [
@@ -16,13 +17,13 @@
     ],
     [
       "2026-07-17",
-      28.5
+      30.5
     ]
   ],
   "weekly": [
     [
       "2026-W29",
-      28.5
+      30.5
     ]
   ],
   "entries": [
@@ -101,6 +102,22 @@
       "hours": 0.4,
       "invested": 0.0,
       "note": "Reading skill docs and translating to your 8 rules"
+    },
+    {
+      "date": "2026-07-17",
+      "task": "Debugged + fixed dashboard showing 0h on file:// (embedded DATA + boot paint before fetch)",
+      "cat": "Tooling",
+      "hours": 1.5,
+      "invested": 0.0,
+      "note": "User would fumble through CORS/fetch debugging for hours; root cause was render() only firing after successful fetch"
+    },
+    {
+      "date": "2026-07-17",
+      "task": "Built autopush.py + daily cron for unattended GitHub sync of hours-saved data",
+      "cat": "Automation",
+      "hours": 0.5,
+      "invested": 0.0,
+      "note": "setInterval-free, silent when clean, alerts on push failure"
     }
   ],
   "updated": "2026-07-17"

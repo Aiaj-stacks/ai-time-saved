@@ -29,6 +29,7 @@ in OneDrive is always current across machines. Run `report` to force a rebuild.
 import argparse
 import json
 import os
+import re
 from datetime import date, timedelta
 
 BASE = os.environ.get(
@@ -285,13 +286,13 @@ def report(entries):
             "weekly": wkdata, "entries": entries, "updated": date.today().isoformat()}
     with open(DATAJSON, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-    # refresh embedded DATA so file:// view shows current data with no server
+    # refresh embedded DATA so file:// view shows current data with no server.
+    # Use a regex so it matches whether DATA is null or already-populated.
     try:
         html = open(DASH, encoding="utf-8").read()
-        needle = "let DATA=null, AUTO=null;"
-        if needle in html:
-            repl = "let DATA=" + json.dumps(data, ensure_ascii=False) + ", AUTO=null;"
-            html = html.replace(needle, repl, 1)
+        new_block = "let DATA=" + json.dumps(data, ensure_ascii=False) + ", AUTO=null;"
+        if re.search(r"let DATA=.*?, AUTO=null;", html, re.S):
+            html = re.sub(r"let DATA=.*?, AUTO=null;", new_block, html, count=1, flags=re.S)
             open(DASH, "w", encoding="utf-8").write(html)
             print(f"  > dashboard.html embedded DATA refreshed")
         else:
