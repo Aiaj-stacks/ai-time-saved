@@ -5,3 +5,6 @@
 {"date": "2026-07-17", "task": "Built AI Time-Saved Tracker v2 (engine, 4-chart dashboard, auto-sync wiring)", "cat": "TPM", "hours": 3.0, "invested": 0.0, "note": "You'd hand-script a logger+charts; conservative"}
 {"date": "2026-07-17", "task": "Captured 8 global operating rules + corrected Riot hours-saved math", "cat": "Tooling", "hours": 0.5, "invested": 0.0, "note": "Organizing+writing standards doc manually"}
 {"date": "2026-07-17", "task": "Upgraded dashboard to live server (serve.py, real-time API, drill-down, inline add form)", "cat": "Tooling", "hours": 2.0, "invested": 0.0, "note": "Building a local web server + interactive UI from scratch"}
+{"date": "2026-07-17", "task": "Built interactive AI Time-Saved dashboard (charts, hover tooltips, drill-down)", "cat": "Tooling", "hours": 3.0, "invested": 0.0, "note": "Hand-building a self-contained HTML/SVG dashboard + local server from scratch"}
+{"date": "2026-07-17", "task": "Created and pushed GitHub repository ai-time-saved", "cat": "Tooling", "hours": 0.5, "invested": 0.0, "note": "Account setup, repo create, commit, push, verify"}
+{"date": "2026-07-17", "task": "Researched + applied global operating-rules standards", "cat": "Research", "hours": 0.4, "invested": 0.0, "note": "Reading skill docs and translating to your 8 rules"}

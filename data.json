@@ -1,12 +1,13 @@
 {
-  "total": 24.6,
+  "total": 28.5,
   "invested": 0.0,
-  "week": 24.6,
-  "month": 24.6,
+  "week": 28.5,
+  "month": 28.5,
   "byCat": {
     "Maintenance": 0.1,
     "TPM": 21.0,
-    "Tooling": 3.5
+    "Tooling": 7.0,
+    "Research": 0.4
   },
   "cum": [
     [
@@ -15,13 +16,13 @@
     ],
     [
       "2026-07-17",
-      24.6
+      28.5
     ]
   ],
   "weekly": [
     [
       "2026-W29",
-      24.6
+      28.5
     ]
   ],
   "entries": [
@@ -76,6 +77,30 @@
       "hours": 2.0,
       "invested": 0.0,
       "note": "Building a local web server + interactive UI from scratch"
+    },
+    {
+      "date": "2026-07-17",
+      "task": "Built interactive AI Time-Saved dashboard (charts, hover tooltips, drill-down)",
+      "cat": "Tooling",
+      "hours": 3.0,
+      "invested": 0.0,
+      "note": "Hand-building a self-contained HTML/SVG dashboard + local server from scratch"
+    },
+    {
+      "date": "2026-07-17",
+      "task": "Created and pushed GitHub repository ai-time-saved",
+      "cat": "Tooling",
+      "hours": 0.5,
+      "invested": 0.0,
+      "note": "Account setup, repo create, commit, push, verify"
+    },
+    {
+      "date": "2026-07-17",
+      "task": "Researched + applied global operating-rules standards",
+      "cat": "Research",
+      "hours": 0.4,
+      "invested": 0.0,
+      "note": "Reading skill docs and translating to your 8 rules"
     }
   ],
   "updated": "2026-07-17"

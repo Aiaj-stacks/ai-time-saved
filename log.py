@@ -274,9 +274,9 @@ DATAJSON = os.path.join(BASE, "data.json")
 
 
 def report(entries):
-    """Write data.json (the live data the dashboard fetches). NEVER rewrite
-    dashboard.html - that is the canonical interactive file and must not be
-    clobbered by this script."""
+    """Write data.json AND refresh the embedded DATA block inside
+    dashboard.html. The embed means the dashboard renders fully when opened
+    directly via file:// (no server, no fetch) - just press F5 after a change."""
     total, inv, wk, mo, by_cat = summarize(entries)
     cum = daily_cum(entries)
     wkdata = weekly(entries)
@@ -285,10 +285,23 @@ def report(entries):
             "weekly": wkdata, "entries": entries, "updated": date.today().isoformat()}
     with open(DATAJSON, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+    # refresh embedded DATA so file:// view shows current data with no server
+    try:
+        html = open(DASH, encoding="utf-8").read()
+        needle = "let DATA=null, AUTO=null;"
+        if needle in html:
+            repl = "let DATA=" + json.dumps(data, ensure_ascii=False) + ", AUTO=null;"
+            html = html.replace(needle, repl, 1)
+            open(DASH, "w", encoding="utf-8").write(html)
+            print(f"  > dashboard.html embedded DATA refreshed")
+        else:
+            print(f"  > (embed marker not found, leaving dashboard.html as-is)")
+    except Exception as e:
+        print(f"  > (skip embed refresh: {e})")
     print(f"  > data written: {DATAJSON}")
     print(f"  > total {total:.1f}h | week {wk:.1f}h | month {mo:.1f}h | ROI "
           + (f"{(total/inv):.1f}x" if inv else "n/a"))
-    print(f"  > NOTE: dashboard.html is the live file. Serve with: python3 serve.py")
+    print(f"  > Open dashboard.html directly (file://) and press F5 - no server needed.")
 
 
 # ---------------------------------------------------------------------------
@@ -310,6 +323,7 @@ def main():
     sub.add_parser("summary")
     sub.add_parser("report")
     sub.add_parser("sync")
+    sub.add_parser("backfill")
 
     args = p.parse_args()
     if args.cmd is None:
@@ -337,6 +351,21 @@ def main():
     elif args.cmd == "sync":
         report(load())
         print("  > OneDrive path is the single source of truth; open dashboard.html on any machine.")
+    elif args.cmd == "backfill":
+        # Auto-capture work the assistant did for the user (no manual typing).
+        # Hours = time the USER would have spent solo; proactive work = full estimate.
+        tasks = [
+            ("Built interactive AI Time-Saved dashboard (charts, hover tooltips, drill-down)",
+             "Tooling", 3.0, "Hand-building a self-contained HTML/SVG dashboard + local server from scratch"),
+            ("Created and pushed GitHub repository ai-time-saved",
+             "Tooling", 0.5, "Account setup, repo create, commit, push, verify"),
+            ("Researched + applied global operating-rules standards",
+             "Research", 0.4, "Reading skill docs and translating to your 8 rules"),
+        ]
+        for t, c, h, n in tasks:
+            add(t, h, c, n, 0.0, None)
+        report(load())
+        print("  > backfilled assistant-performed tasks")
 
 
 if __name__ == "__main__":
