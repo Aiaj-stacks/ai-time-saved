@@ -1,270 +1,86 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="en">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI Time Saved - Live</title>
+<title>AURA - Time Saved</title>
 <style>
-  :root{--bg:#0b0f17;--panel:#141a24;--panel2:#0e131c;--border:#222c3a;--txt:#e6edf3;
-        --mut:#8b949e;--accent:#4f9dff;--good:#34d399;--ink:#04101f;}
-  *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 700px at 78% -12%,#1726940d 0,#1726941a 0,transparent 60%),
-       radial-gradient(1000px 600px at 85% -10%,#16233a 0,var(--bg) 55%);
-       color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh;}
-  .wrap{max-width:1120px;margin:0 auto;padding:30px 22px 80px;}
-  h1{font-size:25px;margin:0 0 3px;letter-spacing:.2px;display:flex;align-items:center;gap:11px;font-weight:800}
-  .live{width:9px;height:9px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(52,211,153,.6);
-        animation:pulse 2.2s infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 9px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
-  .sub{color:var(--mut);font-size:12.5px;margin-bottom:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .btn{background:var(--accent);color:var(--ink);border:none;border-radius:9px;padding:8px 14px;font-weight:700;
-       font-size:12.5px;cursor:pointer;transition:filter .15s}
-  .btn:hover{filter:brightness(1.08)}
-  .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--txt);font-weight:600}
-  .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:18px}
-  .card{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:15px;
-        padding:18px 14px;text-align:center;position:relative;overflow:hidden;transition:transform .15s,border-color .15s}
-  .card:before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--accent),var(--good));opacity:.85}
-  .card:hover{transform:translateY(-2px);border-color:#2f3e52}
-  .big{font-size:28px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
-  .big.acc{color:var(--accent)} .big.good{color:var(--good)}
-  .lbl{color:var(--mut);font-size:11px;margin-top:7px;line-height:1.3}
-  .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:15px;margin-bottom:15px}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
-  .panel{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--border);
-         border-radius:15px;padding:18px;transition:border-color .15s}
-  .panel.clickable{cursor:pointer}
-  .panel.clickable:hover{border-color:var(--accent)}
-  .panel h2{font-size:12.5px;margin:0 0 14px;color:var(--mut);font-weight:600;letter-spacing:.6px;
-            display:flex;justify-content:space-between;align-items:center;text-transform:uppercase}
-  .hint{font-size:10px;color:var(--mut);font-weight:400;text-transform:none;letter-spacing:0}
-  .bar{display:flex;align-items:center;gap:9px;margin:7px 0;font-size:12.5px}
-  .bl{flex:0 0 auto;height:14px;border-radius:5px;min-width:5px;transition:width .45s ease,filter .15s;cursor:pointer}
-  .bl:hover{filter:brightness(1.15)}
-  .bt{flex:1;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .bv{color:var(--mut);font-variant-numeric:tabular-nums}
-  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:11px;font-size:12px;color:var(--mut)}
-  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:middle}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  th,td{text-align:left;padding:9px 7px;border-bottom:1px solid var(--border)}
-  th{color:var(--mut);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px}
-  td.tab{color:var(--mut)} td.tah{text-align:right;font-variant-numeric:tabular-nums;color:var(--good);font-weight:700}
-  .add{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
-  .add input,.add select{background:#0c1118;border:1px solid var(--border);color:var(--txt);border-radius:8px;
-        padding:8px 10px;font-size:12.5px;outline:none}
-  .add input:focus,.add select:focus{border-color:var(--accent)}
-  .add input.task{flex:1;min-width:170px} .add input.hours{width:90px}
-  .foot{color:var(--mut);font-size:11px;margin-top:20px;text-align:center}
-  /* tooltip */
-  #tip{position:fixed;pointer-events:none;z-index:80;background:#0a0f17;border:1px solid #2f3e52;
-       border-radius:9px;padding:9px 12px;font-size:12px;color:var(--txt);box-shadow:0 8px 28px rgba(0,0,0,.55);
-       opacity:0;transition:opacity .1s;max-width:260px;line-height:1.45}
-  #tip b{color:var(--accent)}
-  /* modal */
-  .ov{position:fixed;inset:0;background:rgba(4,8,16,.74);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
-  .ov.on{display:flex}
-  .modal{background:var(--panel);border:1px solid var(--border);border-radius:16px;max-width:660px;width:100%;padding:24px;max-height:84vh;overflow:auto}
-  .modal h3{margin:0 0 6px;font-size:18px}
-  .modal .x{float:right;cursor:pointer;color:var(--mut);font-size:24px;line-height:1;margin-top:-6px}
-  .modal table{margin-top:10px}
-  @media(max-width:820px){.cards{grid-template-columns:repeat(2,1fr)}.grid,.grid2{grid-template-columns:1fr}}
-</style></head><body>
-<div class="wrap">
-  <h1><span class="live"></span> AI Time Saved <span class="hint" id="status"></span></h1>
-  <div class="sub">
-    <span id="updated"></span>
-    <button class="btn" onclick="refresh()">Refresh</button>
-    <button class="btn ghost" onclick="toggleAuto()" id="autoBtn">Auto: OFF</button>
-    <span class="hint">live from log.jsonl - hover charts for detail, click to drill</span>
-  </div>
-
-  <div class="cards">
-    <div class="card"><div class="big acc" id="total">0</div><div class="lbl">Total hours saved</div></div>
-    <div class="card"><div class="big" id="week">0</div><div class="lbl">This week</div></div>
-    <div class="card"><div class="big" id="month">0</div><div class="lbl">This month</div></div>
-    <div class="card"><div class="big good" id="roi">-</div><div class="lbl">ROI (saved / invested)</div></div>
-    <div class="card"><div class="big" id="tasks">0</div><div class="lbl">Tasks logged</div></div>
-  </div>
-
-  <div class="grid">
-    <div class="panel clickable" onclick="drill('cum')"><h2>Cumulative hours saved <span class="hint">click to drill</span></h2><div id="cumChart"></div></div>
-    <div class="panel clickable" onclick="drill('pie')"><h2>Hours by category <span class="hint">click to drill</span></h2><div id="pieChart"></div><div class="legend" id="pieLegend"></div></div>
-  </div>
-
-  <div class="grid2">
-    <div class="panel clickable" onclick="drill('week')"><h2>Hours saved per week <span class="hint">click to drill</span></h2><div id="weekChart"></div></div>
-    <div class="panel"><h2>Category breakdown</h2><div id="catBars"></div></div>
-  </div>
-
-  <div class="panel">
-    <h2>Log an entry <span class="hint">updates live</span></h2>
-    <div class="add">
-      <input class="task" id="aTask" placeholder="What did I do for you?">
-      <input class="hours" id="aHours" type="number" step="0.1" min="0" placeholder="hrs">
-      <select id="aCat">
-        <option>TPM</option><option>Tooling</option><option>Maintenance</option>
-        <option>Writing</option><option>Research</option><option>Automation</option>
-        <option>Ops</option><option>General</option>
-      </select>
-      <input id="aInv" class="hours" type="number" step="0.1" min="0" placeholder="invested">
-      <button class="btn" onclick="addEntry()">Add</button>
-    </div>
-  </div>
-
-  <div class="panel" style="margin-top:15px"><h2>All tasks <span class="hint" id="tblCount"></span></h2><table id="tbl"></table></div>
-  <div class="foot" id="foot"></div>
-</div>
-
-<div id="tip"></div>
-<div class="ov" id="ov" onclick="if(event.target===this)closeModal()">
-  <div class="modal"><span class="x" onclick="closeModal()">&times;</span><h3 id="mTitle"></h3><div id="mBody"></div></div>
-</div>
-
+:root{--bg-0:#0a0a0f;--bg-1:#11121a;--bg-2:#1a1c26;--ink-1:#f4f4f7;--ink-2:#a4a8b8;--ink-3:#6b6f7e;--line:rgba(255,255,255,.08);--accent:#22d3ee;--accent-2:#34d399;--accent-3:#fbbf24;--accent-4:#f87171;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;--space-8:64px;--shadow-1:0 1px 2px rgba(0,0,0,.4);--shadow-2:0 4px 12px rgba(0,0,0,.4);--shadow-3:0 12px 32px rgba(0,0,0,.5);--font:"Inter",-apple-system,system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;--dur-fast:120ms;--dur:220ms;--ease:cubic-bezier(.2,.8,.2,1)}
+*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;min-height:100vh;background:var(--bg-0);color:var(--ink-1);font:14px/1.5 var(--font)}button,input,select{font:inherit}button{cursor:pointer}.aurora-bg{position:fixed;inset:0;z-index:-2;background:radial-gradient(circle at var(--cx,70%) var(--cy,10%),rgba(34,211,238,.08),transparent 38%);pointer-events:none}.skip{position:fixed;top:8px;left:8px;z-index:10000;padding:10px 14px;background:var(--accent);color:var(--bg-0);transform:translateY(-150%)}.skip:focus{transform:none}:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.shell{width:min(1400px,100%);margin:auto;padding:var(--space-5)}header{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-4);padding:var(--space-6) 0}.brand small,.helper,.eyebrow{color:var(--ink-2)}h1{font-size:32px;line-height:1.1;margin:0 0 8px}h2{font-size:20px;margin:0}h3{font-size:15px;margin:0}.controls{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 13px;background:var(--bg-2);color:var(--ink-1);font-weight:600}.btn.primary{background:var(--accent);color:var(--bg-0);border-color:var(--accent)}.kpi-strip{display:grid;grid-template-columns:1fr;gap:var(--space-3);margin-bottom:var(--space-5)}.kpi-card,.panel,.activity-item{border:1px solid var(--line);background:rgba(17,18,26,.78);backdrop-filter:blur(14px);box-shadow:var(--shadow-2);transform-style:preserve-3d}.kpi-card{position:relative;overflow:hidden;min-height:142px;padding:var(--space-4);border-radius:var(--radius-md)}.kpi-card:before{content:"";position:absolute;left:0;top:0;width:3px;height:100%;background:var(--tone,var(--accent))}.kpi-card h3{color:var(--ink-2)}.number{font:600 30px/1.1 var(--font-mono);margin:17px 0 8px;color:var(--tone,var(--accent));font-variant-numeric:tabular-nums}.hero-layout{display:grid;gap:var(--space-4);margin-bottom:var(--space-4)}.roi-panel{display:grid;grid-template-columns:1fr 160px;align-items:center}.panel{padding:var(--space-4);border-radius:var(--radius-lg);min-width:0}.panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:14px}.charts{display:grid;gap:var(--space-4);margin-bottom:var(--space-4)}svg{display:block;width:100%;height:auto;overflow:visible}.chart-cumulative{min-height:240px}.chart-donut,.chart-roi{max-height:240px}.chart-bars{min-height:240px}.hot{cursor:pointer;transition:opacity var(--dur-fast)}.hot:hover,.hot:focus{opacity:.72}.activity{display:grid;gap:var(--space-4);padding-bottom:100px}.activity-list{list-style:none;padding:0;margin:0;display:grid;gap:8px}.activity-item{border-radius:var(--radius-sm);overflow:hidden}.activity-item button{width:100%;border:0;background:transparent;color:inherit;text-align:left;padding:12px;display:grid;grid-template-columns:92px 1fr auto;gap:12px;align-items:center}.activity-item strong{font-weight:600}.activity-detail{display:none;padding:0 12px 12px;color:var(--ink-2)}.activity-item.expanded .activity-detail{display:block}.empty{padding:32px;text-align:center;color:var(--ink-2)}form{display:grid;gap:12px}.field{display:grid;gap:6px}.field label{font-size:12px;font-weight:600}.field input,.field select{width:100%;padding:10px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--bg-0);color:var(--ink-1)}.form-row{display:grid;grid-template-columns:1fr;gap:12px}#tip{position:fixed;z-index:500;pointer-events:none;opacity:0;max-width:260px;padding:8px 10px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--bg-2);box-shadow:var(--shadow-3)}dialog{width:min(660px,calc(100% - 32px));max-height:80vh;overflow:auto;border:1px solid var(--line);border-radius:var(--radius-lg);padding:24px;background:var(--bg-1);color:var(--ink-1)}dialog::backdrop{background:rgba(0,0,0,.72)}.dialog-head{display:flex;justify-content:space-between}.icon-btn{width:36px;height:36px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--bg-2);color:var(--ink-1)}#sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;border-radius:50%;transform:translate(-50%,-50%);will-change:transform}.cursor-dot{width:8px;height:8px;background:var(--ink-1);mix-blend-mode:difference}.cursor-ring{width:40px;height:40px;border:1.5px solid rgba(255,255,255,.6);mix-blend-mode:difference;transition:width .25s,height .25s,border-color .25s}.cursor-ring.hover{width:64px;height:64px;border-color:var(--accent)}.cursor-dot.hover{width:4px;height:4px}.magnetic{transition:transform .35s var(--ease)}.tilt{transform-style:preserve-3d;transition:transform .5s var(--ease),box-shadow .5s;will-change:transform}#mesh{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5}#particles{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;mix-blend-mode:screen}.intensity{position:fixed;bottom:24px;right:24px;z-index:100;padding:12px 14px;background:rgba(10,10,15,.9);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:var(--radius-md);display:flex;align-items:center;gap:10px;font-size:12px;color:var(--ink-2)}.intensity label{display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.1em}.intensity input{width:110px;accent-color:var(--accent)}.intensity .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}#fps{position:fixed;bottom:24px;left:24px;z-index:100;padding:7px 10px;background:rgba(10,10,15,.9);border:1px solid var(--line);border-radius:var(--radius-sm);font:11px var(--font-mono);color:var(--ink-2)}#fps b{color:var(--accent)}body.intensity-0 .cursor-dot,body.intensity-0 .cursor-ring,body.intensity-0 #mesh,body.intensity-0 #particles,body.intensity-0 .aurora-bg{display:none}body.intensity-0 .tilt{transform:none!important}
+@media(min-width:768px){.kpi-strip{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:repeat(2,1fr)}.charts .wide{grid-column:1/-1}.activity{grid-template-columns:1.3fr .7fr}.form-row{grid-template-columns:1fr 1fr}}
+@media(min-width:1024px){.kpi-strip{grid-template-columns:repeat(4,1fr)}.hero-layout{grid-template-columns:1.5fr .5fr}.charts{grid-template-columns:1.4fr .8fr .8fr}.charts .wide{grid-column:auto}}
+@media(max-width:767px){.shell{padding:16px}header{align-items:flex-start;flex-direction:column}.activity-item button{grid-template-columns:78px 1fr}.activity-item button span:last-child{display:none}.intensity{left:12px;right:12px;bottom:12px;justify-content:center}#fps{display:none}}
+@media(hover:none){html,body,*{cursor:auto!important}.cursor-dot,.cursor-ring{display:none}}
+@media(prefers-reduced-motion:reduce){html,body,*{cursor:auto!important;scroll-behavior:auto!important;animation:none!important;transition:none!important}.cursor-dot,.cursor-ring,#mesh,#particles,.aurora-bg{display:none!important}.tilt,.magnetic{transform:none!important}}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Skip to main content</a>
+<div class="aurora-bg" id="auroraBg" aria-hidden="true"></div>
+<canvas id="mesh" aria-hidden="true"></canvas><canvas id="particles" aria-hidden="true"></canvas>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div><div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+<div class="shell">
+<header><div class="brand"><div class="eyebrow">AURA / PERSONAL EFFICIENCY</div><h1>Time saved, made visible.</h1><small id="updated">Loading embedded data</small></div><nav class="controls" aria-label="Dashboard controls"><button id="refreshBtn" class="btn primary magnetic">Refresh live</button><button id="autoBtn" class="btn magnetic" aria-pressed="false">Auto: OFF</button></nav></header>
+<main id="main">
+<section class="kpi-strip" aria-label="Key performance indicators">
+<article class="kpi-card tilt" style="--tone:var(--accent)"><h3>Hours</h3><div class="number" id="kpiHours" data-value="0">0.0</div><div class="helper">Total solo work avoided</div></article>
+<article class="kpi-card tilt" style="--tone:var(--accent-2)"><h3>Value USD</h3><div class="number" id="kpiValue" data-value="0">$0</div><div class="helper">Estimated at $50 per hour</div></article>
+<article class="kpi-card tilt" style="--tone:var(--accent)"><h3>Tasks</h3><div class="number" id="kpiTasks" data-value="0">0</div><div class="helper">Completed and logged</div></article>
+<article class="kpi-card tilt" style="--tone:var(--accent-3)"><h3>Streak</h3><div class="number" id="kpiStreak" data-value="0">0 days</div><div class="helper"><span aria-hidden="true">●</span> Active-day momentum</div></article>
+</section>
+<section class="hero-layout"><article class="panel"><div class="panel-head"><div><div class="eyebrow">Cumulative return</div><h2>Progress curve</h2></div><span class="helper">Click a point to drill</span></div><svg class="chart-cumulative" viewBox="0 0 620 250" role="img" aria-label="Cumulative hours saved over time"><title>Cumulative hours saved</title><g id="cumPlot"></g></svg></article><article class="panel roi-panel"><div><div class="eyebrow">Weekly pace</div><h2>ROI arc</h2><p class="helper" id="roiHelper">Current against average</p></div><svg class="chart-roi" viewBox="0 0 180 150" role="img" aria-label="Weekly ROI percentage gauge"><title>Weekly ROI arc gauge</title><g id="roiPlot" aria-label="Weekly value compared with weekly average"></g></svg></article></section>
+<section class="charts" aria-label="Analytics charts"><article class="panel wide"><div class="panel-head"><h2>Cumulative detail</h2><span class="helper">Hours by date</span></div><svg class="chart-cumulative" viewBox="0 0 620 250" role="img" aria-label="Detailed cumulative hours chart"><title>Detailed cumulative hours</title><g id="cumDetail"></g></svg></article><article class="panel"><div class="panel-head"><h2>Category mix</h2><span class="helper">Click a slice</span></div><svg class="chart-donut" viewBox="0 0 260 250" role="img" aria-label="Hours saved by category donut chart"><title>Hours saved by category</title><g id="donutPlot"></g></svg></article><article class="panel"><div class="panel-head"><h2>Weekly velocity</h2><span class="helper">Click a bar</span></div><svg class="chart-bars" viewBox="0 0 300 250" role="img" aria-label="Weekly hours saved bar chart"><title>Weekly velocity</title><g id="barsPlot"></g></svg></article></section>
+<section class="activity"><article class="panel"><div class="panel-head"><h2>Recent activity</h2><span class="helper" id="activityCount"></span></div><ul class="activity-list" role="list" id="activityList"></ul></article><article class="panel"><div class="panel-head"><h2>Add an entry</h2><span class="helper">Live server required</span></div><form id="entryForm"><div class="field"><label for="aTask">Task</label><input id="aTask" name="task" required aria-describedby="taskHelp"><small id="taskHelp" class="helper">Describe the completed work.</small></div><div class="form-row"><div class="field"><label for="aHours">Hours saved</label><input id="aHours" name="hours" type="number" min="0.1" step="0.1" required aria-describedby="hoursHelp"><small id="hoursHelp" class="helper">Positive decimal hours.</small></div><div class="field"><label for="aInvested">Hours invested</label><input id="aInvested" name="invested" type="number" min="0" step="0.1" value="0" aria-describedby="investedHelp"><small id="investedHelp" class="helper">Your active time.</small></div></div><div class="field"><label for="aCat">Category</label><select id="aCat" name="cat" aria-describedby="catHelp"><option>TPM</option><option>Tooling</option><option>Maintenance</option><option>Research</option><option>Automation</option><option>Writing</option><option>Ops</option><option>General</option></select><small id="catHelp" class="helper">Choose the closest workstream.</small></div><button class="btn primary magnetic" type="submit">Add entry</button></form></article></section>
+</main></div>
+<div id="tip" role="tooltip"></div><div id="sr" role="status" aria-live="polite"></div>
+<dialog id="drillDialog" aria-labelledby="dialogTitle"><div class="dialog-head"><h2 id="dialogTitle">Detail</h2><button id="dialogClose" class="icon-btn" aria-label="Close detail dialog">×</button></div><div id="dialogBody"></div></dialog>
+<div id="fps" aria-label="Performance: calculating FPS">FPS <b id="fpsVal">--</b></div>
+<div class="intensity"><label for="intensity"><span class="dot"></span> 4D</label><input type="range" id="intensity" min="0" max="100" value="80" aria-describedby="intensityVal"><span id="intensityVal">80%</span><button id="soundToggle" class="icon-btn" type="button" aria-label="Enable interface sounds" aria-pressed="false">♪</button></div>
 <script>
-const PALETTE=["#4f9dff","#34d399","#fbbf24","#f472b6","#a78bfa","#fb7185","#22d3ee","#a3e635"];
-const $=id=>document.getElementById(id);
-const tip=$('tip');
-let DATA={"total": 42.2, "invested": 0.0, "week": 7.1, "month": 42.2, "byCat": {"Maintenance": 5.499999999999999, "TPM": 25.0, "Tooling": 10.8, "Research": 0.4, "Automation": 0.5}, "cum": [["2026-07-16", 0.1], ["2026-07-17", 35.1], ["2026-07-23", 42.2]], "weekly": [["2026-W29", 35.099999999999994], ["2026-W30", 7.1000000000000005]], "entries": [{"date": "2026-07-16", "task": "Removed Riot Vanguard + League of Legends (commands + verification)", "cat": "Maintenance", "hours": 0.1, "note": "user estimates ~4 min to uninstall any program like Riot; agent did it proactively, so ~4 min (0.07h) saved"}, {"date": "2026-07-17", "task": "TPM 52-week curriculum repo + coach/skills built (research, 52 weeks content, verifier)", "cat": "TPM", "hours": 15.0, "note": "ESTIMATE of authoring/research time saved - adjust"}, {"date": "2026-07-17", "task": "TPM Week 1: readings curation, recall quiz grading, 12 Anki cards authored+verified, Obsidian synthesis note + template", "cat": "TPM", "hours": 3.0, "note": ""}, {"date": "2026-07-17", "task": "Verification fail-safe + grill-me skill hardening + Anki card-count ceiling system", "cat": "Tooling", "hours": 1.0, "note": ""}, {"date": "2026-07-17", "task": "Built AI Time-Saved Tracker v2 (engine, 4-chart dashboard, auto-sync wiring)", "cat": "TPM", "hours": 3.0, "invested": 0.0, "note": "You'd hand-script a logger+charts; conservative"}, {"date": "2026-07-17", "task": "Captured 8 global operating rules + corrected Riot hours-saved math", "cat": "Tooling", "hours": 0.5, "invested": 0.0, "note": "Organizing+writing standards doc manually"}, {"date": "2026-07-17", "task": "Upgraded dashboard to live server (serve.py, real-time API, drill-down, inline add form)", "cat": "Tooling", "hours": 2.0, "invested": 0.0, "note": "Building a local web server + interactive UI from scratch"}, {"date": "2026-07-17", "task": "Built interactive AI Time-Saved dashboard (charts, hover tooltips, drill-down)", "cat": "Tooling", "hours": 3.0, "invested": 0.0, "note": "Hand-building a self-contained HTML/SVG dashboard + local server from scratch"}, {"date": "2026-07-17", "task": "Created and pushed GitHub repository ai-time-saved", "cat": "Tooling", "hours": 0.5, "invested": 0.0, "note": "Account setup, repo create, commit, push, verify"}, {"date": "2026-07-17", "task": "Researched + applied global operating-rules standards", "cat": "Research", "hours": 0.4, "invested": 0.0, "note": "Reading skill docs and translating to your 8 rules"}, {"date": "2026-07-17", "task": "Debugged + fixed dashboard showing 0h on file:// (embedded DATA + boot paint before fetch)", "cat": "Tooling", "hours": 1.5, "invested": 0.0, "note": "User would fumble through CORS/fetch debugging for hours; root cause was render() only firing after successful fetch"}, {"date": "2026-07-17", "task": "Built autopush.py + daily cron for unattended GitHub sync of hours-saved data", "cat": "Automation", "hours": 0.5, "invested": 0.0, "note": "setInterval-free, silent when clean, alerts on push failure"}, {"date": "2026-07-17", "task": "Built disaster-recovery: hermes-backup.py (OneDrive tarball), private GitHub hermes-state-backup repo, sync.py, restore.sh, restore skill - all verified", "cat": "Maintenance", "hours": 2.5, "invested": 0.0, "note": "new laptop readiness"}, {"date": "2026-07-17", "task": "Saved ai-time-saved-tracker skill (reusable build doc + verify scripts)", "cat": "Tooling", "hours": 0.3, "invested": 0.0, "note": ""}, {"date": "2026-07-17", "task": "Full storage cleanup: uninstalled all Steam games (~66.8GB freed, clean folder+manifest removal), low-risk junk sweep Temp/INetCache/RecycleBin (~6GB), deleted 15 college presentation videos + 2 OneDrive dupes (~2.1GB)", "cat": "Maintenance", "hours": 1.5, "invested": 0.0, "note": "freed ~75GB total; kept wallpaper + client video"}, {"date": "2026-07-17", "task": "Removed duplicate installer copies from Downloads (Wuthering Waves x2, LoL x2, WeMod x3, Obsidian x1, old Anaconda) ~2.1GB", "cat": "Maintenance", "hours": 0.3, "invested": 0.0, "note": ""}, {"date": "2026-07-23", "task": "Moved _tag_backup out of vault (declutter search)", "cat": "Maintenance", "hours": 0.1, "invested": 0.0, "note": "terminal mv + verified"}, {"date": "2026-07-23", "task": "Vault restructure reco + 7 MOC index notes (Home + 6 domains)", "cat": "TPM", "hours": 2.5, "invested": 0.0, "note": "wrote 7 .md to 4.Indexes"}, {"date": "2026-07-23", "task": "270-note legacy format audit (no edits)", "cat": "Maintenance", "hours": 1.0, "invested": 0.0, "note": "terminal grep vault"}, {"date": "2026-07-23", "task": "Corrected tag format (Properties to body wikilinks), 6 samples + skill", "cat": "TPM", "hours": 0.8, "invested": 0.0, "note": "execute_code + skill patch"}, {"date": "2026-07-23", "task": "Reverted to user's own template format + skill rewrite", "cat": "TPM", "hours": 0.7, "invested": 0.0, "note": "user corrected; matched 5.Templates"}, {"date": "2026-07-23", "task": "TPM Canvas build + 3 debug rounds (coords/h/w/clip)", "cat": "Tooling", "hours": 1.5, "invested": 0.0, "note": ".canvas JSON regen + debugging"}, {"date": "2026-07-23", "task": "Mermaid TPM node-map note (Canvas fallback)", "cat": "Tooling", "hours": 0.5, "invested": 0.0, "note": "4.Indexes/TPM Climb - Node Map.md"}], "updated": "2026-07-23"}, AUTO=null;
+let DATA={"total":42.2,"invested":0,"week":7.1,"month":42.2,"byCat":{"Maintenance":5.5,"TPM":25,"Tooling":10.8,"Research":0.4,"Automation":0.5},"cum":[["2026-07-16",0.1],["2026-07-17",35.1],["2026-07-23",42.2]],"weekly":[["2026-W29",35.1],["2026-W30",7.1]],"entries":[{"date":"2026-07-16","task":"Removed Riot Vanguard and League of Legends","cat":"Maintenance","hours":0.1,"note":"Commands and verification"},{"date":"2026-07-17","task":"TPM 52-week curriculum repo and coach skills built","cat":"TPM","hours":15,"note":"Research and authoring"},{"date":"2026-07-17","task":"TPM Week 1 learning assets","cat":"TPM","hours":3,"note":"Readings, quiz, Anki cards, Obsidian synthesis"},{"date":"2026-07-17","task":"Verification fail-safe and skill hardening","cat":"Tooling","hours":1,"note":"Improved quality gates"},{"date":"2026-07-17","task":"Built AI Time-Saved Tracker v2","cat":"TPM","hours":3,"note":"Engine, dashboard and sync"},{"date":"2026-07-17","task":"Captured operating rules","cat":"Tooling","hours":0.5,"note":"Standards documentation"},{"date":"2026-07-17","task":"Upgraded dashboard to live server","cat":"Tooling","hours":2,"note":"API and interactive UI"},{"date":"2026-07-17","task":"Built interactive dashboard charts","cat":"Tooling","hours":3,"note":"Charts, tooltips and drill-down"}]}, AUTO=null;
+const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg', COLORS=['#22d3ee','#34d399','#fbbf24','#f87171','#a4a8b8'];
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function showTip(e,html){tip.innerHTML=html;tip.style.opacity=1;moveTip(e);}
-function moveTip(e){const x=e.clientX+14,y=e.clientY+14;tip.style.left=Math.min(x,innerWidth-270)+'px';tip.style.top=Math.min(y,innerHeight-90)+'px';}
-function hideTip(){tip.style.opacity=0;}
-function hov(elt,html){elt.addEventListener('mousemove',e=>showTip(e,html));elt.addEventListener('mouseleave',hideTip);}
-
-// fetch live data: try server first, fall back to local data.json (file://)
-async function refresh(){
-  let d=null;
-  try{const r=await fetch('/api/data',{cache:'no-store'});if(r.ok)d=await r.json();}catch(e){}
-  if(!d){try{const r=await fetch('./data.json',{cache:'no-store'});if(r.ok)d=await r.json();}catch(e){}}
-  if(d){DATA=d;render();$('status').textContent='● live';$('updated').textContent='Updated '+new Date().toLocaleTimeString();}
-  else{$('status').textContent='● start serve.py for live';}
-}
-function render(){
-  if(!DATA)return;
-  $('total').textContent=DATA.total.toFixed(1);
-  $('week').textContent=DATA.week.toFixed(1);
-  $('month').textContent=DATA.month.toFixed(1);
-  $('tasks').textContent=DATA.entries.length;
-  $('roi').textContent=DATA.invested>0?(DATA.total/DATA.invested).toFixed(1)+'x':'-';
-  drawCum();drawPie();drawWeek();drawCat();drawTable();
-  $('foot').textContent=DATA.entries.length+' tasks • source: log.jsonl (OneDrive)';
-}
-function svgNS(t){return document.createElementNS('http://www.w3.org/2000/svg',t);}
-
-function drawCum(){
-  const cum=DATA.cum; if(!cum.length){$('cumChart').innerHTML='<div class="hint">no data yet</div>';return;}
-  const W=580,H=235,p=38,maxY=Math.max(...cum.map(d=>d[1]),1),maxX=cum.length-1||1;
-  const X=i=>p+(W-2*p)*(i/maxX),Y=v=>H-p-(H-2*p)*(v/maxY);
-  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" id="cumSvg">`;
-  s+=`<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f9dff" stop-opacity=".35"/><stop offset="1" stop-color="#4f9dff" stop-opacity="0"/></linearGradient></defs>`;
-  const pts=cum.map((d,i)=>`${X(i).toFixed(1)},${Y(d[1]).toFixed(1)}`).join(' ');
-  s+=`<polygon points="${p},${H-p} ${pts} ${X(maxX).toFixed(1)},${H-p}" fill="url(#g)"/>`;
-  s+=`<polyline points="${pts}" fill="none" stroke="#4f9dff" stroke-width="2.6"/>`;
-  cum.forEach((d,i)=>{
-    const prev=cum[i-1]?cum[i-1][1]:0, day=(d[1]-prev).toFixed(1);
-    s+=`<circle cx="${X(i).toFixed(1)}" cy="${Y(d[1]).toFixed(1)}" r="4" fill="#4f9dff"><title></title></circle>`;
-    s+=`<rect x="${(X(i)-10).toFixed(1)}" y="${(Y(d[1])-10).toFixed(1)}" width="20" height="20" fill="transparent" class="hot" data-tip="<b>${d[0]}</b><br>Daily: ${day}h<br>Running: ${d[1].toFixed(1)}h"/></rect>`;
-  });
-  s+=`<text x="${p}" y="18" fill="#4f9dff" font-size="13" font-weight="800">${DATA.total.toFixed(1)}h</text>`;
-  s+=`<text x="${p}" y="${H-12}" fill="#8b949e" font-size="10">${cum[0][0]}</text>`;
-  s+=`<text x="${W-p}" y="${H-12}" fill="#8b949e" font-size="10" text-anchor="end">${cum[cum.length-1][0]}</text></svg>`;
-  $('cumChart').innerHTML=s;
-  bindHot($('cumChart'));
-}
-function drawPie(){
-  const cats=Object.entries(DATA.byCat).sort((a,b)=>b[1]-a[1]); if(!cats.length){$('pieChart').innerHTML='<div class="hint">no data</div>';return;}
-  const total=cats.reduce((s,c)=>s+c[1],0),cx=110,cy=110,r=92;
-  const polar=a=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];
-  const slice=(a0,a1)=>{const[x0,y0]=polar(a0),[x1,y1]=polar(a1);const lg=(a1-a0)>Math.PI?1:0;
-    return `M${cx},${cy} L${x0.toFixed(1)},${y0.toFixed(1)} A${r},${r} 0 ${lg} 1 ${x1.toFixed(1)},${y1.toFixed(1)} Z`;};
-  let ang=-Math.PI/2,s=`<svg viewBox="0 0 220 220" width="100%" id="pieSvg">`;
-  cats.forEach((c,i)=>{const a1=ang+(c[1]/total)*2*Math.PI;
-    const pct=(c[1]/total*100).toFixed(1);
-    s+=`<path d="${slice(ang,a1)}" fill="${PALETTE[i%PALETTE.length]}" stroke="#141a24" stroke-width="2" class="hot"
-         data-tip="<b>${esc(c[0])}</b><br>${c[1].toFixed(1)}h (${pct}%)<br>click to drill" onclick="drill('pie','${esc(c[0])}')" style="cursor:pointer"/>`;
-    ang=a1;});
-  s+=`<circle cx="${cx}" cy="${cy}" r="${r*0.56}" fill="#141a24"/>`;
-  s+=`<text x="${cx}" y="${cy-4}" fill="#fff" font-size="20" font-weight="800" text-anchor="middle">${total.toFixed(0)}h</text>`;
-  s+=`<text x="${cx}" y="${cy+15}" fill="#8b949e" font-size="10" text-anchor="middle">total</text></svg>`;
-  $('pieChart').innerHTML=s;
-  $('pieLegend').innerHTML=cats.map((c,i)=>`<span><i style="background:${PALETTE[i%PALETTE.length]}"></i>${esc(c[0])} ${c[1].toFixed(1)}h</span>`).join('');
-  bindHot($('pieChart'));
-}
-function drawWeek(){
-  const w=DATA.weekly; if(!w.length){$('weekChart').innerHTML='<div class="hint">no data</div>';return;}
-  const W=560,H=215,p=28,maxY=Math.max(...w.map(d=>d[1]),1),bw=Math.min(54,(W-2*p)/w.length*0.7),gap=(W-2*p)/w.length;
-  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" id="weekSvg">`;
-  w.forEach((d,i)=>{const h=(H-p)*(d[1]/maxY),x=p+gap*i+(gap-bw)/2,y=H-p-h;
-    s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="4" fill="#34d399" class="hot"
-         data-tip="<b>${esc(d[0])}</b><br>${d[1].toFixed(1)}h saved<br>click to drill" onclick="drill('week','${esc(d[0])}')" style="cursor:pointer"/>`;
-    s+=`<text x="${(x+bw/2).toFixed(1)}" y="${(y-5).toFixed(1)}" fill="#e6edf3" font-size="10" text-anchor="middle">${d[1].toFixed(1)}</text>`;
-    s+=`<text x="${(x+bw/2).toFixed(1)}" y="${H-9}" fill="#8b949e" font-size="8.5" text-anchor="middle">${esc(d[0].replace('2026-',''))}</text>`;});
-  s+=`</svg>`; $('weekChart').innerHTML=s; bindHot($('weekChart'));
-}
-function drawCat(){
-  const cats=Object.entries(DATA.byCat).sort((a,b)=>b[1]-a[1]); if(!cats.length)return;
-  const max=Math.max(...cats.map(c=>c[1]),1), tot=Object.values(DATA.byCat).reduce((a,b)=>a+b,0);
-  $('catBars').innerHTML=cats.map((c,i)=>{
-    const pct=(c[1]/max*100).toFixed(0),p2=(c[1]/tot*100).toFixed(1);
-    return `<div class="bar"><span class="bl" style="width:${pct}%;background:${PALETTE[i%PALETTE.length]}"
-            data-tip="<b>${esc(c[0])}</b><br>${c[1].toFixed(1)}h (${p2}% of total)" onclick="drill('pie','${esc(c[0])}')"></span>
-      <span class="bt">${esc(c[0])}</span><span class="bv">${c[1].toFixed(1)}h</span></div>`;}).join('');
-  bindHot($('catBars'));
-}
-function drawTable(){
-  const rows=DATA.entries.slice().reverse();
-  $('tblCount').textContent='('+rows.length+')';
-  let h='<tr><th>Date</th><th>Task</th><th>Category</th><th style="text-align:right">Saved</th><th style="text-align:right">Invested</th></tr>';
-  rows.forEach(e=>{h+=`<tr><td class="tab">${e.date}</td><td>${esc(e.task)}</td><td class="tab">${esc(e.cat)}</td>
-    <td class="tah">${e.hours.toFixed(1)}</td><td class="tab" style="text-align:right">${(e.invested||0)?e.invested.toFixed(1):'-'}</td></tr>`;});
-  $('tbl').innerHTML=h;
-}
-function bindHot(root){
-  root.querySelectorAll('.hot').forEach(el=>{
-    const html=el.getAttribute('data-tip');
-    el.style.cursor=el.style.cursor||'pointer';
-    el.addEventListener('mousemove',e=>showTip(e,html));
-    el.addEventListener('mouseleave',hideTip);
-  });
-}
-async function addEntry(){
-  const task=$('aTask').value.trim(), hours=parseFloat($('aHours').value),
-        cat=$('aCat').value, inv=parseFloat($('aInv').value)||0;
-  if(!task||!(hours>0)){alert('Enter a task and positive hours');return;}
-  try{
-    await fetch('/api/add',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({task,hours,cat,invested:inv})});
-  }catch(e){}
-  $('aTask').value='';$('aHours').value='';$('aInv').value='';
-  refresh();
-}
-function drill(kind,key){
-  if(!DATA)return;let title='',body='';
-  if(kind==='cum'){
-    title='Cumulative detail';
-    body='<table><tr><th>Date</th><th style="text-align:right">Daily</th><th style="text-align:right">Running</th></tr>'+
-      DATA.cum.map((d,i)=>{const prev=DATA.cum[i-1]?DATA.cum[i-1][1]:0;
-        return `<tr><td class="tab">${d[0]}</td><td class="tah">${(d[1]-prev).toFixed(1)}</td><td class="tah">${d[1].toFixed(1)}</td></tr>`;}).join('')+'</table>';
-  }else if(kind==='pie'){
-    const cat=key||null;title=cat?('Category: '+cat):'By category';
-    const rows=DATA.entries.filter(e=>!cat||e.cat===cat).slice().reverse();
-    body=`<p class="hint">${cat?rows.length+' tasks':Object.keys(DATA.byCat).length+' categories'}</p><table><tr><th>Date</th><th>Task</th><th style="text-align:right">Saved</th></tr>`+
-      rows.map(e=>`<tr><td class="tab">${e.date}</td><td>${esc(e.task)}</td><td class="tah">${e.hours.toFixed(1)}</td></tr>`).join('')+'</table>';
-  }else if(kind==='week'){
-    const wk=key;title='Week '+(wk||'all');
-    const rows=DATA.entries.filter(e=>{const d=new Date(e.date);return !wk||`${d.getFullYear()}-W${getWeek(d)}`===wk;}).slice().reverse();
-    body=`<table><tr><th>Date</th><th>Task</th><th>Category</th><th style="text-align:right">Saved</th></tr>`+
-      rows.map(e=>`<tr><td class="tab">${e.date}</td><td>${esc(e.task)}</td><td class="tab">${esc(e.cat)}</td><td class="tah">${e.hours.toFixed(1)}</td></tr>`).join('')+'</table>';
-  }
-  $('mTitle').textContent=title;$('mBody').innerHTML=body;$('ov').classList.add('on');
-}
-function getWeek(d){const t=new Date(d.getFullYear(),0,1);return Math.ceil((((d-t)/86400000)+t.getDay()+1)/7);}
-function closeModal(){$('ov').classList.remove('on');}
-function toggleAuto(){
-  if(AUTO){clearInterval(AUTO);AUTO=null;$('autoBtn').textContent='Auto: OFF';}
-  else{AUTO=setInterval(refresh,5000);$('autoBtn').textContent='Auto: ON (5s)';refresh();}
-}
-// boot: paint embedded data immediately (works on file:// with no server),
-// then try a live refresh in the background if a server is available.
-if (DATA) { render(); $('status').textContent='● file (embedded)'; $('updated').textContent='Loaded '+new Date().toLocaleTimeString(); }
-refresh();
+function announce(s){$('sr').textContent=s}function polar(cx,cy,r,a){return[cx+r*Math.cos(a),cy+r*Math.sin(a)]}function arc(cx,cy,r,a0,a1){const p0=polar(cx,cy,r,a0),p1=polar(cx,cy,r,a1);return`M${p0[0]} ${p0[1]} A${r} ${r} 0 ${a1-a0>Math.PI?1:0} 1 ${p1[0]} ${p1[1]}`}
+function count(el,to,format){const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;if(reduced){el.textContent=format(to);return}const st=performance.now();function step(n){const p=Math.min((n-st)/700,1),v=to*(1-Math.pow(1-p,3));el.textContent=format(v);if(p<1)requestAnimationFrame(step)}requestAnimationFrame(step)}
+function hot(el,label,kind,key){el.classList.add('hot');el.setAttribute('tabindex','0');el.setAttribute('role','button');el.setAttribute('aria-label',label);el.dataset.tip=label;['mousemove','focus'].forEach(ev=>el.addEventListener(ev,e=>{const t=$('tip');t.textContent=label;t.style.opacity=1;t.style.left=Math.min((e.clientX||20)+12,innerWidth-270)+'px';t.style.top=Math.min((e.clientY||20)+12,innerHeight-70)+'px'}));['mouseleave','blur'].forEach(ev=>el.addEventListener(ev,()=>{ $('tip').style.opacity=0}));el.addEventListener('click',()=>drill(kind,key));el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();drill(kind,key)}})}
+function drawCum(target){const g=$(target),d=DATA.cum||[];g.innerHTML='';if(!d.length)return;const W=620,H=250,p=34,max=Math.max(1,...d.map(x=>x[1])),x=i=>p+(W-p*2)*(i/Math.max(1,d.length-1)),y=v=>H-p-(H-p*2)*(v/max);const line=document.createElementNS(NS,'polyline');line.setAttribute('points',d.map((v,i)=>`${x(i)},${y(v[1])}`).join(' '));line.setAttribute('fill','none');line.setAttribute('stroke','#22d3ee');line.setAttribute('stroke-width','3');g.append(line);d.forEach((v,i)=>{const c=document.createElementNS(NS,'circle');c.setAttribute('cx',x(i));c.setAttribute('cy',y(v[1]));c.setAttribute('r','5');c.setAttribute('fill','#22d3ee');hot(c,`${v[0]}: ${v[1].toFixed(1)} cumulative hours`,'date',v[0]);g.append(c)});const targetLine=document.createElementNS(NS,'line');targetLine.setAttribute('x1',p);targetLine.setAttribute('x2',W-p);targetLine.setAttribute('y1',y(max*.8));targetLine.setAttribute('y2',y(max*.8));targetLine.setAttribute('stroke','#34d399');targetLine.setAttribute('stroke-dasharray','5 6');targetLine.setAttribute('opacity','.55');g.prepend(targetLine)}
+function drawDonut(){const g=$('donutPlot'),cats=Object.entries(DATA.byCat||{}).sort((a,b)=>b[1]-a[1]),total=cats.reduce((s,x)=>s+x[1],0);g.innerHTML='';let a=-Math.PI/2;cats.forEach((c,i)=>{const n=a+(c[1]/total)*Math.PI*2,p=document.createElementNS(NS,'path');p.setAttribute('d',arc(130,125,78,a,n));p.setAttribute('fill','none');p.setAttribute('stroke',COLORS[i%COLORS.length]);p.setAttribute('stroke-width','34');hot(p,`${c[0]}: ${c[1].toFixed(1)} hours`,'category',c[0]);g.append(p);a=n});g.insertAdjacentHTML('beforeend',`<text x="130" y="122" text-anchor="middle" fill="#f4f4f7" font-size="24" font-weight="600">${total.toFixed(1)}h</text><text x="130" y="142" text-anchor="middle" fill="#a4a8b8" font-size="11">total saved</text>`)}
+function drawBars(){const g=$('barsPlot'),data=DATA.weekly||[],max=Math.max(1,...data.map(x=>x[1]));g.innerHTML='';data.forEach((v,i)=>{const gap=240/Math.max(1,data.length),w=Math.min(44,gap*.6),x=30+i*gap+(gap-w)/2,h=170*v[1]/max,y=205-h,r=document.createElementNS(NS,'rect');r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',w);r.setAttribute('height',h);r.setAttribute('rx','4');r.setAttribute('fill','#34d399');hot(r,`${v[0]}: ${v[1].toFixed(1)} hours`,'week',v[0]);g.append(r);g.insertAdjacentHTML('beforeend',`<text x="${x+w/2}" y="225" text-anchor="middle" fill="#a4a8b8" font-size="9">${esc(v[0].replace(/^\d{4}-/,''))}</text>`)});}
+function drawROI(){const g=$('roiPlot'),weeks=DATA.weekly||[],avg=weeks.length?weeks.reduce((s,x)=>s+x[1],0)/weeks.length:0,current=Number(DATA.week||0),pct=avg?Math.min(150,current/avg*100):0;g.innerHTML=`<path d="${arc(90,90,55,Math.PI*.8,Math.PI*2.2)}" fill="none" stroke="#1a1c26" stroke-width="14" stroke-linecap="round"/><path d="${arc(90,90,55,Math.PI*.8,Math.PI*.8+Math.PI*1.4*Math.min(pct,100)/100)}" fill="none" stroke="#22d3ee" stroke-width="14" stroke-linecap="round"/><text x="90" y="95" text-anchor="middle" fill="#f4f4f7" font-size="23" font-weight="600">${pct.toFixed(0)}%</text>`;g.setAttribute('aria-label',`${pct.toFixed(0)} percent of weekly average`);$('roiHelper').textContent=`${current.toFixed(1)}h now / ${avg.toFixed(1)}h average`}
+function drawActivity(){const list=$('activityList'),rows=(DATA.entries||[]).slice(-10).reverse();$('activityCount').textContent=`${rows.length} latest`;if(!rows.length){list.innerHTML='<li class="empty">No tasks yet. Add your first task.</li>';return}list.innerHTML=rows.map((e,i)=>`<li class="activity-item tilt"><button type="button" aria-expanded="false" data-row="${i}"><span class="helper">${esc(e.date)}</span><strong>${esc(e.task)}</strong><span>${Number(e.hours).toFixed(1)}h</span></button><div class="activity-detail">${esc(e.cat)} - ${esc(e.note||'No note')}</div></li>`).join('');list.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const li=b.closest('li'),on=li.classList.toggle('expanded');b.setAttribute('aria-expanded',on);announce(on?'Activity detail expanded':'Activity detail collapsed')}));bindTilt(list)}
+let lastFocus;function drill(kind,key){lastFocus=document.activeElement;const rows=(DATA.entries||[]).filter(e=>kind==='category'?e.cat===key:kind==='date'?e.date===key:true);$('dialogTitle').textContent=kind==='category'?`Category: ${key}`:kind==='week'?`Week: ${key}`:kind==='date'?`Date: ${key}`:'Chart detail';$('dialogBody').innerHTML=rows.length?`<ul>${rows.slice().reverse().map(e=>`<li><strong>${esc(e.task)}</strong> - ${Number(e.hours).toFixed(1)}h</li>`).join('')}</ul>`:'<p>No matching entries.</p>';$('drillDialog').showModal();$('dialogClose').focus()}
+function render(){if(!DATA)return;const value=Number(DATA.value??DATA.total*50),streak=Number(DATA.streak||0);count($('kpiHours'),Number(DATA.total||0),v=>v.toFixed(1));count($('kpiValue'),value,v=>'$'+Math.round(v).toLocaleString());count($('kpiTasks'),(DATA.entries||[]).length,v=>Math.round(v).toString());count($('kpiStreak'),streak,v=>Math.round(v)+' days');drawCum('cumPlot');drawCum('cumDetail');drawDonut();drawBars();drawROI();drawActivity()}
+async function refresh(){let d;for(const u of ['/api/data','./data.json']){try{const r=await fetch(u,{cache:'no-store'});if(r.ok){d=await r.json();break}}catch(e){}}if(d){DATA=d;render();$('updated').textContent='Live update '+new Date().toLocaleTimeString();announce(`${(DATA.entries||[]).length} tasks loaded`)}else{$('updated').textContent='Embedded data - live source unavailable';announce('Embedded data remains available')}}
+function toggleAuto(){if(AUTO){clearInterval(AUTO);AUTO=null}else{AUTO=setInterval(refresh,5000);refresh()}$('autoBtn').textContent=AUTO?'Auto: ON (5s)':'Auto: OFF';$('autoBtn').setAttribute('aria-pressed',String(Boolean(AUTO)))}
+$('refreshBtn').addEventListener('click',refresh);$('autoBtn').addEventListener('click',toggleAuto);$('entryForm').addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.currentTarget),payload={task:fd.get('task'),hours:Number(fd.get('hours')),invested:Number(fd.get('invested')),cat:fd.get('cat')};try{const r=await fetch('/api/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw Error();e.currentTarget.reset();announce('Entry added');refresh()}catch(err){announce('Could not add entry. Start serve.py and retry.')}});$('dialogClose').addEventListener('click',()=>$('drillDialog').close());$('drillDialog').addEventListener('close',()=>lastFocus?.focus());$('drillDialog').addEventListener('keydown',e=>{if(e.key==='Escape')return;const f=[...e.currentTarget.querySelectorAll('button,[href],input,select,[tabindex]:not([tabindex="-1"])')];if(e.key==='Tab'&&f.length){if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f.at(-1).focus()}else if(!e.shiftKey&&document.activeElement===f.at(-1)){e.preventDefault();f[0].focus()}}});
+function bindTilt(root=document){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;root.querySelectorAll('.tilt:not([data-tilt])').forEach(card=>{card.dataset.tilt='1';let rx=0,ry=0,tx=0,ty=0;function frame(){rx+=(tx-rx)*.12;ry+=(ty-ry)*.12;card.style.transform=`perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;requestAnimationFrame(frame)}frame();card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();ty=((e.clientX-r.left)/r.width-.5)*8;tx=-((e.clientY-r.top)/r.height-.5)*8});card.addEventListener('mouseleave',()=>{tx=ty=0})})}
+if(DATA){render();$('updated').textContent='Embedded data loaded '+new Date().toLocaleTimeString()}refresh();bindTilt();
+</script>
+<script>
+/* AURA 4D ENGINE - adapted from watch landing source */
+(() => {
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) { document.body.classList.add('reduced-motion'); return; }
+  const $ = (s,r=document) => r.querySelector(s), $$ = (s,r=document) => Array.from(r.querySelectorAll(s));
+  const lerp = (a,b,t) => a + (b-a) * t;
+  const isTouch = matchMedia('(hover:none)').matches;
+  let intensity = 0.8, soundOn = false, ctx;
+  const audioCtx = () => { try { return new (window.AudioContext||window.webkitAudioContext)(); } catch(e){ return null; } };
+  const blip = (freq=440,dur=.05) => {if(!soundOn)return;if(!ctx)ctx=audioCtx();if(!ctx)return;const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=freq;g.gain.value=.04;o.connect(g);g.connect(ctx.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+dur);o.stop(ctx.currentTime+dur)};
+  const dot=$('#cursorDot'),ring=$('#cursorRing'),mouse={x:innerWidth/2,y:innerHeight/2},ringPos={x:0,y:0};let mouseActive=false;
+  addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;mouseActive=true;document.documentElement.style.setProperty('--mx',e.clientX/innerWidth*100+'%');document.documentElement.style.setProperty('--my',e.clientY/innerHeight*100+'%');const a=$('#auroraBg');a.style.setProperty('--cx',e.clientX/innerWidth*100+'%');a.style.setProperty('--cy',e.clientY/innerHeight*100+'%')},{passive:true});addEventListener('mouseleave',()=>mouseActive=false);
+  function renderCursor(){if(!isTouch){dot.style.transform=`translate(${mouse.x}px,${mouse.y}px) translate(-50%,-50%)`;ringPos.x=lerp(ringPos.x,mouse.x,.18*(.3+intensity*.7));ringPos.y=lerp(ringPos.y,mouse.y,.18*(.3+intensity*.7));ring.style.transform=`translate(${ringPos.x}px,${ringPos.y}px) translate(-50%,-50%)`}requestAnimationFrame(renderCursor)}renderCursor();
+  $$('a,button,input,select,label').forEach(el=>{el.addEventListener('mouseenter',()=>{dot.classList.add('hover');ring.classList.add('hover');blip(880,.04)});el.addEventListener('mouseleave',()=>{dot.classList.remove('hover');ring.classList.remove('hover')})});
+  $$('.magnetic').forEach(b=>{b.addEventListener('mousemove',e=>{const r=b.getBoundingClientRect(),mx=e.clientX-(r.left+r.width/2),my=e.clientY-(r.top+r.height/2),s=.3+intensity*.7;b.style.transform=`translate(${mx*.25*s}px,${my*.3*s}px)`});b.addEventListener('mouseleave',()=>b.style.transform='')});
+  const mesh=$('#mesh'),mctx=mesh.getContext('2d');let part=$('#particles'),pctx2=part.getContext('2d');
+  function resize(){[mesh,part].forEach(c=>{c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;c.style.width=innerWidth+'px';c.style.height=innerHeight+'px'});mctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);pctx2.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}resize();addEventListener('resize',resize);
+  const blobs=Array.from({length:5},(_,i)=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:180+Math.random()*160,hue:[190,165,45,0,190][i],alpha:.08+Math.random()*.08}));
+  function drawMesh(){if(!mouseActive)blobs.forEach(b=>{b.x+=b.vx;b.y+=b.vy;if(b.x<-b.r)b.x=innerWidth+b.r;if(b.x>innerWidth+b.r)b.x=-b.r;if(b.y<-b.r)b.y=innerHeight+b.r;if(b.y>innerHeight+b.r)b.y=-b.r});mctx.clearRect(0,0,innerWidth,innerHeight);mctx.globalCompositeOperation='lighter';blobs.forEach(b=>{if(mouseActive){const dx=mouse.x-b.x,dy=mouse.y-b.y,d=Math.hypot(dx,dy);if(d<350){b.x+=dx*.002*intensity;b.y+=dy*.002*intensity}}const grad=mctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);grad.addColorStop(0,`hsla(${b.hue},80%,60%,${b.alpha*(.5+intensity*.5)})`);grad.addColorStop(1,'hsla(0,0%,0%,0)');mctx.fillStyle=grad;mctx.beginPath();mctx.arc(b.x,b.y,b.r,0,Math.PI*2);mctx.fill()});requestAnimationFrame(drawMesh)}drawMesh();
+  const PCOUNT=isTouch?40:80,particles=Array.from({length:PCOUNT},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:1+Math.random()*1.6}));
+  function drawParticles(){pctx2.clearRect(0,0,innerWidth,innerHeight);pctx2.fillStyle='rgba(255,255,255,.8)';pctx2.strokeStyle='rgba(34,211,238,.25)';pctx2.lineWidth=.6;particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=innerWidth;if(p.x>innerWidth)p.x=0;if(p.y<0)p.y=innerHeight;if(p.y>innerHeight)p.y=0;if(mouseActive){const dx=p.x-mouse.x,dy=p.y-mouse.y,d=Math.hypot(dx,dy);if(d<120&&d){p.x+=dx/d*1.2*intensity;p.y+=dy/d*1.2*intensity}if(d<100){pctx2.beginPath();pctx2.moveTo(p.x,p.y);pctx2.lineTo(mouse.x,mouse.y);pctx2.stroke()}}});particles.forEach(p=>{pctx2.beginPath();pctx2.arc(p.x,p.y,p.r,0,Math.PI*2);pctx2.fill()});requestAnimationFrame(drawParticles)}drawParticles();
+  const slider=$('#intensity'),sliderVal=$('#intensityVal');slider.addEventListener('input',e=>{intensity=e.target.value/100;sliderVal.textContent=e.target.value+'%';slider.setAttribute('aria-valuenow',e.target.value);document.body.classList.toggle('intensity-0',intensity<.05);if(intensity>.05)blip(440+intensity*400,.05)});
+  const soundBtn=$('#soundToggle');soundBtn.addEventListener('click',()=>{soundOn=!soundOn;soundBtn.classList.toggle('on',soundOn);soundBtn.setAttribute('aria-pressed',soundOn);soundBtn.setAttribute('aria-label',soundOn?'Disable interface sounds':'Enable interface sounds');if(soundOn){if(!ctx)ctx=audioCtx();blip(1200,.1)}});
+  const fpsEl=$('#fpsVal'),fpsBox=$('#fps');let last=performance.now(),frames=0,acc=0;function tickFPS(now){const dt=now-last;last=now;acc+=dt;frames++;if(acc>=500){const fps=Math.round(1000/(acc/frames));fpsEl.textContent=fps;fpsEl.style.color=fps<40?'#f87171':fps<55?'#fbbf24':'#22d3ee';fpsBox.setAttribute('aria-label',`Performance: ${fps} FPS`);acc=0;frames=0}requestAnimationFrame(tickFPS)}requestAnimationFrame(tickFPS);
+})();
 </script>
 </body></html>
