@@ -68,3 +68,19 @@
 - Add `log.py bulk` to import entries from a CSV file (useful for migrations)
 - Add a daily-summary cron that emails/tosts a recap
 - Add an `--invested` flag to the `edit` command (it's already there but verify)
+
+- **2026-07-28T21:18:** v16 weekly goal CLI + dashboard widget (commit eb68632)
+- **2026-07-28T21:19:** v16.1 README documents goal/edit/delete subcommands (commit a9be1aa)
+- **2026-07-28T21:25:** v17 per-day breakdown panel (commit 76a6f7b)
+
+## Roadmap (priority-ordered, updated)
+1-6,8,9,10. ~~All earlier items DONE~~
+7. Refactor dashboard.html into separate JS files (deferred - risk without real-browser verification)
+
+## Other candidate tasks
+- Add a stats-overview CLI command that prints the current totals
+- Add `log.py bulk` to import entries from a CSV file
+- Add daily-summary cron that toasts a recap
+- Make the dashboard show "next achievement closest to unlock" prominently
+- Add export to Markdown summary (for sharing in PRs / notes)
+- Add an "Activity heatmap" widget (year-at-a-glance grid)
