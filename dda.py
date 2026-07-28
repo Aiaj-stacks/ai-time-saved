@@ -237,30 +237,41 @@ def gate(cmd: str) -> int:
 
 
 def append_log(line: str) -> int:
-    """Append a single line to log.jsonl with DDA guard."""
+    """Append a single line to log.jsonl with DDA guard.
+    Returns 0 on success, 1 on bad JSON, 2 on missing file,
+    3 on missing required field, 4 on duplicate, 5 on other error.
+    Never calls sys.exit - safe for programmatic use."""
     log = ROOT / "log.jsonl"
     if not log.exists():
-        die("log.jsonl missing; restore from snapshot first")
+        print("[DDA] FAIL: log.jsonl missing; restore from snapshot first", file=sys.stderr)
+        return 2
     # parse + validate the line
     try:
         obj = json.loads(line)
         for k in ("date", "task", "cat", "hours"):
             if k not in obj:
-                die(f"line missing required field: {k}")
+                print(f"[DDA] FAIL: line missing required field: {k}", file=sys.stderr)
+                return 3
     except Exception as e:
-        die(f"line is not valid JSON: {e}")
+        print(f"[DDA] FAIL: line is not valid JSON: {e}", file=sys.stderr)
+        return 1
     # guard: must be a NEW date OR a duplicate within an existing date
     cur = [json.loads(l) for l in log.read_text(encoding="utf-8").splitlines() if l.strip()]
     cur_dates = {e.get("date") for e in cur}
     if obj["date"] in cur_dates:
-        # allow if task is genuinely different (we'll de-dup by exact task string)
         if any(e.get("task") == obj["task"] and e.get("date") == obj["date"] for e in cur):
-            die(f"DUPLICATE: entry for {obj['date']} with same task already exists")
+            print(f"[DDA] FAIL: DUPLICATE: entry for {obj['date']} with same task already exists", file=sys.stderr)
+            return 4
     # append
-    with open(log, "a", encoding="utf-8") as f:
-        f.write(json.dumps(obj, ensure_ascii=False) + "\n")
+    try:
+        with open(log, "a", encoding="utf-8") as f:
+            f.write(json.dumps(obj, ensure_ascii=False) + "\n")
+    except Exception as e:
+        print(f"[DDA] FAIL: could not write: {e}", file=sys.stderr)
+        return 5
     print(f"[DDA] APPEND OK  {obj['date']}  {obj['task'][:50]}...")
     return 0
+
 
 
 def main():
