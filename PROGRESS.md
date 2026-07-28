@@ -33,3 +33,21 @@
 8. Refactor dashboard.html to extract the 7 inline scripts into separate .js files (huge win for maintenance)
 9. Add a basic test harness for log.py / dda.py / serve.py
 10. Add a `make` or just a `dev.sh` that brings up the whole stack with one command
+
+- **2026-07-28T20:46:** v15.3 GitHub Pages config (.nojekyll + index.html) (commit 9adc7a6)
+- **2026-07-28T20:48:** v15.4 README documents GitHub Pages (commit 2da99d6)
+- **2026-07-28T20:55:** v15.5 log.py edit + delete subcommands with --match safety (commit 2ec8cf6)
+- **2026-07-28T20:58:** v15.6 DDA G3 canonical-JSON comparison (no false positives) (commit 5218482)
+- **2026-07-28T20:59:** v15.7 re-serialize log.jsonl to compact format (commit a46d4fb)
+- **2026-07-28T20:59:** pushed 8 commits to main (origin: f4cb02f -> a46d4fb)
+
+## Roadmap (priority-ordered, updated)
+1-2. ~~README refresh, serve.py POST persistence~~ DONE
+3. ~~GitHub Pages config~~ DONE
+4. ~~log.py edit + delete~~ DONE
+5. Add CSV/JSON export endpoint
+6. Add weekly velocity target (log a goal, show progress)
+7. Refactor dashboard.html into separate JS files (huge win for maintenance)
+8. Add basic test harness for log.py / dda.py / serve.py
+9. Add `dev.sh` that brings up the stack with one command
+10. Per-day cumulative breakdown widget
