@@ -126,11 +126,21 @@ def verify() -> int:
         # G1: line count must not decrease
         if len(cur_lines) < len(snap_lines):
             fails.append(f"G1: log.jsonl line count DECREASED {len(snap_lines)} -> {len(cur_lines)}")
-        # G3: every snap line must still exist in current
-        snap_set = set(snap_lines)
-        missing = [l for l in snap_lines if l not in cur_lines]
+        # G3: every snap line must still exist in current - canonicalized JSON
+        # so that re-serialization (compact vs pretty, key order, whitespace)
+        # does NOT trigger a false positive. We only fail on real data loss.
+        def canon(line):
+            try: return json.dumps(json.loads(line), sort_keys=True, separators=(",", ":"))
+            except: return None
+        snap_canon = {c for c in (canon(l) for l in snap_lines) if c is not None}
+        cur_canon  = {c for c in (canon(l) for l in cur_lines)  if c is not None}
+        missing = snap_canon - cur_canon
         if missing:
-            fails.append(f"G3: {len(missing)} log lines from snapshot are MISSING in current file (data was clobbered!)")
+            fails.append(f"G3: {len(missing)} log entries from snapshot are MISSING in current file (data was clobbered!)")
+            # show the first missing entry for debugging
+            first = next(iter(missing))
+            try: print(f"[DDA] first missing: {json.loads(first)}", file=sys.stderr)
+            except: pass
     # G4: data.json total
     data = ROOT / "data.json"
     if data.exists():
