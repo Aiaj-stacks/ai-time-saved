@@ -1,14 +1,210 @@
 {
-  "total": 42.2,
+  "total": 51.27,
+  "value": 2563.35,
+  "streak": 5,
+  "rank": {
+    "name": "Platinum",
+    "glyph": 100,
+    "color": "●",
+    "min": 50,
+    "max": 100,
+    "current": 51.267,
+    "next": "Diamond",
+    "progress": 2.5
+  },
+  "next_rank": {
+    "name": "Diamond",
+    "glyph": 200,
+    "min": 100
+  },
+  "rank_pct": 2.5,
+  "achievements": [
+    {
+      "id": "first",
+      "name": "First Steps",
+      "desc": "Logged your first task",
+      "glyph": "◌",
+      "pct": 100
+    },
+    {
+      "id": "week",
+      "name": "Week Warrior",
+      "desc": "Logged something this week",
+      "glyph": "◷",
+      "pct": 100
+    },
+    {
+      "id": "ten",
+      "name": "Ten Strong",
+      "desc": "10 tasks logged",
+      "glyph": "⑩",
+      "pct": 100
+    },
+    {
+      "id": "q25",
+      "name": "Quarter Century",
+      "desc": "25 tasks logged",
+      "glyph": "㉕",
+      "pct": 100
+    },
+    {
+      "id": "h1",
+      "name": "One Hour Hero",
+      "desc": "1 hour saved",
+      "glyph": "❶",
+      "pct": 100
+    },
+    {
+      "id": "h10",
+      "name": "Ten Hours Tower",
+      "desc": "10 hours saved",
+      "glyph": "❿",
+      "pct": 100
+    },
+    {
+      "id": "h50h",
+      "name": "Fifty Hour Fortress",
+      "desc": "50 hours saved",
+      "glyph": "⓹⓪",
+      "pct": 100
+    },
+    {
+      "id": "cat3",
+      "name": "Tri-Master",
+      "desc": "3+ categories",
+      "glyph": "⧉",
+      "pct": 100
+    },
+    {
+      "id": "cat5",
+      "name": "Penta-Force",
+      "desc": "5+ categories",
+      "glyph": "⫶",
+      "pct": 100
+    },
+    {
+      "id": "hero",
+      "name": "Heroic Heft",
+      "desc": "Saved 5+ hours in a single task",
+      "glyph": "🜲",
+      "pct": 100
+    },
+    {
+      "id": "epic",
+      "name": "Epic Effort",
+      "desc": "Saved 10+ hours in a single task",
+      "glyph": "🜞",
+      "pct": 100
+    },
+    {
+      "id": "s3",
+      "name": "Triple Threat",
+      "desc": "3-day streak",
+      "glyph": "⌛",
+      "pct": 100
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "files",
+      "name": "Files Salvaged",
+      "desc": "29 tasks logged",
+      "glyph": "⎙",
+      "count": 29
+    },
+    {
+      "id": "disk",
+      "name": "Disk Reclaimed",
+      "desc": "~27.8 GB freed",
+      "glyph": "⊠",
+      "count": 27.8
+    },
+    {
+      "id": "tpm",
+      "name": "TPM Knowledge",
+      "desc": "~5.3 curriculum weeks",
+      "glyph": "✦",
+      "count": 5.3
+    },
+    {
+      "id": "auto",
+      "name": "Automation Forged",
+      "desc": "0.5h of systems",
+      "glyph": "⌘",
+      "count": 0.5
+    },
+    {
+      "id": "hours",
+      "name": "Hours Crystallized",
+      "desc": "51.3h saved",
+      "glyph": "◈",
+      "count": 51.267
+    },
+    {
+      "id": "domains",
+      "name": "Domains Touched",
+      "desc": "6 categories",
+      "glyph": "❖",
+      "count": 6
+    }
+  ],
+  "quests": [
+    {
+      "id": "q_week",
+      "name": "Weekly Grinder",
+      "desc": "Save 5h this week",
+      "glyph": "⏵",
+      "target": 5,
+      "current": 16.17,
+      "pct": 100
+    },
+    {
+      "id": "q_month",
+      "name": "Monthly Marathon",
+      "desc": "Save 20h in 30 days",
+      "glyph": "◐",
+      "target": 20,
+      "current": 51.27,
+      "pct": 100
+    },
+    {
+      "id": "q_10",
+      "name": "Task Tactician",
+      "desc": "Log 10 tasks",
+      "glyph": "✓",
+      "target": 10,
+      "current": 29,
+      "pct": 100
+    },
+    {
+      "id": "q_streak",
+      "name": "Streak Sentinel",
+      "desc": "Hit a 7-day streak",
+      "glyph": "✦",
+      "target": 7,
+      "current": 5,
+      "pct": 71.4
+    },
+    {
+      "id": "q_div",
+      "name": "Polymath",
+      "desc": "Log 4 categories",
+      "glyph": "❖",
+      "target": 4,
+      "current": 6,
+      "pct": 100
+    }
+  ],
   "invested": 0.0,
-  "week": 7.1,
-  "month": 42.2,
+  "week": 2.57,
+  "month": 51.27,
   "byCat": {
-    "Maintenance": 5.499999999999999,
-    "TPM": 25.0,
-    "Tooling": 10.8,
+    "Maintenance": 5.566999999999999,
+    "TPM": 26.5,
+    "Tooling": 17.3,
     "Research": 0.4,
-    "Automation": 0.5
+    "Automation": 0.5,
+    "Mixed": 1.0
   },
   "cum": [
     [
@@ -22,6 +218,22 @@
     [
       "2026-07-23",
       42.2
+    ],
+    [
+      "2026-07-24",
+      43.2
+    ],
+    [
+      "2026-07-25",
+      47.2
+    ],
+    [
+      "2026-07-26",
+      48.7
+    ],
+    [
+      "2026-07-27",
+      51.27
     ]
   ],
   "weekly": [
@@ -31,7 +243,11 @@
     ],
     [
       "2026-W30",
-      7.1000000000000005
+      13.600000000000001
+    ],
+    [
+      "2026-W31",
+      2.567
     ]
   ],
   "entries": [
@@ -214,7 +430,55 @@
       "hours": 0.5,
       "invested": 0.0,
       "note": "4.Indexes/TPM Climb - Node Map.md"
+    },
+    {
+      "date": "2026-07-24",
+      "task": "TPM curriculum + dashboard work block",
+      "cat": "Mixed",
+      "hours": 1.0,
+      "invested": 0,
+      "note": ""
+    },
+    {
+      "date": "2026-07-25",
+      "task": "dashboard v3 build",
+      "cat": "Tooling",
+      "hours": 4.0,
+      "invested": 0,
+      "note": "20/20 PASS, public on GitHub Aiaj-stacks/hermes-dashboard-v3"
+    },
+    {
+      "date": "2026-07-26",
+      "task": "Obsidian + TPM + bookkeeping",
+      "cat": "TPM",
+      "hours": 1.5,
+      "invested": 0,
+      "note": ""
+    },
+    {
+      "date": "2026-07-27",
+      "task": "AURA watch landing build + 4D upgrade",
+      "cat": "Tooling",
+      "hours": 2.0,
+      "invested": 0,
+      "note": ""
+    },
+    {
+      "date": "2026-07-27",
+      "task": "Riot uninstall (~37.5GB / 4 min solo baseline)",
+      "cat": "Maintenance",
+      "hours": 0.067,
+      "invested": 0,
+      "note": ""
+    },
+    {
+      "date": "2026-07-27",
+      "task": "dashboard v4 spawn",
+      "cat": "Tooling",
+      "hours": 0.5,
+      "invested": 0,
+      "note": ""
     }
   ],
-  "updated": "2026-07-23"
+  "updated": "2026-07-27"
 }
