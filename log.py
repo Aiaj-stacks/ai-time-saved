@@ -79,6 +79,87 @@ def add(task, hours, cat="General", note="", invested=0.0, d=None):
           + f" | {task}")
 
 
+
+def find_matches(entries, needle):
+    """Find entries whose date+task contains needle (case-insensitive)."""
+    needle = (needle or "").strip().lower()
+    if not needle:
+        return []
+    hits = []
+    for i, e in enumerate(entries):
+        hay = (str(e.get("date", "")) + ":" + str(e.get("task", ""))).lower()
+        if needle in hay:
+            hits.append((i, e))
+    return hits
+
+
+def edit(match, **fields):
+    """Edit one or more fields of entries matching `match` substring.
+    Returns the list of (index, before, after) for the changed entries.
+    Refuses to act on more than one match unless --yes is passed (we just
+    print all matches and require the caller to confirm; the CLI flag controls
+    whether this is treated as a confirmation).
+    """
+    entries = load()
+    hits = find_matches(entries, match)
+    if not hits:
+        print(f"  no entries match: {match!r}")
+        return []
+    allowed = {"task", "cat", "hours", "invested", "date", "note"}
+    updates = {k: v for k, v in fields.items() if k in allowed and v is not None}
+    if not updates:
+        print("  no fields to update. Allowed: " + ", ".join(sorted(allowed)))
+        return []
+    changed = []
+    for idx, before in hits:
+        after = dict(before)
+        for k, v in updates.items():
+            if k in ("hours", "invested"):
+                v = round(float(v), 2)
+            after[k] = v
+        entries[idx] = after
+        changed.append((idx, before, after))
+    # Write back: rebuild file
+    with open(LOG, "w", encoding="utf-8") as f:
+        for e in entries:
+            f.write(json.dumps(e, ensure_ascii=False) + "\n")
+    print(f"  edited {len(changed)} entr{'y' if len(changed)==1 else 'ies'}:")
+    for idx, before, after in changed:
+        diff_keys = [k for k in after if before.get(k) != after.get(k)]
+        diff = ", ".join(f"{k}: {before.get(k)!r} -> {after.get(k)!r}" for k in diff_keys)
+        print(f"    [{idx}] {before.get('date')} {before.get('task')[:50]!r}: {diff}")
+    return changed
+
+
+def delete(match, **filters):
+    """Delete entries matching `match` substring.
+    Optional --date filter restricts to entries on that date.
+    Returns the list of deleted entries.
+    """
+    entries = load()
+    hits = find_matches(entries, match)
+    if not hits:
+        print(f"  no entries match: {match!r}")
+        return []
+    if filters.get("date"):
+        hits = [(i, e) for i, e in hits if str(e.get("date")) == str(filters["date"])]
+        if not hits:
+            print(f"  no entries match {match!r} on date {filters['date']!r}")
+            return []
+    keep_idx = {i for i, _ in hits}
+    removed = [e for i, e in hits]
+    with open(LOG, "w", encoding="utf-8") as f:
+        for i, e in enumerate(entries):
+            if i in keep_idx:
+                continue
+            f.write(json.dumps(e, ensure_ascii=False) + "\n")
+    print(f"  deleted {len(removed)} entr{'y' if len(removed)==1 else 'ies'}:")
+    for e in removed:
+        print(f"    - {e.get('date')} {e.get('task')[:60]!r}")
+    return removed
+
+
+
 # ---------------------------------------------------------------------------
 # aggregation
 # ---------------------------------------------------------------------------
@@ -505,6 +586,22 @@ def main():
     a.add_argument("--date", default=None)
 
     sub.add_parser("list")
+
+    e = sub.add_parser("edit")
+    e.add_argument("--match", required=True, help="substring of 'date:task' to find the entry")
+    e.add_argument("--task", default=None)
+    e.add_argument("--hours", type=float, default=None)
+    e.add_argument("--cat", default=None)
+    e.add_argument("--note", default=None)
+    e.add_argument("--invested", type=float, default=None)
+    e.add_argument("--date", default=None, help="set new date (YYYY-MM-DD)")
+    e.add_argument("--yes", action="store_true", help="do not prompt for confirmation")
+
+    d = sub.add_parser("delete")
+    d.add_argument("--match", required=True)
+    d.add_argument("--date", default=None, help="only delete entries on this date")
+    d.add_argument("--yes", action="store_true")
+
     sub.add_parser("summary")
     sub.add_parser("report")
     sub.add_parser("sync")
@@ -522,6 +619,41 @@ def main():
             print(f"{e['date']} | {e['cat']:<12} | saved {e['hours']:>5.1f}h"
                   + (f" | inv {e.get('invested',0):.1f}h" if e.get('invested',0) else "")
                   + f" | {e['task']}")
+    elif args.cmd == "edit":
+        entries = load()
+        hits = find_matches(entries, args.match)
+        if not hits:
+            print(f"  no entries match: {args.match!r}")
+            return
+        if len(hits) > 1 and not args.yes:
+            print(f"  {len(hits)} entries match. Pass --yes to edit all, or narrow --match:")
+            for i, e in hits:
+                print(f"    [{i}] {e.get('date')} {e.get('task')[:60]!r}")
+            return
+        fields = {k: v for k, v in {
+            "task": args.task, "cat": args.cat, "hours": args.hours,
+            "invested": args.invested, "date": args.date, "note": args.note,
+        }.items() if v is not None}
+        edit(args.match, **fields)
+        report(load())
+    elif args.cmd == "delete":
+        entries = load()
+        hits = find_matches(entries, args.match)
+        if not hits:
+            print(f"  no entries match: {args.match!r}")
+            return
+        if args.date:
+            hits = [(i, e) for i, e in hits if str(e.get("date")) == str(args.date)]
+        if not hits:
+            print(f"  no entries match with date filter")
+            return
+        if len(hits) > 1 and not args.yes:
+            print(f"  {len(hits)} entries match. Pass --yes to delete all, or narrow:")
+            for i, e in hits:
+                print(f"    [{i}] {e.get('date')} {e.get('task')[:60]!r}")
+            return
+        delete(args.match, date=args.date)
+        report(load())
     elif args.cmd == "summary":
         entries = load()
         total, inv, wk, mo, by_cat = summarize(entries)
