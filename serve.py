@@ -15,10 +15,15 @@ Endpoints
   POST /api/log       -> alias for /api/add (the v14 dashboard form uses this path)
   POST /api/reembed   -> re-run python3 log.py report (re-derive data.json + re-embed DATA)
                         useful after manual edits to log.jsonl
+  GET  /export.csv    -> CSV download of log.jsonl (one row per entry)
+  GET  /export.json   -> pretty-printed JSON download of log.jsonl
+
 
 After every successful POST, the server runs `python3 log.py report` so
 the dashboard always reflects the freshest data without needing a restart.
 """
+import csv
+import io
 import http.server
 import json
 import os
@@ -116,8 +121,46 @@ class H(http.server.BaseHTTPRequestHandler):
                 self._send(200, open(LOG, encoding="utf-8").read(), "application/json")
             except FileNotFoundError:
                 self._send(404, "no log", "text/plain")
+        elif p == "/export.csv":
+            self._export_csv()
+        elif p == "/export.json":
+            self._export_json()
         else:
             self._send(404, "not found", "text/plain")
+
+    def _export_csv(self):
+        try:
+            entries = load()
+            buf = io.StringIO()
+            if entries:
+                fieldnames = sorted({k for e in entries for k in e.keys()})
+                w = csv.DictWriter(buf, fieldnames=fieldnames, extrasaction="ignore")
+                w.writeheader()
+                for e in entries:
+                    w.writerow(e)
+            self.send_response(200)
+            self.send_header("Content-Type", "text/csv; charset=utf-8")
+            self.send_header("Content-Disposition", 'attachment; filename="ai-time-saved.csv"')
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(buf.getvalue().encode("utf-8"))
+        except Exception as e:
+            self._send(500, {"error": str(e)})
+
+    def _export_json(self):
+        try:
+            entries = load()
+            payload = {"exported_at": date.today().isoformat(), "count": len(entries), "entries": entries}
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Disposition", 'attachment; filename="ai-time-saved.json"')
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"))
+        except Exception as e:
+            self._send(500, {"error": str(e)})
 
     def _do_add(self):
         try:
