@@ -18,3 +18,18 @@
 ## Iteration log
 - **v6-v14 (just landed on main, commit f4cb02f):** full visual + feature upgrade
 - **2026-07-28T20:32:** PROGRESS.md created. Autonomous mode engaged. Next: fix README.
+
+- **2026-07-28T20:34:** v15 README refresh + PROGRESS.md created (commit 316a436)
+- **2026-07-28T20:40:** v15.1 serve.py re-embeds after POST + port configurable + /api/log alias (commit e10ffc8)
+
+## Roadmap (priority-ordered, updated)
+1. ~~Fix README.md to reflect v14 features~~ DONE (v15)
+2. ~~Add serve.py POST that actually persists + re-embeds~~ DONE (v15.1)
+3. Add GitHub Pages config (.nojekyll + index.html alias) so dashboard is browseable on web
+4. Add `log.py edit` and `log.py delete` subcommands (currently append-only, but allow corrections)
+5. Add a "weekly velocity target" - log a goal and show progress in the dashboard
+6. Add CSV/JSON export endpoint for the log
+7. Add per-day cumulative breakdown widget (the chart only shows totals)
+8. Refactor dashboard.html to extract the 7 inline scripts into separate .js files (huge win for maintenance)
+9. Add a basic test harness for log.py / dda.py / serve.py
+10. Add a `make` or just a `dev.sh` that brings up the whole stack with one command
