@@ -35,6 +35,7 @@ python3 serve.py             # then open http://localhost:8765
 | `dda.py` | Data loss prevention: snapshot before any write, verify after |
 | `index.html` | GitHub Pages entry point (copy of dashboard.html) |
 | `.nojekyll` | Tells GitHub Pages to serve HTML without Jekyll processing |
+| `dev.sh` | One-command stack startup (frees port, opens browser, runs serve.py) |
 | `autopush.py` | Unattended GitHub sync (cron-safe) |
 | `hermes-backup.py` | Daily Hermes state backup to OneDrive |
 | `.dda/snapshots/` | Local snapshots (gitignored, never committed) |
