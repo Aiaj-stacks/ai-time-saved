@@ -1,7 +1,7 @@
 {
   "total": 51.27,
   "value": 2563.35,
-  "streak": 5,
+  "streak": 0,
   "rank": {
     "name": "Platinum",
     "glyph": 100,
@@ -95,13 +95,6 @@
       "desc": "Saved 10+ hours in a single task",
       "glyph": "🜞",
       "pct": 100
-    },
-    {
-      "id": "s3",
-      "name": "Triple Threat",
-      "desc": "3-day streak",
-      "glyph": "⌛",
-      "pct": 100
     }
   ],
   "artifacts": [
@@ -182,8 +175,8 @@
       "desc": "Hit a 7-day streak",
       "glyph": "✦",
       "target": 7,
-      "current": 5,
-      "pct": 71.4
+      "current": 0,
+      "pct": 0
     },
     {
       "id": "q_div",
@@ -480,5 +473,5 @@
       "note": ""
     }
   ],
-  "updated": "2026-07-27"
+  "updated": "2026-07-28"
 }
