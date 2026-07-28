@@ -633,6 +633,25 @@ body.focus-mode .shell > *.focus-keep{opacity:1;transform:scale(1.01);box-shadow
 
 
 
+/* ===== AURA v17 - PER-DAY BREAKDOWN ===== */
+.perday{position:relative;padding:var(--space-5);background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-panel);min-width:0;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.perday::before,.perday::after{content:"";position:absolute;width:14px;height:14px;pointer-events:none;transition:border-color var(--dur-fast) var(--ease)}
+.perday::before{top:0;left:0;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan)}
+.perday::after{bottom:0;right:0;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan)}
+.perday-day{padding:var(--space-3);margin-bottom:var(--space-3);background:rgba(0,0,0,.2);border-left:2px solid var(--cyan-dark);transition:border-color .2s}
+.perday-day:hover{border-color:var(--cyan)}
+.perday-day:last-child{margin-bottom:0}
+.perday-date{font:700 11px var(--font-mono);color:var(--cyan-bright);letter-spacing:.15em;text-transform:uppercase;margin-bottom:var(--space-2);display:flex;justify-content:space-between;align-items:center}
+.perday-date .total{color:var(--gold-bright);font-size:13px;text-shadow:0 0 8px rgba(240,193,75,.4)}
+.perday-entries{list-style:none;padding:0;margin:0;font-size:11px;color:var(--ink-2)}
+.perday-entry{padding:4px 0;border-bottom:1px dashed var(--line-soft);display:flex;align-items:center;gap:8px;line-height:1.4}
+.perday-entry:last-child{border-bottom:0}
+.perday-entry .cat{padding:2px 6px;background:rgba(90,214,255,.08);border:1px solid var(--cyan-dark);border-radius:2px;font-size:9px;color:var(--cyan-bright);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;min-width:62px;text-align:center}
+.perday-entry .task{flex:1;font-family:var(--font-mono);color:var(--ink-1)}
+.perday-entry .hours{font:700 10px var(--font-mono);color:var(--cyan-bright);font-variant-numeric:tabular-nums;flex-shrink:0}
+
+
+
 /* ===== AURA v16 - WEEKLY GOAL WIDGET ===== */
 .goal-card{position:relative;padding:var(--space-5);background:linear-gradient(180deg,rgba(20,28,50,.55),rgba(10,14,28,.55));border:1px solid var(--cyan-dark);box-shadow:var(--shadow-panel);backdrop-filter:blur(6px);display:flex;flex-direction:column;gap:var(--space-3);overflow:hidden}
 .goal-card::before,.goal-card::after{content:"";position:absolute;width:12px;height:12px;pointer-events:none}
@@ -1146,6 +1165,18 @@ body.god .hex-grid-bg{opacity:.15}
     <ul class="activity-list" role="list" id="activityList"></ul>
   </article>
 </section>
+<section class="perday-section" aria-label="Per-day breakdown" style="margin-top:var(--space-6)">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-5)">
+    <article class="perday hex-stream ascii-noise">
+      <div class="panel-head" style="margin-bottom:var(--space-4)">
+        <h2>Per-Day Breakdown <span class="num">chronicle</span></h2>
+        <span class="helper">// most recent 7 days</span>
+      </div>
+      <div id="perDayBody">// loading</div>
+    </article>
+  </div>
+</section>
+
 
 <section class="gamification-row" aria-label="Side quests and greatest feats">
   <article class="panel" hex-stream ascii-noise">
@@ -1868,7 +1899,32 @@ if(DATA){window._v7_soundOn = false; render();v7_afterRender();$('updated').text
     window.v9_toast && window.v9_toast('Pinned: ' + label, null, val + ' • click X to remove');
   });
   /* ON LOAD: render all v10 visuals (call after v9 game-feel finishes) */
-  function renderGoal(){
+  function renderPerDay(){
+  const body = $("perDayBody");
+  if (!body) return;
+  const d = data();
+  const entries = d.entries || [];
+  // group by date
+  const byDate = {};
+  for (const e of entries){
+    if (!byDate[e.date]) byDate[e.date] = [];
+    byDate[e.date].push(e);
+  }
+  // last 7 dates with entries
+  const dates = Object.keys(byDate).sort().reverse().slice(0, 7);
+  if (!dates.length){
+    body.innerHTML = '<div class="perday-date">no entries yet</div>';
+    return;
+  }
+  body.innerHTML = dates.map(date => {
+    const dayEntries = byDate[date];
+    const total = dayEntries.reduce((s,e) => s + (e.hours || 0), 0);
+    const rows = dayEntries.map(e => '<li class="perday-entry"><span class="cat">' + (e.cat || 'X') + '</span><span class="task">' + (e.task || '').slice(0,50) + '</span><span class="hours">' + (e.hours || 0).toFixed(1) + 'h</span></li>').join('');
+    return '<div class="perday-day"><div class="perday-date"><span>' + date + '</span><span class="total">' + total.toFixed(1) + 'h</span></div><ul class="perday-entries">' + rows + '</ul></div>';
+  }).join('');
+}
+
+function renderGoal(){
   const body = $("goalBody");
   if (!body) return;
   const d = data();
