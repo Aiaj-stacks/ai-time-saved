@@ -15,6 +15,10 @@ Commands
              log.py add "task" --hours 2.5 --cat TPM --invested 0.5
              (--invested = time YOU spent with the agent on it, for ROI)
   list     Show all logged entries
+  goal     Set, clear, or show the weekly velocity target (hours/week)
+             log.py goal set 5.0           # aim for 5h/week
+             log.py goal show              # show current goal + progress
+             log.py goal clear             # remove the goal
   summary  Print totals (all-time / week / month / by category / ROI)
   report   Regenerate dashboard.html from the log
   sync     Print the OneDrive path + regen dashboard (manual "are we current?")
@@ -158,6 +162,41 @@ def delete(match, **filters):
         print(f"    - {e.get('date')} {e.get('task')[:60]!r}")
     return removed
 
+
+
+
+def goal(action, hours=None):
+    """Manage the weekly velocity target. Stored in data.json."""
+    data_file = os.path.join(BASE, "data.json")
+    d = {}
+    if os.path.exists(data_file):
+        try: d = json.loads(open(data_file, encoding="utf-8").read())
+        except Exception: d = {}
+    cur = d.get("goal", {})
+    if action == "show":
+        if cur:
+            wk = d.get("week", 0)
+            tgt = cur.get("hours", 0)
+            pct = (wk / tgt * 100) if tgt else 0
+            status = "on track" if pct >= 100 else "behind" if pct < 60 else "in range"
+            print(f"  weekly goal: {tgt}h   this week: {wk:.1f}h   {pct:.0f}%   ({status})")
+        else:
+            print("  no weekly goal set. Use: log.py goal set <hours>")
+        return
+    if action == "clear":
+        d.pop("goal", None)
+        open(data_file, "w", encoding="utf-8").write(json.dumps(d, ensure_ascii=False, indent=2))
+        print("  weekly goal cleared")
+        return
+    if action == "set":
+        if hours is None:
+            print("  usage: log.py goal set <hours>")
+            return
+        d["goal"] = {"hours": float(hours), "set_at": date.today().isoformat()}
+        open(data_file, "w", encoding="utf-8").write(json.dumps(d, ensure_ascii=False, indent=2))
+        print(f"  weekly goal set to {hours}h")
+        return
+    print(f"  unknown goal action: {action}. Use: set|show|clear")
 
 
 # ---------------------------------------------------------------------------
@@ -541,6 +580,16 @@ def report(entries):
     achievements = compute_achievements(entries, by_cat, total)
     artifacts = compute_artifacts(entries, total, by_cat)
     quests = compute_quests(entries, by_cat, total, streak)
+    # preserve user-managed fields (goal, etc.) from previous data.json
+    preserved = {}
+    if os.path.exists(DATAJSON):
+        try: preserved = json.loads(open(DATAJSON, encoding="utf-8").read())
+        except Exception: pass
+    preserved_user_fields = {k: v for k, v in preserved.items() if k not in {
+        "total","value","streak","rank","next_rank","rank_pct","achievements",
+        "artifacts","quests","invested","week","month","byCat","cum","weekly",
+        "entries","updated"
+    }}
     data = {"total": round(total, 2), "value": round(total * 50, 2),
             "streak": streak, "rank": rank, "next_rank": next_rank,
             "rank_pct": rank_pct, "achievements": achievements,
@@ -548,7 +597,8 @@ def report(entries):
             "invested": round(inv, 2), "week": round(wk, 2),
             "month": round(mo, 2), "byCat": by_cat,
             "cum": cum, "weekly": wkdata, "entries": entries,
-            "updated": date.today().isoformat()}
+            "updated": date.today().isoformat(),
+            **preserved_user_fields}
     with open(DATAJSON, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     # refresh embedded DATA so file:// view shows current data with no server.
@@ -603,6 +653,10 @@ def main():
     d.add_argument("--yes", action="store_true")
 
     sub.add_parser("summary")
+
+    g = sub.add_parser("goal")
+    g.add_argument("goal_action", choices=["set", "show", "clear"])
+    g.add_argument("hours", nargs="?", type=float, default=None)
     sub.add_parser("report")
     sub.add_parser("sync")
     sub.add_parser("backfill")
@@ -654,6 +708,8 @@ def main():
             return
         delete(args.match, date=args.date)
         report(load())
+    elif args.cmd == "goal":
+        goal(args.goal_action, args.hours)
     elif args.cmd == "summary":
         entries = load()
         total, inv, wk, mo, by_cat = summarize(entries)
