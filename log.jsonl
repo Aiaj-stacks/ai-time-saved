@@ -21,3 +21,9 @@
 {"date": "2026-07-23", "task": "Reverted to user's own template format + skill rewrite", "cat": "TPM", "hours": 0.7, "invested": 0.0, "note": "user corrected; matched 5.Templates"}
 {"date": "2026-07-23", "task": "TPM Canvas build + 3 debug rounds (coords/h/w/clip)", "cat": "Tooling", "hours": 1.5, "invested": 0.0, "note": ".canvas JSON regen + debugging"}
 {"date": "2026-07-23", "task": "Mermaid TPM node-map note (Canvas fallback)", "cat": "Tooling", "hours": 0.5, "invested": 0.0, "note": "4.Indexes/TPM Climb - Node Map.md"}
+{"date": "2026-07-24", "task": "TPM curriculum + dashboard work block", "cat": "Mixed", "hours": 1.0, "invested": 0, "note": ""}
+{"date": "2026-07-25", "task": "dashboard v3 build", "cat": "Tooling", "hours": 4.0, "invested": 0, "note": "20/20 PASS, public on GitHub Aiaj-stacks/hermes-dashboard-v3"}
+{"date": "2026-07-26", "task": "Obsidian + TPM + bookkeeping", "cat": "TPM", "hours": 1.5, "invested": 0, "note": ""}
+{"date": "2026-07-27", "task": "AURA watch landing build + 4D upgrade", "cat": "Tooling", "hours": 2.0, "invested": 0, "note": ""}
+{"date": "2026-07-27", "task": "Riot uninstall (~37.5GB / 4 min solo baseline)", "cat": "Maintenance", "hours": 0.067, "invested": 0, "note": ""}
+{"date": "2026-07-27", "task": "dashboard v4 spawn", "cat": "Tooling", "hours": 0.5, "invested": 0, "note": ""}

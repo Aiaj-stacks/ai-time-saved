@@ -117,6 +117,180 @@ def weekly(entries):
     return [list(x) for x in sorted(wk.items())]
 
 
+def entry_streak(entries):
+    """Return consecutive calendar days with entries, ending today."""
+    days = {e["date"] for e in entries}
+    cursor = date.today()
+    count = 0
+    while cursor.isoformat() in days:
+        count += 1
+        cursor -= timedelta(days=1)
+    return count
+
+
+# ---------------------------------------------------------------------------
+# Gamification — rank ladder, achievements, artifacts, quests
+# ---------------------------------------------------------------------------
+# Ten tiers. The mid-band hours for "current" progress bar. Inspired by
+# chess/Go ranks so the user sees a familiar ladder climb.
+RANK_LADDER = [
+    # (tier_name, min_hours, max_hours, glyph, color_token)
+    ("Novice",        0,    5,  "○",  "ink-3"),
+    ("Bronze",        5,   15,  "◔",  "amber"),
+    ("Silver",       15,   30,  "◑",  "ink-2"),
+    ("Gold",         30,   50,  "◕",  "amber"),
+    ("Platinum",     50,  100,  "●",  "cyan"),
+    ("Diamond",     100,  200,  "◆",  "cyan"),
+    ("Master",      200,  400,  "★",  "cyan"),
+    ("Grandmaster", 400,  800,  "✦",  "cyan"),
+    ("Sage",        800, 1500,  "❖",  "green"),
+    ("AI Grandmaster", 1500, 10**9, "♛", "green"),
+]
+
+
+def rank_for(total_hours: float):
+    """Return (current_tier_dict, next_tier_dict_or_None, progress_pct)."""
+    cur = RANK_LADDER[0]
+    nxt = RANK_LADDER[1] if len(RANK_LADDER) > 1 else None
+    for i, t in enumerate(RANK_LADDER):
+        if total_hours >= t[1]:
+            cur = t
+            nxt = RANK_LADDER[i+1] if i+1 < len(RANK_LADDER) else None
+    if nxt is None:
+        return {
+            "name": cur[0], "glyph": cur[2], "color": cur[3],
+            "min": cur[1], "max": cur[2] if False else 10**9,
+            "current": total_hours, "next": None, "progress": 100.0,
+        }, None, 100.0
+    span = nxt[1] - cur[1]
+    into = max(0, total_hours - cur[1])
+    pct = min(100.0, (into / span) * 100) if span > 0 else 100.0
+    return {
+        "name": cur[0], "glyph": cur[2], "color": cur[3],
+        "min": cur[1], "max": nxt[1],
+        "current": total_hours, "next": nxt[0], "progress": round(pct, 1),
+    }, {
+        "name": nxt[0], "glyph": nxt[2], "min": nxt[1],
+    }, round(pct, 1)
+
+
+def compute_achievements(entries, by_cat, total):
+    """Return list of unlocked achievements. Each has id, name, desc, glyph, pct."""
+    days = {e["date"] for e in entries}
+    cats = set(by_cat.keys())
+    max_single = max((e.get("hours", 0) for e in entries), default=0)
+    total_tasks = len(entries)
+    out = []
+    # 1: First Steps
+    if total_tasks >= 1:
+        out.append({"id":"first","name":"First Steps","desc":"Logged your first task","glyph":"◌","pct":100})
+    # 2: Week Warrior
+    if any(e["date"] >= (date.today() - timedelta(days=7)).isoformat() for e in entries):
+        out.append({"id":"week","name":"Week Warrior","desc":"Logged something this week","glyph":"◷","pct":100})
+    # 3: Ten Strong
+    if total_tasks >= 10:
+        out.append({"id":"ten","name":"Ten Strong","desc":"10 tasks logged","glyph":"⑩","pct":100})
+    # 4: Quarter Century
+    if total_tasks >= 25:
+        out.append({"id":"q25","name":"Quarter Century","desc":"25 tasks logged","glyph":"㉕","pct":100})
+    # 5: Half Hundred
+    if total_tasks >= 50:
+        out.append({"id":"h50","name":"Half Hundred","desc":"50 tasks logged","glyph":"㊿","pct":100})
+    # 6: Hundred Club
+    if total_tasks >= 100:
+        out.append({"id":"h100","name":"Hundred Club","desc":"100 tasks logged","glyph":"✪","pct":100})
+    # Hours-based
+    if total >= 1: out.append({"id":"h1","name":"One Hour Hero","desc":"1 hour saved","glyph":"❶","pct":100})
+    if total >= 10: out.append({"id":"h10","name":"Ten Hours Tower","desc":"10 hours saved","glyph":"❿","pct":100})
+    if total >= 50: out.append({"id":"h50h","name":"Fifty Hour Fortress","desc":"50 hours saved","glyph":"⓹⓪","pct":100})
+    if total >= 100: out.append({"id":"h100h","name":"Centurion","desc":"100 hours saved","glyph":"Ⅽ","pct":100})
+    if total >= 500: out.append({"id":"h500","name":"Five-Hundred Sage","desc":"500 hours saved","glyph":"⓿","pct":100})
+    # Category diversity
+    if len(cats) >= 3: out.append({"id":"cat3","name":"Tri-Master","desc":"3+ categories","glyph":"⧉","pct":100})
+    if len(cats) >= 5: out.append({"id":"cat5","name":"Penta-Force","desc":"5+ categories","glyph":"⫶","pct":100})
+    # Single-task hero
+    if max_single >= 5: out.append({"id":"hero","name":"Heroic Heft","desc":"Saved 5+ hours in a single task","glyph":"🜲","pct":100})
+    if max_single >= 10: out.append({"id":"epic","name":"Epic Effort","desc":"Saved 10+ hours in a single task","glyph":"🜞","pct":100})
+    # Streak
+    streak = entry_streak(entries)
+    if streak >= 3: out.append({"id":"s3","name":"Triple Threat","desc":"3-day streak","glyph":"⌛","pct":100})
+    if streak >= 7: out.append({"id":"s7","name":"Week Streak","desc":"7-day streak","glyph":"✦","pct":100})
+    if streak >= 14: out.append({"id":"s14","name":"Fortnight","desc":"14-day streak","glyph":"✧","pct":100})
+    return out
+
+
+def compute_artifacts(entries, total, by_cat):
+    """Return list of 'artifacts' — earned collectibles based on real work done."""
+    arts = []
+    # Files saved (rough estimate): each task = 1 artifact
+    saved_files = len(entries)
+    if saved_files > 0:
+        arts.append({"id":"files","name":"Files Salvaged","desc":f"{saved_files} tasks logged","glyph":"⎙","count":saved_files})
+    # Disk freed (heuristic): maintenance tasks * 5GB avg
+    maint = by_cat.get("Maintenance", 0)
+    if maint > 0:
+        gb = round(maint * 5, 1)
+        arts.append({"id":"disk","name":"Disk Reclaimed","desc":f"~{gb} GB freed","glyph":"⊠","count":gb})
+    # TPM weeks (heuristic): each 5h of TPM = 1 week
+    tpm = by_cat.get("TPM", 0)
+    if tpm > 0:
+        weeks = round(tpm / 5, 1)
+        arts.append({"id":"tpm","name":"TPM Knowledge","desc":f"~{weeks} curriculum weeks","glyph":"✦","count":weeks})
+    # Automation multiplier
+    auto = by_cat.get("Automation", 0)
+    if auto > 0:
+        arts.append({"id":"auto","name":"Automation Forged","desc":f"{auto:.1f}h of systems","glyph":"⌘","count":auto})
+    # Hours total artifact
+    if total > 0:
+        arts.append({"id":"hours","name":"Hours Crystallized","desc":f"{total:.1f}h saved","glyph":"◈","count":total})
+    # Categories
+    cats = len(by_cat)
+    if cats > 0:
+        arts.append({"id":"domains","name":"Domains Touched","desc":f"{cats} categories","glyph":"❖","count":cats})
+    return arts
+
+
+def compute_quests(entries, by_cat, total, streak):
+    """Return list of active quests with progress."""
+    quests = []
+    # Weekly: 5h this week
+    from datetime import timedelta
+    week_start = (date.today() - timedelta(days=7)).isoformat()
+    wk = sum(e.get("hours", 0) for e in entries if e["date"] >= week_start)
+    quests.append({
+        "id": "q_week", "name": "Weekly Grinder", "desc": "Save 5h this week",
+        "glyph": "⏵", "target": 5, "current": round(wk, 2),
+        "pct": min(100, round((wk/5)*100, 1)) if wk else 0
+    })
+    # Monthly: 20h
+    mo_start = (date.today() - timedelta(days=30)).isoformat()
+    mo = sum(e.get("hours", 0) for e in entries if e["date"] >= mo_start)
+    quests.append({
+        "id": "q_month", "name": "Monthly Marathon", "desc": "Save 20h in 30 days",
+        "glyph": "◐", "target": 20, "current": round(mo, 2),
+        "pct": min(100, round((mo/20)*100, 1)) if mo else 0
+    })
+    # Tasks: 10 total
+    quests.append({
+        "id": "q_10", "name": "Task Tactician", "desc": "Log 10 tasks",
+        "glyph": "✓", "target": 10, "current": len(entries),
+        "pct": min(100, round((len(entries)/10)*100, 1))
+    })
+    # Streak: 7 days
+    quests.append({
+        "id": "q_streak", "name": "Streak Sentinel", "desc": "Hit a 7-day streak",
+        "glyph": "✦", "target": 7, "current": streak,
+        "pct": min(100, round((streak/7)*100, 1)) if streak else 0
+    })
+    # Diversity: 4 cats
+    quests.append({
+        "id": "q_div", "name": "Polymath", "desc": "Log 4 categories",
+        "glyph": "❖", "target": 4, "current": len(by_cat),
+        "pct": min(100, round((len(by_cat)/4)*100, 1)) if by_cat else 0
+    })
+    return quests
+
+
 # ---------------------------------------------------------------------------
 # dashboard
 # ---------------------------------------------------------------------------
@@ -281,9 +455,19 @@ def report(entries):
     total, inv, wk, mo, by_cat = summarize(entries)
     cum = daily_cum(entries)
     wkdata = weekly(entries)
-    data = {"total": round(total, 2), "invested": round(inv, 2), "week": round(wk, 2),
-            "month": round(mo, 2), "byCat": by_cat, "cum": cum,
-            "weekly": wkdata, "entries": entries, "updated": date.today().isoformat()}
+    streak = entry_streak(entries)
+    rank, next_rank, rank_pct = rank_for(total)
+    achievements = compute_achievements(entries, by_cat, total)
+    artifacts = compute_artifacts(entries, total, by_cat)
+    quests = compute_quests(entries, by_cat, total, streak)
+    data = {"total": round(total, 2), "value": round(total * 50, 2),
+            "streak": streak, "rank": rank, "next_rank": next_rank,
+            "rank_pct": rank_pct, "achievements": achievements,
+            "artifacts": artifacts, "quests": quests,
+            "invested": round(inv, 2), "week": round(wk, 2),
+            "month": round(mo, 2), "byCat": by_cat,
+            "cum": cum, "weekly": wkdata, "entries": entries,
+            "updated": date.today().isoformat()}
     with open(DATAJSON, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     # refresh embedded DATA so file:// view shows current data with no server.
