@@ -28,7 +28,7 @@ python3 serve.py             # then open http://localhost:8765
 | File | Purpose |
 |---|---|
 | `log.jsonl` | Append-only event log (one JSON record per line) |
-| `log.py` | CLI: `add` (append) + `report` (rebuild data.json + re-embed) |
+| `log.py` | CLI: `add` / `edit` / `delete` / `goal` / `summary` / `report` (rebuild data.json + re-embed) |
 | `data.json` | Derived aggregate: total, value, streak, rank, achievements, quests, charts |
 | `dashboard.html` | Self-contained interactive dashboard (v14, sci-fi command-deck style) |
 | `serve.py` | Optional local server with POST endpoint (auto re-embeds DATA on POST) |
@@ -57,10 +57,17 @@ Then open http://localhost:8765/ — the dashboard polls `/api/data` every 5s wh
 ## Log an entry
 
 ### CLI
+
 ```bash
 python3 log.py add "Built the onboarding doc" --hours 2.0 --cat TPM
 python3 log.py add "Uninstalled Steam games" --hours 1.5 --cat Maintenance
-python3 log.py report      # rebuilds data.json + re-embeds in dashboard.html
+python3 log.py edit --match "steam games" --hours 2.0       # correct a typo
+python3 log.py delete --match "test entry"                   # remove an entry
+python3 log.py goal set 3                                    # 3h/week target
+python3 log.py goal show                                    # progress vs target
+python3 log.py goal clear                                    # remove target
+python3 log.py summary                                       # print totals
+python3 log.py report                                        # rebuild data.json + re-embed
 ```
 
 ### Inline form (when served)
