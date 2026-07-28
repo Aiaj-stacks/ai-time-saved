@@ -1,19 +1,29 @@
 #!/usr/bin/env python3
 """
-AI Time-Saved Tracker - Live Server (v3)
-=========================================
+AI Time-Saved Tracker - Live Server (v15)
+==========================================
 Serves the dashboard and a live JSON API from log.jsonl. No external deps.
 Run:  python3 serve.py   (then open http://localhost:8765/)
 
 Endpoints
   GET  /              -> dashboard.html (live)
   GET  /api/data      -> aggregated JSON (re-read from log.jsonl every call)
+  GET  /data.json     -> latest derived data.json (on disk)
   GET  /log.jsonl     -> raw log
-  POST /api/add       -> append a task  (JSON body: task,hours,cat,invested,note)
+  POST /api/add       -> append a task, regenerate data.json + re-embed in dashboard.html
+                        (JSON body: date, task, hours, cat, invested, note)
+  POST /api/log       -> alias for /api/add (the v14 dashboard form uses this path)
+  POST /api/reembed   -> re-run python3 log.py report (re-derive data.json + re-embed DATA)
+                        useful after manual edits to log.jsonl
+
+After every successful POST, the server runs `python3 log.py report` so
+the dashboard always reflects the freshest data without needing a restart.
 """
 import http.server
 import json
 import os
+import subprocess
+import sys
 from datetime import date, timedelta
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -109,28 +119,60 @@ class H(http.server.BaseHTTPRequestHandler):
         else:
             self._send(404, "not found", "text/plain")
 
-    def do_POST(self):
-        if self.path == "/api/add":
+    def _do_add(self):
+        try:
+            n = int(self.headers.get("Content-Length", 0))
+            raw = self.rfile.read(n).decode("utf-8")
+            b = json.loads(raw)
+            rec = {
+                "date": b.get("date") or date.today().isoformat(),
+                "task": str(b.get("task", "")).strip(),
+                "cat": str(b.get("cat", "General")).strip() or "General",
+                "hours": round(float(b.get("hours", 0) or 0), 2),
+                "invested": round(float(b.get("invested", 0) or 0), 2),
+                "note": str(b.get("note", "")).strip(),
+            }
+            if not rec["task"] or rec["hours"] <= 0:
+                self._send(400, {"error": "task and positive hours required"})
+                return None
+            with open(LOG, "a", encoding="utf-8") as f:
+                f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            # Re-embed: run log.py report to refresh data.json + the DATA block in dashboard.html
             try:
-                n = int(self.headers.get("Content-Length", 0))
-                raw = self.rfile.read(n).decode("utf-8")
-                b = json.loads(raw)
-                rec = {
-                    "date": b.get("date") or date.today().isoformat(),
-                    "task": str(b.get("task", "")).strip(),
-                    "cat": str(b.get("cat", "General")).strip() or "General",
-                    "hours": round(float(b.get("hours", 0) or 0), 2),
-                    "invested": round(float(b.get("invested", 0) or 0), 2),
-                    "note": str(b.get("note", "")).strip(),
-                }
-                if not rec["task"] or rec["hours"] <= 0:
-                    self._send(400, {"error": "task and positive hours required"})
-                    return
-                with open(LOG, "a", encoding="utf-8") as f:
-                    f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                subprocess.run(
+                    [sys.executable, os.path.join(BASE, "log.py"), "report"],
+                    check=True, capture_output=True, text=True, timeout=30
+                )
+            except subprocess.CalledProcessError as e:
+                self._send(500, {"error": "logged but re-embed failed: " + e.stderr.strip()})
+                return None
+            return rec
+        except Exception as e:
+            self._send(500, {"error": str(e)})
+            return None
+
+    def _do_reembed(self):
+        try:
+            n = int(self.headers.get("Content-Length", 0))
+            self.rfile.read(n)  # discard any body
+            r = subprocess.run(
+                [sys.executable, os.path.join(BASE, "log.py"), "report"],
+                capture_output=True, text=True, timeout=30, cwd=BASE
+            )
+            if r.returncode != 0:
+                self._send(500, {"error": "re-embed failed: " + r.stderr.strip()})
+                return
+            self._send(200, {"ok": True, "stdout": r.stdout.strip()})
+        except Exception as e:
+            self._send(500, {"error": str(e)})
+
+    def do_POST(self):
+        if self.path in ("/api/add", "/api/log"):
+            rec = self._do_add()
+            if rec is not None:
                 self._send(200, {"ok": True, "entry": rec, "agg": aggregate(load())})
-            except Exception as e:
-                self._send(500, {"error": str(e)})
+        elif self.path == "/api/reembed":
+            self._do_reembed()
         else:
             self._send(404, "not found", "text/plain")
 
@@ -139,12 +181,25 @@ class H(http.server.BaseHTTPRequestHandler):
 
 
 def main():
+    port = PORT
+    # CLI override: python3 serve.py 8768
+    if len(sys.argv) > 1:
+        try: port = int(sys.argv[1])
+        except: pass
+    # env override: PORT=8768 python3 serve.py
+    port = int(os.environ.get("AURA_PORT", port))
     os.makedirs(BASE, exist_ok=True)
     if not os.path.exists(LOG):
         open(LOG, "a").close()
-    srv = http.server.HTTPServer(("0.0.0.0", PORT), H)
-    print(f"AI Time-Saved dashboard live at  http://localhost:{PORT}/")
+    # Allow port reuse to avoid "Address already in use" after Ctrl-C
+    socketserver = http.server.HTTPServer
+    class ReusableTCPServer(socketserver):
+        allow_reuse_address = True
+    srv = ReusableTCPServer(("0.0.0.0", port), H)
+    print(f"AI Time-Saved dashboard live at  http://localhost:{port}/")
     print(f"Serving log: {LOG}")
+    print(f"Serving log: {LOG}")
+    print(f"Env override: AURA_PORT=<n> python3 serve.py [<n>]")
     print("Press Ctrl+C to stop.")
     try:
         srv.serve_forever()
