@@ -51,3 +51,20 @@
 8. Add basic test harness for log.py / dda.py / serve.py
 9. Add `dev.sh` that brings up the stack with one command
 10. Per-day cumulative breakdown widget
+
+- **2026-07-28T21:02:** v15.9 serve.py /export.csv + /export.json (commit b15b606)
+- **2026-07-28T21:05:** v15.10 dev.sh one-command startup + README (commit 61b77f0)
+- **2026-07-28T21:09:** v15.11 test suite (16 tests pass) + dda.append_log returns codes (commit 9701170)
+
+## Roadmap (priority-ordered, updated)
+1-5,8,9. ~~All earlier items DONE~~
+6. Add weekly velocity target (log a goal, show progress)
+7. Refactor dashboard.html into separate JS files
+10. Per-day cumulative breakdown widget
+
+## Other candidate tasks
+- Make the v14 dashboard form actually persist via serve.py's POST (it should already work - verify in browser)
+- Add a stats-overview CLI command that prints the current totals (1-shot summary)
+- Add `log.py bulk` to import entries from a CSV file (useful for migrations)
+- Add a daily-summary cron that emails/tosts a recap
+- Add an `--invested` flag to the `edit` command (it's already there but verify)
