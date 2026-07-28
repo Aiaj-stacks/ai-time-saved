@@ -31,8 +31,10 @@ python3 serve.py             # then open http://localhost:8765
 | `log.py` | CLI: `add` (append) + `report` (rebuild data.json + re-embed) |
 | `data.json` | Derived aggregate: total, value, streak, rank, achievements, quests, charts |
 | `dashboard.html` | Self-contained interactive dashboard (v14, sci-fi command-deck style) |
-| `serve.py` | Optional local server with POST endpoint |
+| `serve.py` | Optional local server with POST endpoint (auto re-embeds DATA on POST) |
 | `dda.py` | Data loss prevention: snapshot before any write, verify after |
+| `index.html` | GitHub Pages entry point (copy of dashboard.html) |
+| `.nojekyll` | Tells GitHub Pages to serve HTML without Jekyll processing |
 | `autopush.py` | Unattended GitHub sync (cron-safe) |
 | `hermes-backup.py` | Daily Hermes state backup to OneDrive |
 | `.dda/snapshots/` | Local snapshots (gitignored, never committed) |
@@ -88,7 +90,19 @@ Default value rate: **$50/hour** (override per-entry if needed).
 - This repository tracks the full history of your hours saved.
 - Watch the cumulative chart grow across commits.
 - For a live interactive view, clone the repo, run `serve.py`, and open localhost:8765.
-- You can also enable GitHub Pages (Settings, Pages, branch main) to view the static dashboard online.
+
+### GitHub Pages (recommended for sharing)
+
+Enabled out of the box. To publish:
+
+1. Repo Settings -> Pages
+2. Source: "Deploy from a branch"
+3. Branch: `main`, folder: `/ (root)`
+4. Save
+
+Public URL: **https://Aiaj-stacks.github.io/ai-time-saved/**
+
+The page is **read-only** (no live `serve.py` on GitHub's static hosting). Re-embed by running `python3 log.py report` locally and pushing, OR click the "Refresh" button in the dashboard to fetch fresh data via the local server.
 
 ## Privacy
 
