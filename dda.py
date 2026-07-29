@@ -75,6 +75,14 @@ def nowstamp() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
+def _safe_reason(reason: str) -> str:
+    """Sanitize a snapshot reason so it's a valid filename on Windows.
+    Replaces colons, slashes, and other invalid chars with underscores."""
+    bad = '<>:"/\\|?*'
+    out = "".join(c if c not in bad else "_" for c in reason)
+    return out.strip().strip(".")[:120] or "manual"
+
+
 def latest_snap():
     if not SNAPS.exists():
         return None
@@ -84,7 +92,7 @@ def latest_snap():
 
 def snapshot(reason: str = "manual") -> Path:
     ensure_dirs()
-    sid = nowstamp() + "_" + reason
+    sid = nowstamp() + "_" + _safe_reason(reason)
     sd = SNAPS / sid
     sd.mkdir(parents=True, exist_ok=True)
     manifest = {"id": sid, "ts": datetime.now(timezone.utc).isoformat(), "reason": reason, "files": {}}

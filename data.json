@@ -1,11 +1,11 @@
 {
   "total": 51.27,
-  "value": 2563.35,
+  "value": 2563.5,
   "streak": 0,
   "rank": {
     "name": "Platinum",
-    "glyph": 100,
-    "color": "●",
+    "glyph": "●",
+    "color": "cyan",
     "min": 50,
     "max": 100,
     "current": 51.267,
@@ -14,7 +14,7 @@
   },
   "next_rank": {
     "name": "Diamond",
-    "glyph": 200,
+    "glyph": "◆",
     "min": 100
   },
   "rank_pct": 2.5,

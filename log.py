@@ -381,7 +381,7 @@ def rank_for(total_hours: float):
             nxt = RANK_LADDER[i+1] if i+1 < len(RANK_LADDER) else None
     if nxt is None:
         return {
-            "name": cur[0], "glyph": cur[2], "color": cur[3],
+            "name": cur[0], "glyph": cur[3], "color": cur[4],
             "min": cur[1], "max": cur[2] if False else 10**9,
             "current": total_hours, "next": None, "progress": 100.0,
         }, None, 100.0
@@ -389,11 +389,11 @@ def rank_for(total_hours: float):
     into = max(0, total_hours - cur[1])
     pct = min(100.0, (into / span) * 100) if span > 0 else 100.0
     return {
-        "name": cur[0], "glyph": cur[2], "color": cur[3],
+        "name": cur[0], "glyph": cur[3], "color": cur[4],
         "min": cur[1], "max": nxt[1],
         "current": total_hours, "next": nxt[0], "progress": round(pct, 1),
     }, {
-        "name": nxt[0], "glyph": nxt[2], "min": nxt[1],
+        "name": nxt[0], "glyph": nxt[3], "min": nxt[1],
     }, round(pct, 1)
 
 
@@ -694,7 +694,7 @@ def report(entries):
         "artifacts","quests","invested","week","month","byCat","cum","weekly",
         "entries","updated"
     }}
-    data = {"total": round(total, 2), "value": round(total * 50, 2),
+    data = {"total": round(total, 2), "value": round(round(total, 2) * 50, 2),  # round total first to avoid float precision drift
             "streak": streak, "rank": rank, "next_rank": next_rank,
             "rank_pct": rank_pct, "achievements": achievements,
             "artifacts": artifacts, "quests": quests,

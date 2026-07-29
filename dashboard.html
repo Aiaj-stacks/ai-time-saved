@@ -633,30 +633,43 @@ body.focus-mode .shell > *.focus-keep{opacity:1;transform:scale(1.01);box-shadow
 
 
 
-/* ===== AURA v19 - ACTIVITY HEATMAP ===== */
+/* ===== AURA v21 - ACTIVITY HEATMAP (GitHub-clone) ===== */
 .heatmap-panel{padding:var(--space-5);background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-panel);position:relative;overflow:hidden;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .heatmap-panel::before,.heatmap-panel::after{content:"";position:absolute;width:14px;height:14px;pointer-events:none;transition:border-color var(--dur-fast) var(--ease)}
 .heatmap-panel::before{top:0;left:0;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan)}
 .heatmap-panel::after{bottom:0;right:0;border-bottom:1px solid var(--ember);border-right:1px solid var(--ember)}
-.heatmap-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4)}
-.heatmap-stats{display:flex;gap:var(--space-4);font:600 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.heatmap-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);gap:var(--space-4);flex-wrap:wrap}
+.heatmap-head .panel-head{margin:0}
+.heatmap-stats{display:flex;gap:var(--space-4);font:600 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);align-items:center}
 .heatmap-stats b{color:var(--cyan-bright);font-weight:700;font-variant-numeric:tabular-nums}
-.heatmap-grid{display:grid;grid-template-columns:repeat(53,11px);grid-template-rows:repeat(7,11px);gap:2px;position:relative}
-.heatmap-months{display:grid;grid-template-columns:repeat(12,1fr);font:600 8px var(--font-mono);color:var(--ink-3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px}
-.heatmap-cell{width:11px;height:11px;border-radius:2px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);transition:all .15s;cursor:default}
-.heatmap-cell:hover{transform:scale(1.4);box-shadow:0 0 8px var(--cyan);z-index:5;border-color:var(--cyan)}
-.heatmap-cell.today{outline:1px solid var(--cyan-bright);outline-offset:1px;box-shadow:0 0 6px var(--cyan)}
-.heatmap-cell.future{opacity:.15;background:transparent;border-color:rgba(255,255,255,.04)}
-.heatmap-cell.lvl-0{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.06)}
-.heatmap-cell.lvl-1{background:rgba(90,214,255,.18);border-color:rgba(90,214,255,.3)}
-.heatmap-cell.lvl-2{background:rgba(90,214,255,.45);border-color:rgba(90,214,255,.55)}
-.heatmap-cell.lvl-3{background:rgba(90,214,255,.75);border-color:rgba(90,214,255,.85)}
-.heatmap-cell.lvl-4{background:rgba(155,234,255,1);border-color:var(--cyan-bright);box-shadow:0 0 4px var(--cyan)}
-.heatmap-legend{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin-top:var(--space-3);font:600 9px var(--font-mono);color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase}
-.heatmap-legend .scale{display:inline-flex;gap:2px;margin-left:8px}
-.heatmap-legend .scale span{width:10px;height:10px;border-radius:2px;border:1px solid rgba(255,255,255,.06)}
-.heatmap-tip{position:fixed;z-index:500;pointer-events:none;padding:6px 10px;background:rgba(10,15,28,.95);border:1px solid var(--cyan-dark);border-radius:4px;font:600 10px var(--font-mono);color:var(--cyan-bright);letter-spacing:.05em;opacity:0;transition:opacity .15s;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+/* GitHub-style contribution graph: 52 weeks x 7 days = 364 cells, 11px squares with 3px gap */
+.heatmap-wrap{display:flex;gap:8px;align-items:flex-start;overflow-x:auto;padding-bottom:4px}
+.heatmap-rail{display:flex;flex-direction:column;gap:3px;padding-top:22px;font:600 10px var(--font-mono);color:var(--ink-3);letter-spacing:.05em;text-transform:uppercase;flex-shrink:0}
+.heatmap-rail span{width:11px;height:11px;line-height:11px;font-size:9px;text-align:right;color:var(--ink-3)}
+.heatmap-main{flex:1;min-width:0}
+.heatmap-months{display:grid;grid-template-columns:repeat(52,11px);gap:3px;font:600 9px var(--font-mono);color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;height:18px}
+.heatmap-months span{grid-column:span 1;line-height:14px;overflow:visible}
+.heatmap-grid{display:grid;grid-template-columns:repeat(52,11px);grid-template-rows:repeat(7,11px);grid-auto-flow:column;gap:3px;position:relative}
+.heatmap-cell{width:11px;height:11px;background:#161b22;border:1px solid rgba(255,255,255,.02);transition:transform .12s ease;cursor:default;box-sizing:border-box}
+/* GitHub-clone exact greens on dark bg */
+.heatmap-cell.lvl-0{background:#161b22}
+.heatmap-cell.lvl-1{background:#0e4429}
+.heatmap-cell.lvl-2{background:#006d32}
+.heatmap-cell.lvl-3{background:#26a641}
+.heatmap-cell.lvl-4{background:#39d353}
+.heatmap-cell:hover{transform:scale(1.4);z-index:5;outline:1px solid var(--cyan-bright)}
+.heatmap-cell.today{outline:1px solid var(--cyan-bright);outline-offset:1px;box-shadow:0 0 4px var(--cyan)}
+.heatmap-legend{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin-top:var(--space-3);font:600 10px var(--font-mono);color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase}
+.heatmap-legend .scale{display:inline-flex;gap:3px;margin-left:8px}
+.heatmap-legend .scale span{width:11px;height:11px;border:1px solid rgba(255,255,255,.04)}
+.heatmap-legend .scale .lvl-0{background:#161b22}
+.heatmap-legend .scale .lvl-1{background:#0e4429}
+.heatmap-legend .scale .lvl-2{background:#006d32}
+.heatmap-legend .scale .lvl-3{background:#26a641}
+.heatmap-legend .scale .lvl-4{background:#39d353}
+.heatmap-tip{position:fixed;z-index:500;pointer-events:none;padding:6px 10px;background:#0d1117;border:1px solid #30363d;border-radius:6px;font:600 11px var(--font-mono);color:#e6edf3;letter-spacing:.01em;opacity:0;transition:opacity .12s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.6)}
 .heatmap-tip.show{opacity:1}
+.heatmap-tip b{color:#39d353;font-weight:700}
 
 
 
@@ -1108,6 +1121,25 @@ body.god .hex-grid-bg{opacity:.15}
   </div>
 </section>
 
+<section class="heatmap-strip" aria-label="Activity heatmap - last 365 days">
+  <article class="heatmap-panel hex-stream ascii-noise">
+    <div class="heatmap-head">
+      <div class="panel-head" style="margin:0"><h2>Activity Heatmap <span class="num" id="hmYear">Last 365 days</span></h2></div>
+      <div class="heatmap-stats"><span>active days: <b id="hmDays">0</b></span><span>current streak: <b id="hmStreak">0</b></span><span>peak: <b id="hmPeak">0h</b></span><span>total: <b id="hmTotal">0h</b></span></div>
+    </div>
+    <div class="heatmap-wrap">
+      <div class="heatmap-rail"><span></span><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span></div>
+      <div class="heatmap-main">
+        <div class="heatmap-months" id="hmMonths"></div>
+        <div class="heatmap-grid" id="hmGrid"></div>
+      </div>
+    </div>
+    <div class="heatmap-legend">less<div class="scale"><span class="lvl-0"></span><span class="lvl-1"></span><span class="lvl-2"></span><span class="lvl-3"></span><span class="lvl-4"></span></div>more</div>
+    <div class="heatmap-tip" id="hmTip" role="tooltip"></div>
+    <style>.heatmap-cell.sel{outline:2px solid var(--cyan);outline-offset:1px;box-shadow:0 0 6px var(--cyan-bright)}.goal-card.heat-pulse{animation:heatpulse 1.4s var(--ease)}@keyframes heatpulse{0%,100%{box-shadow:var(--shadow-panel)}50%{box-shadow:0 0 32px var(--cyan),0 0 48px rgba(90,214,255,.4)}}</style>
+  </article>
+</section>
+
 <section class="kpi-strip" aria-label="Inventory of feats">
   <article class="kpi-card tilt" data-rarity="legendary">
     <div class="kpi-label">POWER HOURS</div>
@@ -1201,16 +1233,6 @@ body.god .hex-grid-bg{opacity:.15}
       </div>
       <div id="perDayBody">// loading</div>
     </article>
-    <article class="heatmap-panel hex-stream ascii-noise">
-      <div class="heatmap-head">
-        <div class="panel-head" style="margin:0"><h2>Activity Heatmap <span class="num">year-at-a-glance</span></h2></div>
-        <div class="heatmap-stats"><span>days active: <b id="hmDays">0</b></span><span>streak: <b id="hmStreak">0</b></span><span>peak: <b id="hmPeak">0h</b></span></div>
-      </div>
-      <div class="heatmap-months" id="hmMonths"></div>
-      <div class="heatmap-grid" id="hmGrid"></div>
-      <div class="heatmap-legend">less<div class="scale"><span class="lvl-0"></span><span class="lvl-1"></span><span class="lvl-2"></span><span class="lvl-3"></span><span class="lvl-4"></span></div>more</div>
-      <div class="heatmap-tip" id="hmTip" role="tooltip"></div>
-    </article>
   </div>
 </section>
 
@@ -1253,7 +1275,7 @@ body.god .hex-grid-bg{opacity:.15}
 
 <script>
 
-let DATA={"total": 51.27, "value": 2563.35, "streak": 0, "rank": {"name": "Platinum", "glyph": 100, "color": "●", "min": 50, "max": 100, "current": 51.267, "next": "Diamond", "progress": 2.5}, "next_rank": {"name": "Diamond", "glyph": 200, "min": 100}, "rank_pct": 2.5, "achievements": [{"id": "first", "name": "First Steps", "desc": "Logged your first task", "glyph": "◌", "pct": 100}, {"id": "week", "name": "Week Warrior", "desc": "Logged something this week", "glyph": "◷", "pct": 100}, {"id": "ten", "name": "Ten Strong", "desc": "10 tasks logged", "glyph": "⑩", "pct": 100}, {"id": "q25", "name": "Quarter Century", "desc": "25 tasks logged", "glyph": "㉕", "pct": 100}, {"id": "h1", "name": "One Hour Hero", "desc": "1 hour saved", "glyph": "❶", "pct": 100}, {"id": "h10", "name": "Ten Hours Tower", "desc": "10 hours saved", "glyph": "❿", "pct": 100}, {"id": "h50h", "name": "Fifty Hour Fortress", "desc": "50 hours saved", "glyph": "⓹⓪", "pct": 100}, {"id": "cat3", "name": "Tri-Master", "desc": "3+ categories", "glyph": "⧉", "pct": 100}, {"id": "cat5", "name": "Penta-Force", "desc": "5+ categories", "glyph": "⫶", "pct": 100}, {"id": "hero", "name": "Heroic Heft", "desc": "Saved 5+ hours in a single task", "glyph": "🜲", "pct": 100}, {"id": "epic", "name": "Epic Effort", "desc": "Saved 10+ hours in a single task", "glyph": "🜞", "pct": 100}], "artifacts": [{"id": "files", "name": "Files Salvaged", "desc": "29 tasks logged", "glyph": "⎙", "count": 29}, {"id": "disk", "name": "Disk Reclaimed", "desc": "~27.8 GB freed", "glyph": "⊠", "count": 27.8}, {"id": "tpm", "name": "TPM Knowledge", "desc": "~5.3 curriculum weeks", "glyph": "✦", "count": 5.3}, {"id": "auto", "name": "Automation Forged", "desc": "0.5h of systems", "glyph": "⌘", "count": 0.5}, {"id": "hours", "name": "Hours Crystallized", "desc": "51.3h saved", "glyph": "◈", "count": 51.267}, {"id": "domains", "name": "Domains Touched", "desc": "6 categories", "glyph": "❖", "count": 6}], "quests": [{"id": "q_week", "name": "Weekly Grinder", "desc": "Save 5h this week", "glyph": "⏵", "target": 5, "current": 16.17, "pct": 100}, {"id": "q_month", "name": "Monthly Marathon", "desc": "Save 20h in 30 days", "glyph": "◐", "target": 20, "current": 51.27, "pct": 100}, {"id": "q_10", "name": "Task Tactician", "desc": "Log 10 tasks", "glyph": "✓", "target": 10, "current": 29, "pct": 100}, {"id": "q_streak", "name": "Streak Sentinel", "desc": "Hit a 7-day streak", "glyph": "✦", "target": 7, "current": 0, "pct": 0}, {"id": "q_div", "name": "Polymath", "desc": "Log 4 categories", "glyph": "❖", "target": 4, "current": 6, "pct": 100}], "invested": 0.0, "week": 2.57, "month": 51.27, "byCat": {"Maintenance": 5.566999999999999, "TPM": 26.5, "Tooling": 17.3, "Research": 0.4, "Automation": 0.5, "Mixed": 1.0}, "cum": [["2026-07-16", 0.1], ["2026-07-17", 35.1], ["2026-07-23", 42.2], ["2026-07-24", 43.2], ["2026-07-25", 47.2], ["2026-07-26", 48.7], ["2026-07-27", 51.27]], "weekly": [["2026-W29", 35.099999999999994], ["2026-W30", 13.600000000000001], ["2026-W31", 2.567]], "entries": [{"date": "2026-07-16", "task": "Removed Riot Vanguard + League of Legends (commands + verification)", "cat": "Maintenance", "hours": 0.1, "note": "user estimates ~4 min to uninstall any program like Riot; agent did it proactively, so ~4 min (0.07h) saved"}, {"date": "2026-07-17", "task": "TPM 52-week curriculum repo + coach/skills built (research, 52 weeks content, verifier)", "cat": "TPM", "hours": 15.0, "note": "ESTIMATE of authoring/research time saved - adjust"}, {"date": "2026-07-17", "task": "TPM Week 1: readings curation, recall quiz grading, 12 Anki cards authored+verified, Obsidian synthesis note + template", "cat": "TPM", "hours": 3.0, "note": ""}, {"date": "2026-07-17", "task": "Verification fail-safe + grill-me skill hardening + Anki card-count ceiling system", "cat": "Tooling", "hours": 1.0, "note": ""}, {"date": "2026-07-17", "task": "Built AI Time-Saved Tracker v2 (engine, 4-chart dashboard, auto-sync wiring)", "cat": "TPM", "hours": 3.0, "invested": 0.0, "note": "You'd hand-script a logger+charts; conservative"}, {"date": "2026-07-17", "task": "Captured 8 global operating rules + corrected Riot hours-saved math", "cat": "Tooling", "hours": 0.5, "invested": 0.0, "note": "Organizing+writing standards doc manually"}, {"date": "2026-07-17", "task": "Upgraded dashboard to live server (serve.py, real-time API, drill-down, inline add form)", "cat": "Tooling", "hours": 2.0, "invested": 0.0, "note": "Building a local web server + interactive UI from scratch"}, {"date": "2026-07-17", "task": "Built interactive AI Time-Saved dashboard (charts, hover tooltips, drill-down)", "cat": "Tooling", "hours": 3.0, "invested": 0.0, "note": "Hand-building a self-contained HTML/SVG dashboard + local server from scratch"}, {"date": "2026-07-17", "task": "Created and pushed GitHub repository ai-time-saved", "cat": "Tooling", "hours": 0.5, "invested": 0.0, "note": "Account setup, repo create, commit, push, verify"}, {"date": "2026-07-17", "task": "Researched + applied global operating-rules standards", "cat": "Research", "hours": 0.4, "invested": 0.0, "note": "Reading skill docs and translating to your 8 rules"}, {"date": "2026-07-17", "task": "Debugged + fixed dashboard showing 0h on file:// (embedded DATA + boot paint before fetch)", "cat": "Tooling", "hours": 1.5, "invested": 0.0, "note": "User would fumble through CORS/fetch debugging for hours; root cause was render() only firing after successful fetch"}, {"date": "2026-07-17", "task": "Built autopush.py + daily cron for unattended GitHub sync of hours-saved data", "cat": "Automation", "hours": 0.5, "invested": 0.0, "note": "setInterval-free, silent when clean, alerts on push failure"}, {"date": "2026-07-17", "task": "Built disaster-recovery: hermes-backup.py (OneDrive tarball), private GitHub hermes-state-backup repo, sync.py, restore.sh, restore skill - all verified", "cat": "Maintenance", "hours": 2.5, "invested": 0.0, "note": "new laptop readiness"}, {"date": "2026-07-17", "task": "Saved ai-time-saved-tracker skill (reusable build doc + verify scripts)", "cat": "Tooling", "hours": 0.3, "invested": 0.0, "note": ""}, {"date": "2026-07-17", "task": "Full storage cleanup: uninstalled all Steam games (~66.8GB freed, clean folder+manifest removal), low-risk junk sweep Temp/INetCache/RecycleBin (~6GB), deleted 15 college presentation videos + 2 OneDrive dupes (~2.1GB)", "cat": "Maintenance", "hours": 1.5, "invested": 0.0, "note": "freed ~75GB total; kept wallpaper + client video"}, {"date": "2026-07-17", "task": "Removed duplicate installer copies from Downloads (Wuthering Waves x2, LoL x2, WeMod x3, Obsidian x1, old Anaconda) ~2.1GB", "cat": "Maintenance", "hours": 0.3, "invested": 0.0, "note": ""}, {"date": "2026-07-23", "task": "Moved _tag_backup out of vault (declutter search)", "cat": "Maintenance", "hours": 0.1, "invested": 0.0, "note": "terminal mv + verified"}, {"date": "2026-07-23", "task": "Vault restructure reco + 7 MOC index notes (Home + 6 domains)", "cat": "TPM", "hours": 2.5, "invested": 0.0, "note": "wrote 7 .md to 4.Indexes"}, {"date": "2026-07-23", "task": "270-note legacy format audit (no edits)", "cat": "Maintenance", "hours": 1.0, "invested": 0.0, "note": "terminal grep vault"}, {"date": "2026-07-23", "task": "Corrected tag format (Properties to body wikilinks), 6 samples + skill", "cat": "TPM", "hours": 0.8, "invested": 0.0, "note": "execute_code + skill patch"}, {"date": "2026-07-23", "task": "Reverted to user's own template format + skill rewrite", "cat": "TPM", "hours": 0.7, "invested": 0.0, "note": "user corrected; matched 5.Templates"}, {"date": "2026-07-23", "task": "TPM Canvas build + 3 debug rounds (coords/h/w/clip)", "cat": "Tooling", "hours": 1.5, "invested": 0.0, "note": ".canvas JSON regen + debugging"}, {"date": "2026-07-23", "task": "Mermaid TPM node-map note (Canvas fallback)", "cat": "Tooling", "hours": 0.5, "invested": 0.0, "note": "4.Indexes/TPM Climb - Node Map.md"}, {"date": "2026-07-24", "task": "TPM curriculum + dashboard work block", "cat": "Mixed", "hours": 1.0, "invested": 0, "note": ""}, {"date": "2026-07-25", "task": "dashboard v3 build", "cat": "Tooling", "hours": 4.0, "invested": 0, "note": "20/20 PASS, public on GitHub Aiaj-stacks/hermes-dashboard-v3"}, {"date": "2026-07-26", "task": "Obsidian + TPM + bookkeeping", "cat": "TPM", "hours": 1.5, "invested": 0, "note": ""}, {"date": "2026-07-27", "task": "AURA watch landing build + 4D upgrade", "cat": "Tooling", "hours": 2.0, "invested": 0, "note": ""}, {"date": "2026-07-27", "task": "Riot uninstall (~37.5GB / 4 min solo baseline)", "cat": "Maintenance", "hours": 0.067, "invested": 0, "note": ""}, {"date": "2026-07-27", "task": "dashboard v4 spawn", "cat": "Tooling", "hours": 0.5, "invested": 0, "note": ""}], "updated": "2026-07-29", "goal": {"hours": 3.0, "set_at": "2026-07-28"}}, AUTO=null;
+let DATA={"total": 51.27, "value": 2563.5, "streak": 0, "rank": {"name": "Platinum", "glyph": "●", "color": "cyan", "min": 50, "max": 100, "current": 51.267, "next": "Diamond", "progress": 2.5}, "next_rank": {"name": "Diamond", "glyph": "◆", "min": 100}, "rank_pct": 2.5, "achievements": [{"id": "first", "name": "First Steps", "desc": "Logged your first task", "glyph": "◌", "pct": 100}, {"id": "week", "name": "Week Warrior", "desc": "Logged something this week", "glyph": "◷", "pct": 100}, {"id": "ten", "name": "Ten Strong", "desc": "10 tasks logged", "glyph": "⑩", "pct": 100}, {"id": "q25", "name": "Quarter Century", "desc": "25 tasks logged", "glyph": "㉕", "pct": 100}, {"id": "h1", "name": "One Hour Hero", "desc": "1 hour saved", "glyph": "❶", "pct": 100}, {"id": "h10", "name": "Ten Hours Tower", "desc": "10 hours saved", "glyph": "❿", "pct": 100}, {"id": "h50h", "name": "Fifty Hour Fortress", "desc": "50 hours saved", "glyph": "⓹⓪", "pct": 100}, {"id": "cat3", "name": "Tri-Master", "desc": "3+ categories", "glyph": "⧉", "pct": 100}, {"id": "cat5", "name": "Penta-Force", "desc": "5+ categories", "glyph": "⫶", "pct": 100}, {"id": "hero", "name": "Heroic Heft", "desc": "Saved 5+ hours in a single task", "glyph": "🜲", "pct": 100}, {"id": "epic", "name": "Epic Effort", "desc": "Saved 10+ hours in a single task", "glyph": "🜞", "pct": 100}], "artifacts": [{"id": "files", "name": "Files Salvaged", "desc": "29 tasks logged", "glyph": "⎙", "count": 29}, {"id": "disk", "name": "Disk Reclaimed", "desc": "~27.8 GB freed", "glyph": "⊠", "count": 27.8}, {"id": "tpm", "name": "TPM Knowledge", "desc": "~5.3 curriculum weeks", "glyph": "✦", "count": 5.3}, {"id": "auto", "name": "Automation Forged", "desc": "0.5h of systems", "glyph": "⌘", "count": 0.5}, {"id": "hours", "name": "Hours Crystallized", "desc": "51.3h saved", "glyph": "◈", "count": 51.267}, {"id": "domains", "name": "Domains Touched", "desc": "6 categories", "glyph": "❖", "count": 6}], "quests": [{"id": "q_week", "name": "Weekly Grinder", "desc": "Save 5h this week", "glyph": "⏵", "target": 5, "current": 16.17, "pct": 100}, {"id": "q_month", "name": "Monthly Marathon", "desc": "Save 20h in 30 days", "glyph": "◐", "target": 20, "current": 51.27, "pct": 100}, {"id": "q_10", "name": "Task Tactician", "desc": "Log 10 tasks", "glyph": "✓", "target": 10, "current": 29, "pct": 100}, {"id": "q_streak", "name": "Streak Sentinel", "desc": "Hit a 7-day streak", "glyph": "✦", "target": 7, "current": 0, "pct": 0}, {"id": "q_div", "name": "Polymath", "desc": "Log 4 categories", "glyph": "❖", "target": 4, "current": 6, "pct": 100}], "invested": 0.0, "week": 2.57, "month": 51.27, "byCat": {"Maintenance": 5.566999999999999, "TPM": 26.5, "Tooling": 17.3, "Research": 0.4, "Automation": 0.5, "Mixed": 1.0}, "cum": [["2026-07-16", 0.1], ["2026-07-17", 35.1], ["2026-07-23", 42.2], ["2026-07-24", 43.2], ["2026-07-25", 47.2], ["2026-07-26", 48.7], ["2026-07-27", 51.27]], "weekly": [["2026-W29", 35.099999999999994], ["2026-W30", 13.600000000000001], ["2026-W31", 2.567]], "entries": [{"date": "2026-07-16", "task": "Removed Riot Vanguard + League of Legends (commands + verification)", "cat": "Maintenance", "hours": 0.1, "note": "user estimates ~4 min to uninstall any program like Riot; agent did it proactively, so ~4 min (0.07h) saved"}, {"date": "2026-07-17", "task": "TPM 52-week curriculum repo + coach/skills built (research, 52 weeks content, verifier)", "cat": "TPM", "hours": 15.0, "note": "ESTIMATE of authoring/research time saved - adjust"}, {"date": "2026-07-17", "task": "TPM Week 1: readings curation, recall quiz grading, 12 Anki cards authored+verified, Obsidian synthesis note + template", "cat": "TPM", "hours": 3.0, "note": ""}, {"date": "2026-07-17", "task": "Verification fail-safe + grill-me skill hardening + Anki card-count ceiling system", "cat": "Tooling", "hours": 1.0, "note": ""}, {"date": "2026-07-17", "task": "Built AI Time-Saved Tracker v2 (engine, 4-chart dashboard, auto-sync wiring)", "cat": "TPM", "hours": 3.0, "invested": 0.0, "note": "You'd hand-script a logger+charts; conservative"}, {"date": "2026-07-17", "task": "Captured 8 global operating rules + corrected Riot hours-saved math", "cat": "Tooling", "hours": 0.5, "invested": 0.0, "note": "Organizing+writing standards doc manually"}, {"date": "2026-07-17", "task": "Upgraded dashboard to live server (serve.py, real-time API, drill-down, inline add form)", "cat": "Tooling", "hours": 2.0, "invested": 0.0, "note": "Building a local web server + interactive UI from scratch"}, {"date": "2026-07-17", "task": "Built interactive AI Time-Saved dashboard (charts, hover tooltips, drill-down)", "cat": "Tooling", "hours": 3.0, "invested": 0.0, "note": "Hand-building a self-contained HTML/SVG dashboard + local server from scratch"}, {"date": "2026-07-17", "task": "Created and pushed GitHub repository ai-time-saved", "cat": "Tooling", "hours": 0.5, "invested": 0.0, "note": "Account setup, repo create, commit, push, verify"}, {"date": "2026-07-17", "task": "Researched + applied global operating-rules standards", "cat": "Research", "hours": 0.4, "invested": 0.0, "note": "Reading skill docs and translating to your 8 rules"}, {"date": "2026-07-17", "task": "Debugged + fixed dashboard showing 0h on file:// (embedded DATA + boot paint before fetch)", "cat": "Tooling", "hours": 1.5, "invested": 0.0, "note": "User would fumble through CORS/fetch debugging for hours; root cause was render() only firing after successful fetch"}, {"date": "2026-07-17", "task": "Built autopush.py + daily cron for unattended GitHub sync of hours-saved data", "cat": "Automation", "hours": 0.5, "invested": 0.0, "note": "setInterval-free, silent when clean, alerts on push failure"}, {"date": "2026-07-17", "task": "Built disaster-recovery: hermes-backup.py (OneDrive tarball), private GitHub hermes-state-backup repo, sync.py, restore.sh, restore skill - all verified", "cat": "Maintenance", "hours": 2.5, "invested": 0.0, "note": "new laptop readiness"}, {"date": "2026-07-17", "task": "Saved ai-time-saved-tracker skill (reusable build doc + verify scripts)", "cat": "Tooling", "hours": 0.3, "invested": 0.0, "note": ""}, {"date": "2026-07-17", "task": "Full storage cleanup: uninstalled all Steam games (~66.8GB freed, clean folder+manifest removal), low-risk junk sweep Temp/INetCache/RecycleBin (~6GB), deleted 15 college presentation videos + 2 OneDrive dupes (~2.1GB)", "cat": "Maintenance", "hours": 1.5, "invested": 0.0, "note": "freed ~75GB total; kept wallpaper + client video"}, {"date": "2026-07-17", "task": "Removed duplicate installer copies from Downloads (Wuthering Waves x2, LoL x2, WeMod x3, Obsidian x1, old Anaconda) ~2.1GB", "cat": "Maintenance", "hours": 0.3, "invested": 0.0, "note": ""}, {"date": "2026-07-23", "task": "Moved _tag_backup out of vault (declutter search)", "cat": "Maintenance", "hours": 0.1, "invested": 0.0, "note": "terminal mv + verified"}, {"date": "2026-07-23", "task": "Vault restructure reco + 7 MOC index notes (Home + 6 domains)", "cat": "TPM", "hours": 2.5, "invested": 0.0, "note": "wrote 7 .md to 4.Indexes"}, {"date": "2026-07-23", "task": "270-note legacy format audit (no edits)", "cat": "Maintenance", "hours": 1.0, "invested": 0.0, "note": "terminal grep vault"}, {"date": "2026-07-23", "task": "Corrected tag format (Properties to body wikilinks), 6 samples + skill", "cat": "TPM", "hours": 0.8, "invested": 0.0, "note": "execute_code + skill patch"}, {"date": "2026-07-23", "task": "Reverted to user's own template format + skill rewrite", "cat": "TPM", "hours": 0.7, "invested": 0.0, "note": "user corrected; matched 5.Templates"}, {"date": "2026-07-23", "task": "TPM Canvas build + 3 debug rounds (coords/h/w/clip)", "cat": "Tooling", "hours": 1.5, "invested": 0.0, "note": ".canvas JSON regen + debugging"}, {"date": "2026-07-23", "task": "Mermaid TPM node-map note (Canvas fallback)", "cat": "Tooling", "hours": 0.5, "invested": 0.0, "note": "4.Indexes/TPM Climb - Node Map.md"}, {"date": "2026-07-24", "task": "TPM curriculum + dashboard work block", "cat": "Mixed", "hours": 1.0, "invested": 0, "note": ""}, {"date": "2026-07-25", "task": "dashboard v3 build", "cat": "Tooling", "hours": 4.0, "invested": 0, "note": "20/20 PASS, public on GitHub Aiaj-stacks/hermes-dashboard-v3"}, {"date": "2026-07-26", "task": "Obsidian + TPM + bookkeeping", "cat": "TPM", "hours": 1.5, "invested": 0, "note": ""}, {"date": "2026-07-27", "task": "AURA watch landing build + 4D upgrade", "cat": "Tooling", "hours": 2.0, "invested": 0, "note": ""}, {"date": "2026-07-27", "task": "Riot uninstall (~37.5GB / 4 min solo baseline)", "cat": "Maintenance", "hours": 0.067, "invested": 0, "note": ""}, {"date": "2026-07-27", "task": "dashboard v4 spawn", "cat": "Tooling", "hours": 0.5, "invested": 0, "note": ""}], "updated": "2026-07-29", "goal": {"hours": 3.0, "set_at": "2026-07-28"}}, AUTO=null;
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg', COLORS=['#22d3ee','#34d399','#fbbf24','#f87171','#a4a8b8'];
 const ALL_ACHIEVEMENTS=[
   {id:'first',name:'First Steps',desc:'Logged your first task',glyph:'◌'},
@@ -1276,20 +1298,21 @@ const ALL_ACHIEVEMENTS=[
   {id:'s14',name:'Fortnight',desc:'14-day streak',glyph:'✧'}
 ];
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function announce(s){$('#sr').textContent=s}function polar(cx,cy,r,a){return[cx+r*Math.cos(a),cy+r*Math.sin(a)]}function arc(cx,cy,r,a0,a1){const p0=polar(cx,cy,r,a0),p1=polar(cx,cy,r,a1);return`M${p0[0]} ${p0[1]} A${r} ${r} 0 ${a1-a0>Math.PI?1:0} 1 ${p1[0]} ${p1[1]}`}
+function announce(s){$('sr').textContent=s}function polar(cx,cy,r,a){return[cx+r*Math.cos(a),cy+r*Math.sin(a)]}function arc(cx,cy,r,a0,a1){const p0=polar(cx,cy,r,a0),p1=polar(cx,cy,r,a1);return`M${p0[0]} ${p0[1]} A${r} ${r} 0 ${a1-a0>Math.PI?1:0} 1 ${p1[0]} ${p1[1]}`}
 function count(el,to,format){const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;if(reduced){el.textContent=format(to);return}const st=performance.now();function step(n){const p=Math.min((n-st)/700,1),v=to*(1-Math.pow(1-p,3));el.textContent=format(v);if(p<1)requestAnimationFrame(step)}requestAnimationFrame(step)}
-function hot(el,label,kind,key){el.classList.add('hot');el.setAttribute('tabindex','0');el.setAttribute('role','button');el.setAttribute('aria-label',label);el.dataset.tip=label;['mousemove','focus'].forEach(ev=>el.addEventListener(ev,e=>{const t=$('#tip');t.textContent=label;t.style.opacity=1;t.style.left=Math.min((e.clientX||20)+12,innerWidth-270)+'px';t.style.top=Math.min((e.clientY||20)+12,innerHeight-70)+'px'}));['mouseleave','blur'].forEach(ev=>el.addEventListener(ev,()=>{ $('#tip').style.opacity=0}));el.addEventListener('click',()=>drill(kind,key));el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();drill(kind,key)}})}
+function hot(el,label,kind,key){el.classList.add('hot');el.setAttribute('tabindex','0');el.setAttribute('role','button');el.setAttribute('aria-label',label);el.dataset.tip=label;['mousemove','focus'].forEach(ev=>el.addEventListener(ev,e=>{const t=$('tip');t.textContent=label;t.style.opacity=1;t.style.left=Math.min((e.clientX||20)+12,innerWidth-270)+'px';t.style.top=Math.min((e.clientY||20)+12,innerHeight-70)+'px'}));['mouseleave','blur'].forEach(ev=>el.addEventListener(ev,()=>{ $('tip').style.opacity=0}));el.addEventListener('click',()=>drill(kind,key));el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();drill(kind,key)}})}
 function drawCum(target){const g=$(target),d=DATA.cum||[];g.innerHTML='';if(!d.length)return;const W=620,H=250,p=34,max=Math.max(1,...d.map(x=>x[1])),x=i=>p+(W-p*2)*(i/Math.max(1,d.length-1)),y=v=>H-p-(H-p*2)*(v/max);const line=document.createElementNS(NS,'polyline');line.setAttribute('points',d.map((v,i)=>`${x(i)},${y(v[1])}`).join(' '));line.setAttribute('fill','none');line.setAttribute('stroke','#22d3ee');line.setAttribute('stroke-width','3');g.append(line);d.forEach((v,i)=>{const c=document.createElementNS(NS,'circle');c.setAttribute('cx',x(i));c.setAttribute('cy',y(v[1]));c.setAttribute('r','5');c.setAttribute('fill','#22d3ee');hot(c,`${v[0]}: ${v[1].toFixed(1)} cumulative hours`,'date',v[0]);g.append(c)});const targetLine=document.createElementNS(NS,'line');targetLine.setAttribute('x1',p);targetLine.setAttribute('x2',W-p);targetLine.setAttribute('y1',y(max*.8));targetLine.setAttribute('y2',y(max*.8));targetLine.setAttribute('stroke','#34d399');targetLine.setAttribute('stroke-dasharray','5 6');targetLine.setAttribute('opacity','.55');g.prepend(targetLine)}
-function drawDonut(){const g=$('#donutPlot'),cats=Object.entries(DATA.byCat||{}).sort((a,b)=>b[1]-a[1]),total=cats.reduce((s,x)=>s+x[1],0);g.innerHTML='';let a=-Math.PI/2;cats.forEach((c,i)=>{const n=a+(c[1]/total)*Math.PI*2,p=document.createElementNS(NS,'path');p.setAttribute('d',arc(130,125,78,a,n));p.setAttribute('fill','none');p.setAttribute('stroke',COLORS[i%COLORS.length]);p.setAttribute('stroke-width','34');hot(p,`${c[0]}: ${c[1].toFixed(1)} hours`,'category',c[0]);g.append(p);a=n});g.insertAdjacentHTML('beforeend',`<text x="130" y="122" text-anchor="middle" fill="#f4f4f7" font-size="24" font-weight="600">${total.toFixed(1)}h</text><text x="130" y="142" text-anchor="middle" fill="#a4a8b8" font-size="11">total saved</text>`)}
-function drawBars(){const g=$('#barsPlot'),data=DATA.weekly||[],max=Math.max(1,...data.map(x=>x[1]));g.innerHTML='';data.forEach((v,i)=>{const gap=240/Math.max(1,data.length),w=Math.min(44,gap*.6),x=30+i*gap+(gap-w)/2,h=170*v[1]/max,y=205-h,r=document.createElementNS(NS,'rect');r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',w);r.setAttribute('height',h);r.setAttribute('rx','4');r.setAttribute('fill','#34d399');hot(r,`${v[0]}: ${v[1].toFixed(1)} hours`,'week',v[0]);g.append(r);g.insertAdjacentHTML('beforeend',`<text x="${x+w/2}" y="225" text-anchor="middle" fill="#a4a8b8" font-size="9">${esc(v[0].replace(/^\d{4}-/,''))}</text>`)});}
-function drawROI(){const g=$('#roiPlot'),weeks=DATA.weekly||[],avg=weeks.length?weeks.reduce((s,x)=>s+x[1],0)/weeks.length:0,current=Number(DATA.week||0),pct=avg?Math.min(150,current/avg*100):0;g.innerHTML=`<path d="${arc(90,90,55,Math.PI*.8,Math.PI*2.2)}" fill="none" stroke="#1a1c26" stroke-width="14" stroke-linecap="round"/><path d="${arc(90,90,55,Math.PI*.8,Math.PI*.8+Math.PI*1.4*Math.min(pct,100)/100)}" fill="none" stroke="#22d3ee" stroke-width="14" stroke-linecap="round"/><text x="90" y="95" text-anchor="middle" fill="#f4f4f7" font-size="23" font-weight="600">${pct.toFixed(0)}%</text>`;g.setAttribute('aria-label',`${pct.toFixed(0)} percent of weekly average`);$('#roiHelper').textContent=`${current.toFixed(1)}h now / ${avg.toFixed(1)}h average`}
-function drawActivity(){const list=$('#activityList'),rows=(DATA.entries||[]).slice(-10).reverse();$('#activityCount').textContent=`${rows.length} latest`;if(!rows.length){list.innerHTML='<li class="empty">No tasks yet. Add your first task.</li>';return}list.innerHTML=rows.map((e,i)=>`<li class="activity-item tilt"><button type="button" aria-expanded="false" data-row="${i}"><span class="helper">${esc(e.date)}</span><strong>${esc(e.task)}</strong><span>${Number(e.hours).toFixed(1)}h</span></button><div class="activity-detail">${esc(e.cat)} - ${esc(e.note||'No note')}</div></li>`).join('');list.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const li=b.closest('li'),on=li.classList.toggle('expanded');b.setAttribute('aria-expanded',on);announce(on?'Activity detail expanded':'Activity detail collapsed')}));bindTilt(list)}
-let lastFocus;function drill(kind,key){lastFocus=document.activeElement;const rows=(DATA.entries||[]).filter(e=>kind==='category'?e.cat===key:kind==='date'?e.date===key:true);$('#dialogTitle').textContent=kind==='category'?`Category: ${key}`:kind==='week'?`Week: ${key}`:kind==='date'?`Date: ${key}`:'Chart detail';$('#dialogBody').innerHTML=rows.length?`<ul>${rows.slice().reverse().map(e=>`<li><strong>${esc(e.task)}</strong> - ${Number(e.hours).toFixed(1)}h</li>`).join('')}</ul>`:'<p>No matching entries.</p>';$('#drillDialog').showModal();$('#dialogClose').focus()}
-function renderRank(){if(!DATA)return;const r=DATA.rank||{name:'-',glyph:'?',progress:0,current:0,next:null},n=DATA.next_rank;count($('#kpiHours'),Number(DATA.total||0),v=>v.toFixed(1));count($('#kpiValue'),Number(DATA.value??(DATA.total*50)),v=>'$'+Math.round(v).toLocaleString());count($('#kpiTasks'),(DATA.entries||[]).length,v=>Math.round(v).toString());count($('#kpiStreak'),Number(DATA.streak||0),v=>Math.round(v)+' days');$('#rankName').textContent=r.name||'-';if($('rankGlyph'))$('rankGlyph').textContent=(r.name||'?')[0];const tierNames = ['Novice','Bronze','Silver','Gold','Platinum','Diamond','Master','Grandmaster','Sage','AI Grandmaster'];
-$('#rankTier').textContent = 'Tier ' + (tierNames.indexOf(r.name)+1 || '?') + ' of 10';$('#rankNext').textContent=n?n.name:'MAX';$('#rankPct').textContent=(r.progress??0).toFixed(1)+'%';$('#rankBarFill').style.width=(r.progress??0)+'%';$('#rankBar').setAttribute('aria-valuenow',Math.round(r.progress||0));count($('#rankHours'),Number(r.current||0),v=>v.toFixed(1));count($('#rankValue'),Number(DATA.value??0),v=>'$'+Math.round(v).toLocaleString());count($('#rankTasks'),(DATA.entries||[]).length,v=>Math.round(v).toString());count($('#rankStreak'),Number(DATA.streak||0),v=>Math.round(v)+'d')}
-function renderAchievements(){const grid=$('#achGrid'),all=ALL_ACHIEVEMENTS,unlocked=new Set((DATA.achievements||[]).map(a=>a.id));$('#achCount').textContent=`${unlocked.size} / ${all.length}`;grid.innerHTML=all.map(a=>{const ok=unlocked.has(a.id);return`<article class=\"feat-tile rarity-{['rare','epic','legendary','rare','epic'][all.indexOf(a)%5]}${ok?' unlocked':' locked'}" role="listitem" aria-label="${esc(a.name)}: ${ok?'unlocked':'locked'} - ${esc(a.desc)}" tabindex="0"><div class="feat-rune" aria-hidden="true">${esc(a.glyph)}</div><div class="feat-name">${esc(a.name)}</div><div class="feat-desc">${esc(a.desc)}</div></article>`}).join('');grid.querySelectorAll('.ach-tile').forEach(t=>{t.addEventListener('mouseenter',()=>{const tip=$('#tip');tip.textContent=t.getAttribute('aria-label');tip.style.opacity=1;const r=t.getBoundingClientRect();tip.style.left=Math.min(r.left+10,innerWidth-260)+'px';tip.style.top=Math.max(10,r.top-32)+'px'});t.addEventListener('mouseleave',()=>{$('#tip').style.opacity=0})})}
-function renderArtifacts(){const grid=$('#artGrid'),arts=DATA.artifacts||[];$('#artCount').textContent=`${arts.length} collected`;grid.innerHTML=arts.length?arts.map(a=>`<article class=\"inv-item rarity-{['legendary','epic','rare','','rare','epic'][arts.indexOf(a)%6]} role="listitem" aria-label="${esc(a.name)}: ${esc(a.desc)}"><div class="inv-icon" aria-hidden="true">${esc(a.glyph)}</div><div class="inv-name">${esc(a.name)}</div><div class="inv-count">${typeof a.count==='number'?(a.count%1===0?a.count:a.count.toFixed(1)):esc(String(a.count))}</div><div class="inv-desc">${esc(a.desc)}</div></article>`).join(''):'<p class="empty">No artifacts yet - keep logging.</p>'}
-function renderQuests(){const list=$('#questList'),qs=DATA.quests||[];const done=qs.filter(q=>q.pct>=100).length;$('#questCount').textContent=`${done} / ${qs.length} done`;list.innerHTML=qs.map(q=>`<article class="quest-row${q.pct>=100?' done':''}" role="listitem" aria-label="${esc(q.name)}: ${q.current} of ${q.target}, ${q.pct.toFixed(0)} percent"><div class="quest-seal" aria-hidden="true">${esc(q.glyph)}</div><div class="quest-info"><div class="quest-name">${esc(q.name)}</div><div class="quest-desc">${esc(q.desc)}</div></div><div class="quest-pct">${q.pct.toFixed(0)}%</div><div class="quest-bar"><div class="quest-bar-fill" style="width:${q.pct}%"></div></div></article>`).join('')}
+function drawDonut(){const g=$('donutPlot'),cats=Object.entries(DATA.byCat||{}).sort((a,b)=>b[1]-a[1]),total=cats.reduce((s,x)=>s+x[1],0);g.innerHTML='';let a=-Math.PI/2;cats.forEach((c,i)=>{const n=a+(c[1]/total)*Math.PI*2,p=document.createElementNS(NS,'path');p.setAttribute('d',arc(130,125,78,a,n));p.setAttribute('fill','none');p.setAttribute('stroke',COLORS[i%COLORS.length]);p.setAttribute('stroke-width','34');hot(p,`${c[0]}: ${c[1].toFixed(1)} hours`,'category',c[0]);g.append(p);a=n});g.insertAdjacentHTML('beforeend',`<text x="130" y="122" text-anchor="middle" fill="#f4f4f7" font-size="24" font-weight="600">${total.toFixed(1)}h</text><text x="130" y="142" text-anchor="middle" fill="#a4a8b8" font-size="11">total saved</text>`)}
+function drawBars(){const g=$('barsPlot'),data=DATA.weekly||[],max=Math.max(1,...data.map(x=>x[1]));g.innerHTML='';data.forEach((v,i)=>{const gap=240/Math.max(1,data.length),w=Math.min(44,gap*.6),x=30+i*gap+(gap-w)/2,h=170*v[1]/max,y=205-h,r=document.createElementNS(NS,'rect');r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',w);r.setAttribute('height',h);r.setAttribute('rx','4');r.setAttribute('fill','#34d399');hot(r,`${v[0]}: ${v[1].toFixed(1)} hours`,'week',v[0]);g.append(r);g.insertAdjacentHTML('beforeend',`<text x="${x+w/2}" y="225" text-anchor="middle" fill="#a4a8b8" font-size="9">${esc(v[0].replace(/^\d{4}-/,''))}</text>`)});}
+function drawROI(){const g=$('roiPlot'),weeks=DATA.weekly||[],avg=weeks.length?weeks.reduce((s,x)=>s+x[1],0)/weeks.length:0,current=Number(DATA.week||0),pct=avg?Math.min(150,current/avg*100):0;g.innerHTML=`<path d="${arc(90,90,55,Math.PI*.8,Math.PI*2.2)}" fill="none" stroke="#1a1c26" stroke-width="14" stroke-linecap="round"/><path d="${arc(90,90,55,Math.PI*.8,Math.PI*.8+Math.PI*1.4*Math.min(pct,100)/100)}" fill="none" stroke="#22d3ee" stroke-width="14" stroke-linecap="round"/><text x="90" y="95" text-anchor="middle" fill="#f4f4f7" font-size="23" font-weight="600">${pct.toFixed(0)}%</text>`;g.setAttribute('aria-label',`${pct.toFixed(0)} percent of weekly average`);$('roiHelper').textContent=`${current.toFixed(1)}h now / ${avg.toFixed(1)}h average`}
+function drawActivity(){const list=$('activityList'),rows=(DATA.entries||[]).slice(-10).reverse();$('activityCount').textContent=`${rows.length} latest`;if(!rows.length){list.innerHTML='<li class="empty">No tasks yet. Add your first task.</li>';return}list.innerHTML=rows.map((e,i)=>`<li class="activity-item tilt"><button type="button" aria-expanded="false" data-row="${i}"><span class="helper">${esc(e.date)}</span><strong>${esc(e.task)}</strong><span>${Number(e.hours).toFixed(1)}h</span></button><div class="activity-detail">${esc(e.cat)} - ${esc(e.note||'No note')}</div></li>`).join('');list.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const li=b.closest('li'),on=li.classList.toggle('expanded');b.setAttribute('aria-expanded',on);announce(on?'Activity detail expanded':'Activity detail collapsed')}));bindTilt(list)}
+let lastFocus;function drill(kind,key){lastFocus=document.activeElement;const rows=(DATA.entries||[]).filter(e=>kind==='category'?e.cat===key:kind==='date'?e.date===key:true);$('dialogTitle').textContent=kind==='category'?`Category: ${key}`:kind==='week'?`Week: ${key}`:kind==='date'?`Date: ${key}`:'Chart detail';$('dialogBody').innerHTML=rows.length?`<ul>${rows.slice().reverse().map(e=>`<li><strong>${esc(e.task)}</strong> - ${Number(e.hours).toFixed(1)}h</li>`).join('')}</ul>`:'<p>No matching entries.</p>';$('drillDialog').showModal();$('dialogClose').focus()}
+function renderRank(){if(!DATA)return;const r=DATA.rank||{name:'-',glyph:'?',progress:0,current:0,next:null},n=DATA.next_rank;count($('kpiHours'),Number(DATA.total||0),v=>v.toFixed(1));count($('kpiValue'),Number(DATA.value??(DATA.total*50)),v=>'$'+Math.floor(v).toLocaleString());
+count($('kpiTasks'),(DATA.entries||[]).length,v=>Math.round(v).toString());count($('kpiStreak'),Number(DATA.streak||0),v=>Math.round(v)+' days');$('rankName').textContent=r.name||'-';if($('rankGlyph'))$('rankGlyph').textContent=(r.name||'?')[0];const tierNames = ['Novice','Bronze','Silver','Gold','Platinum','Diamond','Master','Grandmaster','Sage','AI Grandmaster'];
+$('rankTier').textContent = 'Tier ' + (tierNames.indexOf(r.name)+1 || '?') + ' of 10';$('rankNext').textContent=n?n.name:'MAX';$('rankPct').textContent=(r.progress??0).toFixed(1)+'%';$('rankBarFill').style.width=(r.progress??0)+'%';$('rankBar').setAttribute('aria-valuenow',Math.round(r.progress||0));count($('rankHours'),Number(r.current||0),v=>v.toFixed(1));count($('rankValue'),Number(DATA.value??0),v=>'$'+Math.round(v).toLocaleString());count($('rankTasks'),(DATA.entries||[]).length,v=>Math.round(v).toString());count($('rankStreak'),Number(DATA.streak||0),v=>Math.round(v)+'d')}
+function renderAchievements(){const grid=$('achGrid'),all=ALL_ACHIEVEMENTS,unlocked=new Set((DATA.achievements||[]).map(a=>a.id));$('achCount').textContent=`${unlocked.size} / ${all.length}`;grid.innerHTML=all.map(a=>{const ok=unlocked.has(a.id);return`<article class=\"feat-tile rarity-{['rare','epic','legendary','rare','epic'][all.indexOf(a)%5]}${ok?' unlocked':' locked'}" role="listitem" aria-label="${esc(a.name)}: ${ok?'unlocked':'locked'} - ${esc(a.desc)}" tabindex="0"><div class="feat-rune" aria-hidden="true">${esc(a.glyph)}</div><div class="feat-name">${esc(a.name)}</div><div class="feat-desc">${esc(a.desc)}</div></article>`}).join('');grid.querySelectorAll('.ach-tile').forEach(t=>{t.addEventListener('mouseenter',()=>{const tip=$('tip');tip.textContent=t.getAttribute('aria-label');tip.style.opacity=1;const r=t.getBoundingClientRect();tip.style.left=Math.min(r.left+10,innerWidth-260)+'px';tip.style.top=Math.max(10,r.top-32)+'px'});t.addEventListener('mouseleave',()=>{$('tip').style.opacity=0})})}
+function renderArtifacts(){const grid=$('artGrid'),arts=DATA.artifacts||[];$('artCount').textContent=`${arts.length} collected`;grid.innerHTML=arts.length?arts.map(a=>`<article class=\"inv-item rarity-{['legendary','epic','rare','','rare','epic'][arts.indexOf(a)%6]} role="listitem" aria-label="${esc(a.name)}: ${esc(a.desc)}"><div class="inv-icon" aria-hidden="true">${esc(a.glyph)}</div><div class="inv-name">${esc(a.name)}</div><div class="inv-count">${typeof a.count==='number'?(a.count%1===0?a.count:a.count.toFixed(1)):esc(String(a.count))}</div><div class="inv-desc">${esc(a.desc)}</div></article>`).join(''):'<p class="empty">No artifacts yet - keep logging.</p>'}
+function renderQuests(){const list=$('questList'),qs=DATA.quests||[];const done=qs.filter(q=>q.pct>=100).length;$('questCount').textContent=`${done} / ${qs.length} done`;list.innerHTML=qs.map(q=>`<article class="quest-row${q.pct>=100?' done':''}" role="listitem" aria-label="${esc(q.name)}: ${q.current} of ${q.target}, ${q.pct.toFixed(0)} percent"><div class="quest-seal" aria-hidden="true">${esc(q.glyph)}</div><div class="quest-info"><div class="quest-name">${esc(q.name)}</div><div class="quest-desc">${esc(q.desc)}</div></div><div class="quest-pct">${q.pct.toFixed(0)}%</div><div class="quest-bar"><div class="quest-bar-fill" style="width:${q.pct}%"></div></div></article>`).join('')}
 function render(){if(!DATA)return;renderRank();drawCum('cumPlot');drawCum('cumDetail');drawDonut();drawBars();drawROI();drawActivity();renderAchievements();renderArtifacts();renderQuests()}
 
 /* ===== v7 - level-up detector + rank change flash ===== */
@@ -1356,7 +1379,7 @@ function v7_levelup(name){
   setTimeout(() => banner.classList.add('fire'), 50);
   setTimeout(() => banner.remove(), 2500);
 }
-function v7_announce(s){ const el = $('#sr'); if (el) el.textContent = s; }
+function v7_announce(s){ const el = $('sr'); if (el) el.textContent = s; }
 function v7_blip(kind, dur){
   if (window._v7_soundOn === false) return;
   if (!window._v7_audioCtx){
@@ -1407,11 +1430,11 @@ function v7_chime(kind){
   // unified: v7_blip handles kinds
   v7_blip(kind);
 }
-async function refresh(){let d;for(const u of ['/api/data','./data.json']){try{const r=await fetch(u,{cache:'no-store'});if(r.ok){d=await r.json();break}}catch(e){}}if(d){DATA=d;render();v7_afterRender();$('#updated').textContent='Live update '+new Date().toLocaleTimeString();announce(`${(DATA.entries||[]).length} tasks loaded`)}else{$('#updated').textContent='Embedded data - live source unavailable';announce('Embedded data remains available')}}
-function toggleAuto(){if(AUTO){clearInterval(AUTO);AUTO=null}else{AUTO=setInterval(refresh,5000);refresh()}$('#autoBtn').textContent=AUTO?'Auto: ON (5s)':'Auto: OFF';$('#autoBtn').setAttribute('aria-pressed',String(Boolean(AUTO)))}
-$('#refreshBtn').addEventListener('click',refresh);$('#autoBtn').addEventListener('click',toggleAuto);$('#entryForm').addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.currentTarget),payload={task:fd.get('task'),hours:Number(fd.get('hours')),invested:Number(fd.get('invested')),cat:fd.get('cat')};try{const r=await fetch('/api/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw Error();e.currentTarget.reset();announce('Entry added');refresh()}catch(err){announce('Could not add entry. Start serve.py and retry.')}});$('#dialogClose').addEventListener('click',()=>$('#drillDialog').close());$('#drillDialog').addEventListener('close',()=>lastFocus?.focus());$('#drillDialog').addEventListener('keydown',e=>{if(e.key==='Escape')return;const f=[...e.currentTarget.querySelectorAll('button,[href],input,select,[tabindex]:not([tabindex="-1"])')];if(e.key==='Tab'&&f.length){if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f.at(-1).focus()}else if(!e.shiftKey&&document.activeElement===f.at(-1)){e.preventDefault();f[0].focus()}}});
+async function refresh(){let d;for(const u of ['/api/data','./data.json']){try{const r=await fetch(u,{cache:'no-store'});if(r.ok){d=await r.json();break}}catch(e){}}if(d){DATA=d;render();v7_afterRender();$('updated').textContent='Live update '+new Date().toLocaleTimeString();announce(`${(DATA.entries||[]).length} tasks loaded`)}else{$('updated').textContent='Embedded data - live source unavailable';announce('Embedded data remains available')}}
+function toggleAuto(){if(AUTO){clearInterval(AUTO);AUTO=null}else{AUTO=setInterval(refresh,5000);refresh()}$('autoBtn').textContent=AUTO?'Auto: ON (5s)':'Auto: OFF';$('autoBtn').setAttribute('aria-pressed',String(Boolean(AUTO)))}
+$('refreshBtn').addEventListener('click',refresh);$('autoBtn').addEventListener('click',toggleAuto);$('entryForm').addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.currentTarget),payload={task:fd.get('task'),hours:Number(fd.get('hours')),invested:Number(fd.get('invested')),cat:fd.get('cat')};try{const r=await fetch('/api/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw Error();e.currentTarget.reset();announce('Entry added');refresh()}catch(err){announce('Could not add entry. Start serve.py and retry.')}});$('dialogClose').addEventListener('click',()=>$('drillDialog').close());$('drillDialog').addEventListener('close',()=>lastFocus?.focus());$('drillDialog').addEventListener('keydown',e=>{if(e.key==='Escape')return;const f=[...e.currentTarget.querySelectorAll('button,[href],input,select,[tabindex]:not([tabindex="-1"])')];if(e.key==='Tab'&&f.length){if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f.at(-1).focus()}else if(!e.shiftKey&&document.activeElement===f.at(-1)){e.preventDefault();f[0].focus()}}});
 function bindTilt(root=document){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;root.querySelectorAll('.tilt:not([data-tilt])').forEach(card=>{card.dataset.tilt='1';let rx=0,ry=0,tx=0,ty=0;function frame(){rx+=(tx-rx)*.12;ry+=(ty-ry)*.12;card.style.transform=`perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;requestAnimationFrame(frame)}frame();card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();ty=((e.clientX-r.left)/r.width-.5)*8;tx=-((e.clientY-r.top)/r.height-.5)*8});card.addEventListener('mouseleave',()=>{tx=ty=0})})}
-if(DATA){window._v7_soundOn = false; render();v7_afterRender();$('#updated').textContent='Embedded data loaded '+new Date().toLocaleTimeString()}refresh();bindTilt();
+if(DATA){window._v7_soundOn = false; render();v7_afterRender();$('updated').textContent='Embedded data loaded '+new Date().toLocaleTimeString()}refresh();bindTilt();
 
 </script>
 
@@ -1944,90 +1967,147 @@ if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.body.classL
   if (!grid || !monthsEl) return;
   const d = data();
   const entries = d.entries || [];
-  // bucket by date
+  // bucket by date (sum hours per day)
   const byDate = {};
   for (const e of entries){
+    if (!e.date) continue;
     if (!byDate[e.date]) byDate[e.date] = 0;
     byDate[e.date] += (e.hours || 0);
   }
-  // find max for scaling
-  const max = Math.max(0.01, ...Object.values(byDate));
+  // find max for stats
+  const max = Math.max(0, ...Object.values(byDate));
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const todayStr = today.toISOString().slice(0, 10);
-  // current week's Sunday = last col
-  // we render: rows = days of week (Sun..Sat = 0..6), cols = last 53 weeks
-  const todayDow = today.getDay(); // 0=Sun
-  // start date: go back (todayDow + 52*7) days
-  const start = new Date(today);
-  start.setDate(today.getDate() - (todayDow + 52*7 - 6));
+  // ----- GitHub-clone grid layout -----
+  // We render 52 weeks x 7 days = 364 cells, ending at today's week.
+  // Days run Sun..Sat (row 0=Sun, row 6=Sat).
+  // The LEFTMOST column is the OLDEST week (52 weeks ago), the RIGHTMOST is the week containing today.
+  const totalWeeks = 52;
+  // Find the Saturday of the current week (row 6 of the week containing today).
+  // GitHub uses Sunday-start weeks: row 0 = Sun, row 6 = Sat.
+  const todayDow = today.getDay(); // 0 = Sun
+  // Date of the Saturday at the END of today's week:
+  const endSat = new Date(today);
+  endSat.setDate(today.getDate() + (6 - todayDow));
+  // Date of the Sunday at the START of the leftmost (week 0) column:
+  const startSun = new Date(endSat);
+  startSun.setDate(endSat.getDate() - totalWeeks * 7);
+  // Build all 364 cells (col, row) and assign each a date + hours + level.
+  const M = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
   const cells = [];
-  const monthLabels = [];
-  let curMonth = -1;
-  for (let col = 0; col < 53; col++){
-    let monthLabel = "";
+  const monthSet = new Set(); // months that get a label (only those whose day 1 falls within that column)
+  let activeDays = 0;
+  let peak = 0;
+  for (let col = 0; col < totalWeeks; col++){
     for (let row = 0; row < 7; row++){
-      const idx = col * 7 + row;
-      const d2 = new Date(start);
-      d2.setDate(start.getDate() + idx);
+      const d2 = new Date(startSun);
+      d2.setDate(startSun.getDate() + col * 7 + row);
       const iso = d2.toISOString().slice(0, 10);
       const hours = byDate[iso] || 0;
       const isFuture = d2 > today;
       const isToday = iso === todayStr;
-      // intensity: 0 = lvl-0, 1 = lvl-1, ..., 4 = lvl-4
-      const ratio = hours / max;
+      // GitHub-clone intensity tier based on hours (per spec):
+      // 0h = tier 0; 0 < h < 0.5 = tier 1; 0.5 <= h < 2 = tier 2;
+      // 2 <= h < 4 = tier 3; h >= 4 = tier 4
       let lvl = 0;
-      if (hours > 0){
-        if (ratio < 0.1) lvl = 1;
-        else if (ratio < 0.3) lvl = 2;
-        else if (ratio < 0.6) lvl = 3;
-        else lvl = 4;
-      }
+      if (hours > 0 && hours < 0.5) lvl = 1;
+      else if (hours >= 0.5 && hours < 2) lvl = 2;
+      else if (hours >= 2 && hours < 4) lvl = 3;
+      else if (hours >= 4) lvl = 4;
       cells.push({col, row, iso, hours, lvl, isFuture, isToday});
-    }
-    // month label for the FIRST day of this column
-    const firstDayOfCol = new Date(start);
-    firstDayOfCol.setDate(start.getDate() + col * 7);
-    const m = firstDayOfCol.getMonth();
-    if (m !== curMonth){
-      monthLabels.push({col, name: ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][m]});
-      curMonth = m;
+      if (!isFuture && hours > 0) activeDays++;
+      if (hours > peak) peak = hours;
+      // Month label: show month name IF day-1-of-month falls within this column (row 0..6)
+      // Only label columns that contain at least some past days (don't waste labels on all-future columns at the very end).
+      const colHasPast = (() => {
+        const colStart = new Date(startSun);
+        colStart.setDate(startSun.getDate() + col * 7);
+        return colStart <= today;
+      })();
+      if (colHasPast){
+        const y = d2.getFullYear();
+        const m = d2.getMonth();
+        const firstOfMonth = new Date(y, m, 1);
+        // place label at the column containing the 1st of this month, regardless of whether 1st itself is future
+        const daysFromStart = Math.floor((firstOfMonth - startSun) / 86400000);
+        if (daysFromStart >= 0 && daysFromStart < totalWeeks * 7 && Math.floor(daysFromStart / 7) === col){
+          monthSet.add(col + ":" + M[m]);
+        }
+      }
     }
   }
-  // build month labels (one per column, blank if no label)
-  const monthCols = monthLabels;
-  let lastCol = -1;
-  monthsEl.innerHTML = Array.from({length: 53}, (_, i) => {
-    const lbl = monthCols.find(m => m.col === i);
-    return lbl ? '<span style="grid-column:' + (i+1) + ';text-align:left">' + lbl.name + '</span>' : '<span></span>';
+  // Build month labels as 52-column grid (only first row populated)
+  monthsEl.innerHTML = Array.from({length: totalWeeks}, (_, i) => {
+    let lbl = "";
+    monthSet.forEach(v => {
+      const [c, name] = v.split(":");
+      if (parseInt(c, 10) === i) lbl = name;
+    });
+    return lbl ? `<span style="grid-column:${i + 1};text-align:left">${lbl}</span>` : "<span></span>";
   }).join("");
-  // build cells
+  // Render cells in column-major order so layout is GitHub-style (each col = week, top to bottom).
+  // Future cells are NOT rendered at all (per spec).
+  // Render all cells; future cells get .future class (visually invisible via CSS opacity)
   grid.innerHTML = cells.map(c => {
     const cls = "heatmap-cell lvl-" + c.lvl + (c.isToday ? " today" : "") + (c.isFuture ? " future" : "");
-    return '<div class="' + cls + '" data-iso="' + c.iso + '" data-hours="' + c.hours.toFixed(2) + '" style="grid-column:' + (c.col+1) + ';grid-row:' + (c.row+1) + '"></div>';
+    return `<div class="${cls}" data-iso="${c.iso}" data-hours="${c.hours.toFixed(2)}" style="grid-column:${c.col + 1};grid-row:${c.row + 1}"></div>`;
   }).join("");
-  // tooltip on hover
+  // Tooltip: 'N contributions on DATE' or 'No contributions on DATE'
+  const fmtDate = iso => {
+    const dt = new Date(iso + "T00:00:00");
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    return `${days[dt.getDay()]} ${months[dt.getMonth()]} ${dt.getDate()}, ${dt.getFullYear()}`;
+  };
   grid.onmousemove = e => {
     const t = e.target;
     if (!t.classList.contains("heatmap-cell")){ tip.classList.remove("show"); return; }
     const iso = t.dataset.iso;
     const hrs = parseFloat(t.dataset.hours || 0);
-    tip.textContent = iso + (hrs ? " · " + hrs.toFixed(2) + "h" : " · 0h");
+    if (hrs > 0){
+      const n = hrs >= 1 ? Math.round(hrs) : 1; // approximate "contributions" count
+      tip.innerHTML = `<b>${n} contribution${n === 1 ? "" : "s"}</b> on ${fmtDate(iso)}`;
+    } else {
+      tip.innerHTML = `No contributions on ${fmtDate(iso)}`;
+    }
     tip.classList.add("show");
-    tip.style.left = Math.min(e.clientX + 12, innerWidth - 180) + "px";
-    tip.style.top = Math.min(e.clientY + 12, innerHeight - 40) + "px";
+    tip.style.left = Math.min(e.clientX + 14, innerWidth - 220) + "px";
+    tip.style.top = Math.min(e.clientY + 14, innerHeight - 40) + "px";
   };
   grid.onmouseleave = () => tip.classList.remove("show");
-  // stats
-  const activeDays = Object.keys(byDate).length;
+  // Click cell: highlight + scroll goal panel into view
+  grid.onclick = e => {
+    const t = e.target;
+    if (!t.classList.contains("heatmap-cell")) return;
+    grid.querySelectorAll(".heatmap-cell.sel").forEach(x => x.classList.remove("sel"));
+    t.classList.add("sel");
+    const goal = $("#goalCard");
+    if (goal){ goal.scrollIntoView({behavior: "smooth", block: "center"}); goal.classList.add("heat-pulse"); setTimeout(() => goal.classList.remove("heat-pulse"), 1400); }
+  };
+  // longest streak (in rendered cells)
   let longestStreak = 0, curStreak = 0;
-  const allDates = Object.keys(byDate).sort();
-  for (const dt of allDates){
+  const sortedDates = Object.keys(byDate).sort();
+  for (const dt of sortedDates){
     if (byDate[dt] > 0){ curStreak++; longestStreak = Math.max(longestStreak, curStreak); }
     else curStreak = 0;
   }
+  // current streak (consecutive active days ending today or yesterday)
+  let currentStreak = 0;
+  const cursor = new Date(today);
+  // Skip today if it's empty (don't count a missing "today" against the streak yet)
+  if ((byDate[todayStr] || 0) === 0) cursor.setDate(cursor.getDate() - 1);
+  while (true){
+    const iso = cursor.toISOString().slice(0, 10);
+    if ((byDate[iso] || 0) > 0) currentStreak++;
+    else break;
+    cursor.setDate(cursor.getDate() - 1);
+    if (currentStreak > 365) break; // safety
+  }
   if ($("#hmDays")) $("#hmDays").textContent = activeDays;
-  if ($("#hmStreak")) $("#hmStreak").textContent = longestStreak;
-  if ($("#hmPeak")) $("#hmPeak").textContent = max.toFixed(1) + "h";
+  if ($("#hmStreak")) $("#hmStreak").textContent = currentStreak + "d";
+  if ($("#hmPeak")) $("#hmPeak").textContent = peak.toFixed(1) + "h";
+  if ($("#hmTotal")) $("#hmTotal").textContent = (Object.values(byDate).reduce((a, b) => a + b, 0)).toFixed(1) + "h";
 }
 
 function renderPerDay(){
@@ -3055,7 +3135,5 @@ function v10_renderAll(){
   });
 })();
 </script>
-<script>
-
 </body>
 </html>
