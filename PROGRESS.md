@@ -103,3 +103,22 @@
   - Add a tag system (so each entry can have multiple tags)
   - Add `log.py import` (vs bulk which uses CSV - accept JSON arrays)
   - Auto-detect daily summary cron (suggest via toast if no entry today)
+
+- **2026-07-28T22:10:** v18.4 CRITICAL FIX - test isolation (commit 3c33179)
+
+## Lessons learned (v18.4)
+- **Test scripts that write to the real data path = silent data loss.**
+  The `log.py` module used module-level `LOG = os.path.join(BASE, "log.jsonl")` which was
+  bound at import time. Tests set `log.BASE = tmpdir` but `log.LOG` was still production.
+  Test entries leaked into production log.jsonl, shrinking it from 29 to 2 entries.
+- **Fix:** added `_base_dir()/_log_path()/_dash_path()/_data_path()` helpers that
+  re-read `os.environ['AI_TIME_SAVED_DIR']` at every call. All write/read sites use them.
+- **DDA saved the day:** the snapshot from earlier let me `git checkout HEAD -- log.jsonl data.json`
+  and recover immediately. This is exactly the failure mode DDA was built for.
+- **Lesson:** any code that mutates user data MUST go through DDA or use environment-driven paths.
+  Tests must never silently write to production.
+
+## Roadmap (priority-ordered, updated)
+1-11, v15-v18 - DONE
+- Test count now 20/20 pass with proper isolation
+- Refactor dashboard.html into separate JS files - deferred (high risk)
