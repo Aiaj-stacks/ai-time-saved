@@ -11,8 +11,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
-# Make log.py importable. It's in the project root, one level up from tests/.
+# Redirect AI_TIME_SAVED_DIR BEFORE importing log so all module-level
+# paths and runtime _base_dir() calls land in our tempdir.
 ROOT = Path(__file__).resolve().parent.parent
+TMPROOT = tempfile.mkdtemp(prefix="ai-time-saved-test-")
+os.environ["AI_TIME_SAVED_DIR"] = TMPROOT
 sys.path.insert(0, str(ROOT))
 
 import log  # noqa: E402
@@ -20,26 +23,28 @@ import log  # noqa: E402
 
 class TestLog(unittest.TestCase):
     def setUp(self):
-        # Use a tempdir so we never touch the real log.jsonl
+        # Use a fresh tempdir per test so they don't pollute each other
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.tmpdir = Path(self.tmp.name)
-        # Monkey-patch log.BASE/LOG/DASH to point inside tmpdir
-        self._orig_base, self._orig_log, self._orig_dash = log.BASE, log.LOG, log.DASH
-        log.BASE = str(self.tmpdir)
-        log.LOG = str(self.tmpdir / "log.jsonl")
-        log.DASH = str(self.tmpdir / "dashboard.html")
-        # Create an empty dashboard.html stub so report() does not error
+        # Override the module-level TMPROOT for this test
+        os.environ["AI_TIME_SAVED_DIR"] = str(self.tmpdir)
+        # Re-import log so its module-level BASE/LOG/DASH pick up the new path
+        # We can't truly reimport, but the helper functions _base_dir() etc.
+        # read from os.environ every call, so all writes/reads will target
+        # the new path. Verify by creating a stub dashboard.html:
         (self.tmpdir / "dashboard.html").write_text("<html></html>")
 
     def tearDown(self):
-        log.BASE, log.LOG, log.DASH = self._orig_base, self._orig_log, self._orig_dash
+        # restore production path for the next test class
+        os.environ["AI_TIME_SAVED_DIR"] = TMPROOT
 
     # --- add / load ---
     def test_add_appends_one_line(self):
         log.add("task a", 1.5, "TPM")
-        self.assertTrue(Path(log.LOG).exists())
-        lines = Path(log.LOG).read_text(encoding="utf-8").splitlines()
+        log_path = os.path.join(self.tmpdir, "log.jsonl")
+        self.assertTrue(Path(log_path).exists())
+        lines = Path(log_path).read_text(encoding="utf-8").splitlines()
         self.assertEqual(len(lines), 1)
         rec = json.loads(lines[0])
         self.assertEqual(rec["task"], "task a")

@@ -40,14 +40,35 @@ import os
 import re
 import csv
 import io
+import sys
 from datetime import date, timedelta
 
-BASE = os.environ.get(
-    "AI_TIME_SAVED_DIR",
-    "/mnt/c/Users/rijve/OneDrive/Documents/ai-time-saved",
-)
-LOG = os.path.join(BASE, "log.jsonl")
-DASH = os.path.join(BASE, "dashboard.html")
+
+def _base_dir():
+    """Resolve BASE dynamically. Honor AI_TIME_SAVED_DIR env var.
+    Tests should set os.environ['AI_TIME_SAVED_DIR'] = '/tmp/sb' BEFORE importing
+    log, OR monkey-patch the BASE attribute after import (call functions will
+    re-read each time)."""
+    return os.environ.get(
+        "AI_TIME_SAVED_DIR",
+        "/mnt/c/Users/rijve/OneDrive/Documents/ai-time-saved",
+    )
+def _log_path():
+    return os.path.join(_base_dir(), "log.jsonl")
+def _dash_path():
+    return os.path.join(_base_dir(), "dashboard.html")
+def _data_path():
+    return os.path.join(_base_dir(), "data.json")
+
+# Module-level defaults for backwards compatibility. They point at the
+# production paths at import time. Functions that write/read files MUST call
+# _log_path() / _dash_path() / _data_path() instead of using LOG / DASH / DATAJSON
+# directly, so that test isolation via os.environ or monkey-patch works.
+BASE = _base_dir()
+LOG = _log_path()
+DASH = _dash_path()
+DATAJSON = _data_path()
+
 
 PALETTE = ["#4f9dff", "#34d399", "#fbbf24", "#f472b6",
            "#a78bfa", "#fb7185", "#22d3ee", "#a3e635"]
@@ -80,22 +101,26 @@ ALL_ACHIEVEMENTS = [
 # storage
 # ---------------------------------------------------------------------------
 def ensure():
-    os.makedirs(BASE, exist_ok=True)
-    if not os.path.exists(LOG):
-        open(LOG, "a").close()
+    os.makedirs(_base_dir(), exist_ok=True)
+    if not os.path.exists(_log_path()):
+        open(_log_path(), "a").close()
 
 
 def load():
     ensure()
     out = []
-    for line in open(LOG, encoding="utf-8"):
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            out.append(json.loads(line))
-        except Exception:
-            pass
+    try:
+        path = _log_path()
+        for line in open(path, encoding="utf-8"):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                out.append(json.loads(line))
+            except Exception:
+                pass
+    except FileNotFoundError:
+        return []
     return out
 
 
@@ -105,7 +130,7 @@ def add(task, hours, cat="General", note="", invested=0.0, d=None):
            "hours": round(float(hours), 2),
            "invested": round(float(invested), 2),
            "note": note}
-    with open(LOG, "a", encoding="utf-8") as f:
+    with open(_log_path(), "a", encoding="utf-8") as f:
         f.write(json.dumps(rec, ensure_ascii=False) + "\n")
     print(f"  + logged {d} | {cat} | saved {rec['hours']}h"
           + (f" | invested {rec['invested']}h" if rec["invested"] else "")
@@ -153,7 +178,7 @@ def edit(match, **fields):
         entries[idx] = after
         changed.append((idx, before, after))
     # Write back: rebuild file
-    with open(LOG, "w", encoding="utf-8") as f:
+    with open(_log_path(), "w", encoding="utf-8") as f:
         for e in entries:
             f.write(json.dumps(e, ensure_ascii=False) + "\n")
     print(f"  edited {len(changed)} entr{'y' if len(changed)==1 else 'ies'}:")
@@ -181,7 +206,7 @@ def delete(match, **filters):
             return []
     keep_idx = {i for i, _ in hits}
     removed = [e for i, e in hits]
-    with open(LOG, "w", encoding="utf-8") as f:
+    with open(_log_path(), "w", encoding="utf-8") as f:
         for i, e in enumerate(entries):
             if i in keep_idx:
                 continue
@@ -196,7 +221,7 @@ def delete(match, **filters):
 
 def goal(action, hours=None):
     """Manage the weekly velocity target. Stored in data.json."""
-    data_file = os.path.join(BASE, "data.json")
+    data_file = _data_path()
     d = {}
     if os.path.exists(data_file):
         try: d = json.loads(open(data_file, encoding="utf-8").read())
@@ -235,14 +260,16 @@ def bulk(csv_path, dry_run=False):
     Returns the number of entries appended.
     Refuses if CSV is malformed or any row is missing required fields."""
     if not os.path.exists(csv_path):
-        die(f"CSV file not found: {csv_path}")
+        print(f"  [bulk] FAIL: CSV file not found: {csv_path}", file=sys.stderr)
+        return None
     required = {"date", "task", "cat", "hours"}
     with open(csv_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         fieldnames = reader.fieldnames or []
         missing = required - set(fieldnames)
         if missing:
-            die(f"CSV missing required columns: {sorted(missing)} (have: {fieldnames})")
+            print(f"  [bulk] FAIL: CSV missing required columns: {sorted(missing)} (have: {fieldnames})", file=sys.stderr)
+            return None
         rows = list(reader)
     if not rows:
         print(f"  CSV is empty (header only); nothing to import")
@@ -257,15 +284,16 @@ def bulk(csv_path, dry_run=False):
             invested = round(float(row.get("invested") or 0), 2)
             note = (row.get("note") or "").strip()
             if not d or not task or hours <= 0:
-                raise ValueError(f"row {i}: date, task, and positive hours required")
+                raise ValueError(f"date, task, and positive hours required")
         except Exception as e:
-            die(f"row {i} parse failed: {e}")
+            print(f"  [bulk] FAIL: row {i} parse failed: {e}", file=sys.stderr)
+            return None
         if dry_run:
             print(f"  [dry-run] {d} | {cat} | {hours}h | {task[:50]}")
             continue
         rec = {"date": d, "task": task, "cat": cat, "hours": hours,
                "invested": invested, "note": note}
-        with open(LOG, "a", encoding="utf-8") as f:
+        with open(_log_path(), "a", encoding="utf-8") as f:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
         appended += 1
     if not dry_run:
@@ -657,8 +685,9 @@ def report(entries):
     quests = compute_quests(entries, by_cat, total, streak)
     # preserve user-managed fields (goal, etc.) from previous data.json
     preserved = {}
-    if os.path.exists(DATAJSON):
-        try: preserved = json.loads(open(DATAJSON, encoding="utf-8").read())
+    dp = _data_path()
+    if os.path.exists(dp):
+        try: preserved = json.loads(open(dp, encoding="utf-8").read())
         except Exception: pass
     preserved_user_fields = {k: v for k, v in preserved.items() if k not in {
         "total","value","streak","rank","next_rank","rank_pct","achievements",
@@ -674,12 +703,12 @@ def report(entries):
             "cum": cum, "weekly": wkdata, "entries": entries,
             "updated": date.today().isoformat(),
             **preserved_user_fields}
-    with open(DATAJSON, "w", encoding="utf-8") as f:
+    with open(dp, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     # refresh embedded DATA so file:// view shows current data with no server.
     # Use a regex so it matches whether DATA is null or already-populated.
     try:
-        html = open(DASH, encoding="utf-8").read()
+        html = open(_dash_path(), encoding="utf-8").read()
         new_block = "let DATA=" + json.dumps(data, ensure_ascii=False) + ", AUTO=null;"
         if re.search(r"let DATA=.*?, AUTO=null;", html, re.S):
             html = re.sub(r"let DATA=.*?, AUTO=null;", new_block, html, count=1, flags=re.S)
@@ -689,7 +718,7 @@ def report(entries):
             print(f"  > (embed marker not found, leaving dashboard.html as-is)")
     except Exception as e:
         print(f"  > (skip embed refresh: {e})")
-    print(f"  > data written: {DATAJSON}")
+    print(f"  > data written: {dp}")
     print(f"  > total {total:.1f}h | week {wk:.1f}h | month {mo:.1f}h | ROI "
           + (f"{(total/inv):.1f}x" if inv else "n/a"))
     print(f"  > Open dashboard.html directly (file://) and press F5 - no server needed.")
@@ -826,7 +855,7 @@ def main():
             mark = "[x]" if q.get('pct',0) >= 100 else ("[ ]" if q.get('pct',0) == 0 else "[~]")
             print(f"  {mark} {q['name']} - {q['desc']} ({q.get('pct',0):.0f}%)")
         # goal (read from data.json, set by 'goal' subcommand)
-        data_file = os.path.join(BASE, "data.json")
+        data_file = _data_path()
         if os.path.exists(data_file):
             try:
                 goal_data = json.loads(open(data_file, encoding="utf-8").read()).get("goal")

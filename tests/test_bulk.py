@@ -8,7 +8,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
+# Redirect AI_TIME_SAVED_DIR BEFORE importing log
 ROOT = Path(__file__).resolve().parent.parent
+TMPROOT = tempfile.mkdtemp(prefix="ai-time-saved-bulk-test-")
+os.environ["AI_TIME_SAVED_DIR"] = TMPROOT
 sys.path.insert(0, str(ROOT))
 
 import log  # noqa: E402
@@ -19,14 +22,11 @@ class TestBulk(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.tmpdir = Path(self.tmp.name)
-        self._orig_base, self._orig_log, self._orig_dash = log.BASE, log.LOG, log.DASH
-        log.BASE = str(self.tmpdir)
-        log.LOG = str(self.tmpdir / "log.jsonl")
-        log.DASH = str(self.tmpdir / "dashboard.html")
+        os.environ["AI_TIME_SAVED_DIR"] = str(self.tmpdir)
         (self.tmpdir / "dashboard.html").write_text("<html></html>")
 
     def tearDown(self):
-        log.BASE, log.LOG, log.DASH = self._orig_base, self._orig_log, self._orig_dash
+        os.environ["AI_TIME_SAVED_DIR"] = TMPROOT
 
     def _write_csv(self, content):
         path = self.tmpdir / "import.csv"
@@ -42,7 +42,8 @@ class TestBulk(unittest.TestCase):
         n = log.bulk(path, dry_run=True)
         self.assertEqual(n, 0)  # dry_run returns 0 appended
         # file should not exist
-        self.assertFalse(Path(log.LOG).exists())
+        log_path = os.path.join(self.tmpdir, "log.jsonl")
+        self.assertFalse(Path(log_path).exists())
 
     def test_bulk_real_import_appends_all_rows(self):
         path = self._write_csv(
@@ -59,8 +60,9 @@ class TestBulk(unittest.TestCase):
 
     def test_bulk_missing_required_column_exits(self):
         path = self._write_csv("date,task\n2026-01-01,foo\n")
-        with self.assertRaises(SystemExit):
-            log.bulk(path)
+        result = log.bulk(path)
+        # bulk returns None on failure (not raises), so we can recover.
+        self.assertIsNone(result)
 
     def test_bulk_empty_file_is_noop(self):
         path = self._write_csv("date,task,cat,hours\n")
