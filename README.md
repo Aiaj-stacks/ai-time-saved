@@ -63,15 +63,29 @@ python3 log.py add "Built the onboarding doc" --hours 2.0 --cat TPM
 python3 log.py add "Uninstalled Steam games" --hours 1.5 --cat Maintenance
 python3 log.py edit --match "steam games" --hours 2.0       # correct a typo
 python3 log.py delete --match "test entry"                   # remove an entry
+python3 log.py bulk entries.csv                              # import from CSV (dry-run first!)
+python3 log.py bulk entries.csv --dry-run                    # validate without writing
 python3 log.py goal set 3                                    # 3h/week target
 python3 log.py goal show                                    # progress vs target
 python3 log.py goal clear                                    # remove target
-python3 log.py summary                                       # print totals
+python3 log.py summary                                       # rich CLI: rank, achievements, artifacts, quests, goal
 python3 log.py report                                        # rebuild data.json + re-embed
 ```
 
 ### Inline form (when served)
 Use the "Deploy New Entry" panel inside the dashboard. The form POSTs to `/api/log` which writes to `log.jsonl` and re-embeds.
+
+### CSV bulk import
+```csv
+date,task,cat,hours,invested,note
+2026-07-20,Reviewed PR #42,TPM,1.0,0.2,
+2026-07-21,Set up CI pipeline,Tooling,2.5,0.5,GitHub Actions
+```
+```bash
+python3 log.py bulk entries.csv --dry-run    # validate only
+python3 log.py bulk entries.csv              # append + re-embed
+```
+Required columns: `date`, `task`, `cat`, `hours`. Optional: `invested`, `note`.
 
 ## Hours saved method
 
