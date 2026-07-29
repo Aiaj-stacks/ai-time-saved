@@ -3229,5 +3229,94 @@ function v10_renderAll(){
 })();
 </script>
 
+
+<script>
+window.__testResult = null;
+(function(){
+  function runTest(){
+    try {
+      const cells = document.querySelectorAll('#hmGrid .heatmap-cell');
+      const target = [...cells].find(c => c.dataset.iso === '2026-07-17');
+      if (!target) {
+        window.__testResult = {error: 'no cell found'};
+        return;
+      }
+      const tip = document.querySelector('#hmTip');
+      // Fire mouseover with the cell as target via the grid
+      const grid = document.getElementById('hmGrid');
+      // Use dispatchEvent on the GRID (since handler is on grid) with the
+      // actual cell as event target
+      const rect = target.getBoundingClientRect();
+      // Scroll into view first
+      target.scrollIntoView({block: 'center'});
+      const ev = new MouseEvent('mouseover', {
+        bubbles: true, cancelable: true, view: window,
+        clientX: rect.left + 5, clientY: rect.top + 5
+      });
+      // Override target via the relatedTarget trick - dispatch on grid with cell as event
+      Object.defineProperty(ev, 'target', {value: target, writable: false});
+      // Since the handler uses e.target.closest(), it needs e.target to be the cell
+      // The grid handler listens on grid, so we dispatch on grid but with target=cell
+      // Actually let me just dispatch on the cell directly - that bubbles to grid
+      const ev2 = new MouseEvent('mouseover', {bubbles: true, cancelable: true, view: window, clientX: rect.left + 5, clientY: rect.top + 5});
+      target.dispatchEvent(ev2);
+      // Wait a tick then check
+      setTimeout(() => {
+        window.__testResult = {
+          iso: target.dataset.iso,
+          hours: target.dataset.hours,
+          tipShow: tip.classList.contains('show'),
+          tipText: tip.textContent,
+          tipHTML: tip.innerHTML,
+          tipStyle: tip.style.cssText,
+          tipPos: {left: tip.style.left, top: tip.style.top}
+        };
+      }, 100);
+    } catch(e) {
+      window.__testResult = {error: e.message};
+    }
+  }
+  if (document.readyState === 'complete') setTimeout(runTest, 1500);
+  else window.addEventListener('load', () => setTimeout(runTest, 1500));
+})();
+</script>
+
+
+<script>
+window.__testResult = null;
+(function(){
+  function runTest(){
+    try {
+      const cells = document.querySelectorAll('#hmGrid .heatmap-cell');
+      const target = [...cells].find(c => c.dataset.iso === '2026-07-17');
+      if (!target) {
+        window.__testResult = {error: 'no cell found'};
+        return;
+      }
+      const tip = document.querySelector('#hmTip');
+      const rect = target.getBoundingClientRect();
+      target.scrollIntoView({block: 'center'});
+      const ev = new MouseEvent('mouseover', {bubbles: true, cancelable: true, view: window, clientX: rect.left + 5, clientY: rect.top + 5});
+      target.dispatchEvent(ev);
+      setTimeout(() => {
+        window.__testResult = {
+          iso: target.dataset.iso,
+          hours: target.dataset.hours,
+          tipShow: tip.classList.contains('show'),
+          tipText: tip.textContent,
+          tipHTML: tip.innerHTML,
+          tipStyle: tip.style.cssText,
+          tipPos: {left: tip.style.left, top: tip.style.top}
+        };
+      }, 200);
+    } catch(e) {
+      window.__testResult = {error: e.message};
+    }
+  }
+  if (document.readyState === 'complete') setTimeout(runTest, 2000);
+  else window.addEventListener('load', () => setTimeout(runTest, 2000));
+})();
+</script>
+
 </body>
 </html>
