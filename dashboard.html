@@ -2125,14 +2125,33 @@ if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.body.classL
     if (!t.classList.contains("heatmap-cell")){ tip.classList.remove("show"); return; }
     const iso = t.dataset.iso;
     const hrs = parseFloat(t.dataset.hours || 0);
+    // Find entries for this date
+    const d = data();
+    const dayEntries = (d.entries || []).filter(en => en.date === iso);
+    const taskCount = dayEntries.length;
     if (hrs > 0){
-      const n = hrs >= 1 ? Math.round(hrs) : 1; // approximate "contributions" count
-      tip.innerHTML = `<b>${n} contribution${n === 1 ? "" : "s"}</b> on ${fmtDate(iso)}`;
+      const hoursStr = hrs === 1 ? '1 hour' : hrs.toFixed(2).replace(/\.?0+$/, '') + ' hours';
+      const taskStr = taskCount === 1 ? '1 task' : taskCount + ' tasks';
+      let html = `<b>${hoursStr} saved</b> on ${fmtDate(iso)}<br><span style="opacity:.7">${taskStr}`;
+      // Show top 3 task names
+      if (dayEntries.length > 0) {
+        const tasks = dayEntries.slice(0, 3).map(en => esc(en.task || '').slice(0, 30)).join(', ');
+        if (dayEntries.length > 3) html += ` +${dayEntries.length - 3} more`;
+        html += '</span>';
+      } else {
+        html += '</span>';
+      }
+      tip.innerHTML = html;
     } else {
-      tip.innerHTML = `No contributions on ${fmtDate(iso)}`;
+      const isFuture = t.classList.contains("future");
+      if (isFuture) {
+        tip.innerHTML = `Future date ${fmtDate(iso)}`;
+      } else {
+        tip.innerHTML = `No hours saved on ${fmtDate(iso)}`;
+      }
     }
     tip.classList.add("show");
-    tip.style.left = Math.min(e.clientX + 14, innerWidth - 220) + "px";
+    tip.style.left = Math.min(e.clientX + 14, innerWidth - 280) + "px";
     tip.style.top = Math.min(e.clientY + 14, innerHeight - 40) + "px";
   };
   grid.onmouseleave = () => tip.classList.remove("show");
