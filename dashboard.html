@@ -675,7 +675,7 @@ body.focus-mode .shell > *.focus-keep{opacity:1;transform:scale(1.01);box-shadow
 .heatmap-legend .scale .lvl-2{background:#006d32}
 .heatmap-legend .scale .lvl-3{background:#26a641}
 .heatmap-legend .scale .lvl-4{background:#39d353}
-.heatmap-tip{position:fixed;z-index:500;pointer-events:none;padding:6px 10px;background:#0d1117;border:1px solid #30363d;border-radius:6px;font:600 11px var(--font-mono);color:#e6edf3;letter-spacing:.01em;opacity:0;transition:opacity .12s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.heatmap-tip{position:fixed;z-index:9990;pointer-events:none;padding:6px 10px;background:#0d1117;border:1px solid #30363d;border-radius:6px;font:600 11px var(--font-mono);color:#e6edf3;letter-spacing:.01em;opacity:0;transition:opacity .12s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.6)}
 .heatmap-tip.show{opacity:1}
 .heatmap-tip b{color:#39d353;font-weight:700}
 
@@ -2120,41 +2120,55 @@ if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.body.classL
     const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
     return `${days[dt.getDay()]} ${months[dt.getMonth()]} ${dt.getDate()}, ${dt.getFullYear()}`;
   };
-  grid.onmousemove = e => {
-    const t = e.target;
-    if (!t.classList.contains("heatmap-cell")){ tip.classList.remove("show"); return; }
-    const iso = t.dataset.iso;
-    const hrs = parseFloat(t.dataset.hours || 0);
-    // Find entries for this date
+  // Tooltip: use mouseover with delegation - works even if grid innerHTML is replaced
+  function showHeatmapTip(cell, clientX, clientY){
+    if (!cell || !cell.classList || !cell.classList.contains('heatmap-cell')) return;
+    const iso = cell.dataset.iso;
+    if (!iso) return;
+    const hrs = parseFloat(cell.dataset.hours || 0);
     const d = data();
     const dayEntries = (d.entries || []).filter(en => en.date === iso);
     const taskCount = dayEntries.length;
+    let html;
     if (hrs > 0){
       const hoursStr = hrs === 1 ? '1 hour' : hrs.toFixed(2).replace(/\.?0+$/, '') + ' hours';
       const taskStr = taskCount === 1 ? '1 task' : taskCount + ' tasks';
-      let html = `<b>${hoursStr} saved</b> on ${fmtDate(iso)}<br><span style="opacity:.7">${taskStr}`;
-      // Show top 3 task names
+      html = '<b>' + hoursStr + ' saved</b> on ' + fmtDate(iso) + '<br><span style="opacity:.7">' + taskStr;
       if (dayEntries.length > 0) {
         const tasks = dayEntries.slice(0, 3).map(en => esc(en.task || '').slice(0, 30)).join(', ');
-        if (dayEntries.length > 3) html += ` +${dayEntries.length - 3} more`;
+        if (dayEntries.length > 3) html += ' +' + (dayEntries.length - 3) + ' more';
         html += '</span>';
       } else {
         html += '</span>';
       }
-      tip.innerHTML = html;
+    } else if (cell.classList.contains('future')) {
+      html = 'Future date ' + fmtDate(iso);
     } else {
-      const isFuture = t.classList.contains("future");
-      if (isFuture) {
-        tip.innerHTML = `Future date ${fmtDate(iso)}`;
-      } else {
-        tip.innerHTML = `No hours saved on ${fmtDate(iso)}`;
-      }
+      html = 'No hours saved on ' + fmtDate(iso);
     }
-    tip.classList.add("show");
-    tip.style.left = Math.min(e.clientX + 14, innerWidth - 280) + "px";
-    tip.style.top = Math.min(e.clientY + 14, innerHeight - 40) + "px";
+    tip.innerHTML = html;
+    // Position the tooltip to the right of the cell, clamped to viewport
+    const rect = cell.getBoundingClientRect();
+    const tipX = Math.min(rect.right + 8, window.innerWidth - 300);
+    const tipY = Math.max(8, rect.top - 8);
+    tip.style.left = tipX + 'px';
+    tip.style.top = tipY + 'px';
+    tip.classList.add('show');
+  }
+  function hideHeatmapTip(){
+    if (tip) tip.classList.remove('show');
+  }
+  // Use mouseover for delegation - fires when mouse enters any child
+  grid.onmouseover = e => {
+    const cell = e.target.closest('.heatmap-cell');
+    if (cell) showHeatmapTip(cell, e.clientX, e.clientY);
   };
-  grid.onmouseleave = () => tip.classList.remove("show");
+  grid.onmouseout = e => {
+    // Only hide if mouse left the grid entirely
+    if (!e.relatedTarget || !grid.contains(e.relatedTarget)) {
+      hideHeatmapTip();
+    }
+  };
   // Click cell: highlight + scroll goal panel into view
   grid.onclick = e => {
     const t = e.target;
@@ -3214,5 +3228,6 @@ function v10_renderAll(){
   });
 })();
 </script>
+
 </body>
 </html>
