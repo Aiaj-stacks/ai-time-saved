@@ -52,6 +52,29 @@ DASH = os.path.join(BASE, "dashboard.html")
 PALETTE = ["#4f9dff", "#34d399", "#fbbf24", "#f472b6",
            "#a78bfa", "#fb7185", "#22d3ee", "#a3e635"]
 
+# 18-entry achievement catalog (mirrored from dashboard.html ALL_ACHIEVEMENTS).
+# Keep these IDs in sync with the dashboard so the "done" set is consistent.
+ALL_ACHIEVEMENTS = [
+    {"id":"first",  "name":"First Steps",         "desc":"Logged your first task"},
+    {"id":"week",   "name":"Week Warrior",        "desc":"Logged something this week"},
+    {"id":"ten",    "name":"Ten Strong",          "desc":"10 tasks logged"},
+    {"id":"q25",    "name":"Quarter Century",     "desc":"25 tasks logged"},
+    {"id":"h50",    "name":"Half Hundred",        "desc":"50 tasks logged"},
+    {"id":"h100",   "name":"Hundred Club",        "desc":"100 tasks logged"},
+    {"id":"h1",     "name":"One Hour Hero",       "desc":"1 hour saved"},
+    {"id":"h10",    "name":"Ten Hours Tower",     "desc":"10 hours saved"},
+    {"id":"h50h",   "name":"Fifty Hour Fortress", "desc":"50 hours saved"},
+    {"id":"h100h",  "name":"Centurion",           "desc":"100 hours saved"},
+    {"id":"h500",   "name":"Five-Hundred Sage",   "desc":"500 hours saved"},
+    {"id":"cat3",   "name":"Tri-Master",          "desc":"3+ categories"},
+    {"id":"cat5",   "name":"Penta-Force",         "desc":"5+ categories"},
+    {"id":"hero",   "name":"Heroic Heft",         "desc":"Saved 5+ hours in a single task"},
+    {"id":"epic",   "name":"Epic Effort",         "desc":"Saved 10+ hours in a single task"},
+    {"id":"s3",     "name":"Triple Threat",       "desc":"3-day streak"},
+    {"id":"s7",     "name":"Week Streak",         "desc":"7-day streak"},
+    {"id":"s14",    "name":"Fortnight",           "desc":"14-day streak"},
+]
+
 
 # ---------------------------------------------------------------------------
 # storage
@@ -771,12 +794,47 @@ def main():
     elif args.cmd == "summary":
         entries = load()
         total, inv, wk, mo, by_cat = summarize(entries)
-        print(f"All-time : {total:.1f}h across {len(entries)} tasks")
-        print(f"This week : {wk:.1f}h   This month: {mo:.1f}h")
-        print(f"Invested  : {inv:.1f}h   ROI: {(total/inv):.1f}x" if inv else "Invested  : n/a (use --invested)")
+        streak = entry_streak(entries)
+        rank, next_rank, rank_pct = rank_for(total)
+        achievements = compute_achievements(entries, by_cat, total)
+        artifacts = compute_artifacts(entries, total, by_cat)
+        quests = compute_quests(entries, by_cat, total, streak)
+        print(f"All-time   : {total:.1f}h across {len(entries)} tasks")
+        print(f"This week  : {wk:.1f}h   This month: {mo:.1f}h")
+        print(f"Invested   : {inv:.1f}h   ROI: {(total/inv):.1f}x" if inv else "Invested   : n/a (use --invested)")
+        print(f"Streak     : {streak} day(s)")
+        print(f"Rank       : {rank['name']} ({rank_pct:.1f}% to {next_rank['name'] if next_rank else 'MAX'})")
+        print(f"Value      : ${round(total*50,2):.0f}")
+        print()
         print("By category:")
         for c, h in sorted(by_cat.items(), key=lambda x: -x[1]):
-            print(f"  {c:<12} {h:>6.1f}h")
+            print(f"  {c:<14} {h:>6.1f}h")
+        print()
+        print(f"Achievements: {len(achievements)} of {len(ALL_ACHIEVEMENTS)} unlocked")
+        done = [a for a in achievements if a.get("pct", 0) >= 100]
+        for a in done[:5]:
+            print(f"  + {a['name']} - {a['desc']}")
+        if len(done) > 5:
+            print(f"  ... and {len(done)-5} more")
+        print()
+        print(f"Artifacts: {len(artifacts)} collected")
+        for a in artifacts:
+            print(f"  * {a['name']} - {a['desc']}")
+        print()
+        print(f"Quests: {sum(1 for q in quests if q.get('pct',0) >= 100)} of {len(quests)} done")
+        for q in quests:
+            mark = "[x]" if q.get('pct',0) >= 100 else ("[ ]" if q.get('pct',0) == 0 else "[~]")
+            print(f"  {mark} {q['name']} - {q['desc']} ({q.get('pct',0):.0f}%)")
+        # goal (read from data.json, set by 'goal' subcommand)
+        data_file = os.path.join(BASE, "data.json")
+        if os.path.exists(data_file):
+            try:
+                goal_data = json.loads(open(data_file, encoding="utf-8").read()).get("goal")
+                if goal_data:
+                    pct = (wk / goal_data["hours"] * 100) if goal_data.get("hours") else 0
+                    print()
+                    print(f"Weekly goal: {goal_data['hours']}h   this week: {wk:.1f}h   {pct:.0f}%")
+            except Exception: pass
     elif args.cmd == "report":
         report(load())
     elif args.cmd == "sync":
