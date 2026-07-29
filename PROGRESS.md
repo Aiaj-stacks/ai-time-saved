@@ -122,3 +122,24 @@
 1-11, v15-v18 - DONE
 - Test count now 20/20 pass with proper isolation
 - Refactor dashboard.html into separate JS files - deferred (high risk)
+
+- **2026-07-28T22:35:** v19 activity heatmap panel (commit f0db150)
+
+## v19 detail
+- Added a year-at-a-glance heatmap panel (53 weeks x 7 days = 371 cells)
+- 5 intensity tiers colored from low (cyan/transparent) to high (bright cyan glow)
+- Today cell outlined with cyan glow
+- Hover tooltip shows date + hours
+- Month labels along top, day of week implied by row position
+- Stats: days active, longest streak, peak day
+- **Bug fixed during v19:** renderGoal() and renderPerDay() were declared but
+  never called from v10_renderAll. Both functions + renderHeatmap() now wired in.
+- All 7 inline scripts still parse clean.
+
+## Roadmap (priority-ordered, updated)
+- DONE: v15 (README), v15.1 (serve.py POST), v15.3 (GitHub Pages),
+       v15.5 (log.py edit/delete), v15.6 (DDA G3 canonical),
+       v15.9 (exports), v15.10 (dev.sh), v15.11 (tests),
+       v16 (goal CLI + widget), v17 (per-day panel), v18 (bulk + summary),
+       v18.4 (test isolation fix), v19 (activity heatmap)
+- Refactor dashboard.html into separate JS files - still deferred (risk without real browser)
