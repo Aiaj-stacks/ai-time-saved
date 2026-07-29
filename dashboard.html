@@ -315,6 +315,14 @@ form{display:grid;gap:var(--space-3)}
 .form-row{display:grid;grid-template-columns:1fr;gap:var(--space-3)}
 @media(min-width:480px){.form-row{grid-template-columns:1fr 1fr}}
 .form-hint{font:italic 11px var(--font-body);color:var(--ink-3);padding-top:var(--space-2);border-top:1px dashed var(--line-soft);margin-top:var(--space-2)}
+.estimator{margin:0 0 var(--space-3);padding:var(--space-3);background:rgba(90,214,255,.04);border:1px solid rgba(90,214,255,.15);border-radius:6px;display:grid;gap:6px}
+.estimator-row{display:grid;grid-template-columns:140px 1fr;align-items:baseline;gap:var(--space-3);padding:4px 0}
+.estimator-label{font:600 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.estimator-val{font:600 14px var(--font-mono);color:var(--cyan-bright);text-align:right;font-variant-numeric:tabular-nums}
+.estimator-val.net{color:var(--ember);font-size:16px}
+.estimator-val.value{color:var(--cyan);font-size:16px}
+.estimator .helper{grid-column:1/-1;margin:0;font:500 9px var(--font-mono);color:var(--ink-3);letter-spacing:.05em;text-transform:uppercase;opacity:.7}
+.estimator:empty{display:none}
 
 /* gamification sections - inventory */
 .gamification-row{display:grid;grid-template-columns:1fr;gap:var(--space-4);margin-bottom:var(--space-6)}
@@ -1211,8 +1219,14 @@ body.god .hex-grid-bg{opacity:.15}
     <form id="entryForm">
       <div class="field"><label for="aTask">Deed</label><input id="aTask" name="task" required aria-describedby="taskHelp"><small id="taskHelp" class="helper">Describe the work that was done.</small></div>
       <div class="form-row">
-        <div class="field"><label for="aHours">Runes Earned</label><input id="aHours" name="hours" type="number" min="0.1" step="0.1" required aria-describedby="hoursHelp"><small id="hoursHelp" class="helper">Hours saved.</small></div>
+        <div class="field"><label for="aHours">Runes Earned</label><input id="aHours" name="hours" type="number" min="0.1" step="0.1" required aria-describedby="hoursHelp" aria-live="polite"><small id="hoursHelp" class="helper">Hours saved.</small></div>
         <div class="field"><label for="aInvested">Time Invested</label><input id="aInvested" name="invested" type="number" min="0" step="0.1" value="0" aria-describedby="investedHelp"><small id="investedHelp" class="helper">Your active time.</small></div>
+      </div>
+      <div class="estimator" id="estimator" aria-live="polite">
+        <div class="estimator-row"><span class="estimator-label">Manual time</span><span class="estimator-val" id="estManual">--</span><small class="helper">estimated time you would have spent without help</small></div>
+        <div class="estimator-row"><span class="estimator-label">Time invested</span><span class="estimator-val" id="estInvested">--</span><small class="helper">your active time on this task</small></div>
+        <div class="estimator-row"><span class="estimator-label">NET SAVED</span><span class="estimator-val net" id="estNet">--</span><small class="helper">manual minus invested</small></div>
+        <div class="estimator-row"><span class="estimator-label">Value @ $50/hr</span><span class="estimator-val value" id="estValue">--</span><small class="helper">net saved × your hourly rate</small></div>
       </div>
       <div class="field"><label for="aCat">Discipline</label><select id="aCat" name="cat" aria-describedby="catHelp"><option>TPM</option><option>Tooling</option><option>Maintenance</option><option>Research</option><option>Automation</option><option>Writing</option><option>Ops</option><option>General</option></select><small id="catHelp" class="helper">Choose the closest workstream.</small></div>
       <button class="btn primary magnetic" type="submit">Inscribe</button>
@@ -1432,7 +1446,36 @@ function v7_chime(kind){
 }
 async function refresh(){let d;for(const u of ['/api/data','./data.json']){try{const r=await fetch(u,{cache:'no-store'});if(r.ok){d=await r.json();break}}catch(e){}}if(d){DATA=d;render();v7_afterRender();$('updated').textContent='Live update '+new Date().toLocaleTimeString();announce(`${(DATA.entries||[]).length} tasks loaded`)}else{$('updated').textContent='Embedded data - live source unavailable';announce('Embedded data remains available')}}
 function toggleAuto(){if(AUTO){clearInterval(AUTO);AUTO=null}else{AUTO=setInterval(refresh,5000);refresh()}$('autoBtn').textContent=AUTO?'Auto: ON (5s)':'Auto: OFF';$('autoBtn').setAttribute('aria-pressed',String(Boolean(AUTO)))}
-$('refreshBtn').addEventListener('click',refresh);$('autoBtn').addEventListener('click',toggleAuto);$('entryForm').addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.currentTarget),payload={task:fd.get('task'),hours:Number(fd.get('hours')),invested:Number(fd.get('invested')),cat:fd.get('cat')};try{const r=await fetch('/api/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw Error();e.currentTarget.reset();announce('Entry added');refresh()}catch(err){announce('Could not add entry. Start serve.py and retry.')}});$('dialogClose').addEventListener('click',()=>$('drillDialog').close());$('drillDialog').addEventListener('close',()=>lastFocus?.focus());$('drillDialog').addEventListener('keydown',e=>{if(e.key==='Escape')return;const f=[...e.currentTarget.querySelectorAll('button,[href],input,select,[tabindex]:not([tabindex="-1"])')];if(e.key==='Tab'&&f.length){if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f.at(-1).focus()}else if(!e.shiftKey&&document.activeElement===f.at(-1)){e.preventDefault();f[0].focus()}}});
+
+  // TIME-SAVINGS ESTIMATOR - live updates as user types
+  function updateEstimator(){
+    const hoursSaved = parseFloat($('aHours').value) || 0;
+    const invested = parseFloat($('aInvested').value) || 0;
+    const cat = $('aCat').value || '';
+    let mult = 1.5;
+    if (cat === 'TPM' || cat === 'Research') mult = 2.0;
+    else if (cat === 'Maintenance') mult = 1.3;
+    else if (cat === 'Tooling' || cat === 'Automation') mult = 1.6;
+    const manual = hoursSaved > 0 ? Math.max(hoursSaved * mult, hoursSaved + 1) : 0;
+    const net = Math.max(0, manual - invested);
+    const rate = 50;
+    const value = net * rate;
+    const fmt = n => n > 0 ? n.toFixed(1) + 'h' : '--';
+    const fmtM = n => '$' + Math.round(n).toLocaleString();
+    $('estManual').textContent = fmt(manual);
+    $('estInvested').textContent = fmt(invested);
+    $('estNet').textContent = fmt(net);
+    $('estValue').textContent = manual > 0 ? fmtM(value) : '--';
+  }
+  ['aHours','aInvested','aCat'].forEach(id => {
+    const el = $(id);
+    if (el) {
+      el.addEventListener('input', updateEstimator);
+      el.addEventListener('change', updateEstimator);
+    }
+  });
+
+  $('refreshBtn').addEventListener('click',refresh);$('autoBtn').addEventListener('click',toggleAuto);$('entryForm').addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.currentTarget),payload={task:fd.get('task'),hours:Number(fd.get('hours')),invested:Number(fd.get('invested')),cat:fd.get('cat')};try{const r=await fetch('/api/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw Error();e.currentTarget.reset();announce('Entry added');refresh()}catch(err){announce('Could not add entry. Start serve.py and retry.')}});$('dialogClose').addEventListener('click',()=>$('drillDialog').close());$('drillDialog').addEventListener('close',()=>lastFocus?.focus());$('drillDialog').addEventListener('keydown',e=>{if(e.key==='Escape')return;const f=[...e.currentTarget.querySelectorAll('button,[href],input,select,[tabindex]:not([tabindex="-1"])')];if(e.key==='Tab'&&f.length){if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f.at(-1).focus()}else if(!e.shiftKey&&document.activeElement===f.at(-1)){e.preventDefault();f[0].focus()}}});
 function bindTilt(root=document){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;root.querySelectorAll('.tilt:not([data-tilt])').forEach(card=>{card.dataset.tilt='1';let rx=0,ry=0,tx=0,ty=0;function frame(){rx+=(tx-rx)*.12;ry+=(ty-ry)*.12;card.style.transform=`perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;requestAnimationFrame(frame)}frame();card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();ty=((e.clientX-r.left)/r.width-.5)*8;tx=-((e.clientY-r.top)/r.height-.5)*8});card.addEventListener('mouseleave',()=>{tx=ty=0})})}
 if(DATA){window._v7_soundOn = false; render();v7_afterRender();$('updated').textContent='Embedded data loaded '+new Date().toLocaleTimeString()}refresh();bindTilt();
 
