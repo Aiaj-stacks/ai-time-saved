@@ -633,6 +633,33 @@ body.focus-mode .shell > *.focus-keep{opacity:1;transform:scale(1.01);box-shadow
 
 
 
+/* ===== AURA v19 - ACTIVITY HEATMAP ===== */
+.heatmap-panel{padding:var(--space-5);background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-panel);position:relative;overflow:hidden;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.heatmap-panel::before,.heatmap-panel::after{content:"";position:absolute;width:14px;height:14px;pointer-events:none;transition:border-color var(--dur-fast) var(--ease)}
+.heatmap-panel::before{top:0;left:0;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan)}
+.heatmap-panel::after{bottom:0;right:0;border-bottom:1px solid var(--ember);border-right:1px solid var(--ember)}
+.heatmap-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4)}
+.heatmap-stats{display:flex;gap:var(--space-4);font:600 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.heatmap-stats b{color:var(--cyan-bright);font-weight:700;font-variant-numeric:tabular-nums}
+.heatmap-grid{display:grid;grid-template-columns:repeat(53,11px);grid-template-rows:repeat(7,11px);gap:2px;position:relative}
+.heatmap-months{display:grid;grid-template-columns:repeat(12,1fr);font:600 8px var(--font-mono);color:var(--ink-3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px}
+.heatmap-cell{width:11px;height:11px;border-radius:2px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);transition:all .15s;cursor:default}
+.heatmap-cell:hover{transform:scale(1.4);box-shadow:0 0 8px var(--cyan);z-index:5;border-color:var(--cyan)}
+.heatmap-cell.today{outline:1px solid var(--cyan-bright);outline-offset:1px;box-shadow:0 0 6px var(--cyan)}
+.heatmap-cell.future{opacity:.15;background:transparent;border-color:rgba(255,255,255,.04)}
+.heatmap-cell.lvl-0{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.06)}
+.heatmap-cell.lvl-1{background:rgba(90,214,255,.18);border-color:rgba(90,214,255,.3)}
+.heatmap-cell.lvl-2{background:rgba(90,214,255,.45);border-color:rgba(90,214,255,.55)}
+.heatmap-cell.lvl-3{background:rgba(90,214,255,.75);border-color:rgba(90,214,255,.85)}
+.heatmap-cell.lvl-4{background:rgba(155,234,255,1);border-color:var(--cyan-bright);box-shadow:0 0 4px var(--cyan)}
+.heatmap-legend{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin-top:var(--space-3);font:600 9px var(--font-mono);color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase}
+.heatmap-legend .scale{display:inline-flex;gap:2px;margin-left:8px}
+.heatmap-legend .scale span{width:10px;height:10px;border-radius:2px;border:1px solid rgba(255,255,255,.06)}
+.heatmap-tip{position:fixed;z-index:500;pointer-events:none;padding:6px 10px;background:rgba(10,15,28,.95);border:1px solid var(--cyan-dark);border-radius:4px;font:600 10px var(--font-mono);color:var(--cyan-bright);letter-spacing:.05em;opacity:0;transition:opacity .15s;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.heatmap-tip.show{opacity:1}
+
+
+
 /* ===== AURA v17 - PER-DAY BREAKDOWN ===== */
 .perday{position:relative;padding:var(--space-5);background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-panel);min-width:0;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .perday::before,.perday::after{content:"";position:absolute;width:14px;height:14px;pointer-events:none;transition:border-color var(--dur-fast) var(--ease)}
@@ -1165,7 +1192,7 @@ body.god .hex-grid-bg{opacity:.15}
     <ul class="activity-list" role="list" id="activityList"></ul>
   </article>
 </section>
-<section class="perday-section" aria-label="Per-day breakdown" style="margin-top:var(--space-6)">
+<section class="heatmap-section" aria-label="Activity heatmap" style="margin-top:var(--space-6)">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-5)">
     <article class="perday hex-stream ascii-noise">
       <div class="panel-head" style="margin-bottom:var(--space-4)">
@@ -1173,6 +1200,16 @@ body.god .hex-grid-bg{opacity:.15}
         <span class="helper">// most recent 7 days</span>
       </div>
       <div id="perDayBody">// loading</div>
+    </article>
+    <article class="heatmap-panel hex-stream ascii-noise">
+      <div class="heatmap-head">
+        <div class="panel-head" style="margin:0"><h2>Activity Heatmap <span class="num">year-at-a-glance</span></h2></div>
+        <div class="heatmap-stats"><span>days active: <b id="hmDays">0</b></span><span>streak: <b id="hmStreak">0</b></span><span>peak: <b id="hmPeak">0h</b></span></div>
+      </div>
+      <div class="heatmap-months" id="hmMonths"></div>
+      <div class="heatmap-grid" id="hmGrid"></div>
+      <div class="heatmap-legend">less<div class="scale"><span class="lvl-0"></span><span class="lvl-1"></span><span class="lvl-2"></span><span class="lvl-3"></span><span class="lvl-4"></span></div>more</div>
+      <div class="heatmap-tip" id="hmTip" role="tooltip"></div>
     </article>
   </div>
 </section>
@@ -1899,7 +1936,100 @@ if(DATA){window._v7_soundOn = false; render();v7_afterRender();$('updated').text
     window.v9_toast && window.v9_toast('Pinned: ' + label, null, val + ' • click X to remove');
   });
   /* ON LOAD: render all v10 visuals (call after v9 game-feel finishes) */
-  function renderPerDay(){
+  function renderHeatmap(){
+  const grid = $("hmGrid");
+  const monthsEl = $("hmMonths");
+  const tip = $("hmTip");
+  if (!grid || !monthsEl) return;
+  const d = data();
+  const entries = d.entries || [];
+  // bucket by date
+  const byDate = {};
+  for (const e of entries){
+    if (!byDate[e.date]) byDate[e.date] = 0;
+    byDate[e.date] += (e.hours || 0);
+  }
+  // find max for scaling
+  const max = Math.max(0.01, ...Object.values(byDate));
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
+  // current week's Sunday = last col
+  // we render: rows = days of week (Sun..Sat = 0..6), cols = last 53 weeks
+  const todayDow = today.getDay(); // 0=Sun
+  // start date: go back (todayDow + 52*7) days
+  const start = new Date(today);
+  start.setDate(today.getDate() - (todayDow + 52*7 - 6));
+  const cells = [];
+  const monthLabels = [];
+  let curMonth = -1;
+  for (let col = 0; col < 53; col++){
+    let monthLabel = "";
+    for (let row = 0; row < 7; row++){
+      const idx = col * 7 + row;
+      const d2 = new Date(start);
+      d2.setDate(start.getDate() + idx);
+      const iso = d2.toISOString().slice(0, 10);
+      const hours = byDate[iso] || 0;
+      const isFuture = d2 > today;
+      const isToday = iso === todayStr;
+      // intensity: 0 = lvl-0, 1 = lvl-1, ..., 4 = lvl-4
+      const ratio = hours / max;
+      let lvl = 0;
+      if (hours > 0){
+        if (ratio < 0.1) lvl = 1;
+        else if (ratio < 0.3) lvl = 2;
+        else if (ratio < 0.6) lvl = 3;
+        else lvl = 4;
+      }
+      cells.push({col, row, iso, hours, lvl, isFuture, isToday});
+    }
+    // month label for the FIRST day of this column
+    const firstDayOfCol = new Date(start);
+    firstDayOfCol.setDate(start.getDate() + col * 7);
+    const m = firstDayOfCol.getMonth();
+    if (m !== curMonth){
+      monthLabels.push({col, name: ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][m]});
+      curMonth = m;
+    }
+  }
+  // build month labels (one per column, blank if no label)
+  const monthCols = monthLabels;
+  let lastCol = -1;
+  monthsEl.innerHTML = Array.from({length: 53}, (_, i) => {
+    const lbl = monthCols.find(m => m.col === i);
+    return lbl ? '<span style="grid-column:' + (i+1) + ';text-align:left">' + lbl.name + '</span>' : '<span></span>';
+  }).join("");
+  // build cells
+  grid.innerHTML = cells.map(c => {
+    const cls = "heatmap-cell lvl-" + c.lvl + (c.isToday ? " today" : "") + (c.isFuture ? " future" : "");
+    return '<div class="' + cls + '" data-iso="' + c.iso + '" data-hours="' + c.hours.toFixed(2) + '" style="grid-column:' + (c.col+1) + ';grid-row:' + (c.row+1) + '"></div>';
+  }).join("");
+  // tooltip on hover
+  grid.onmousemove = e => {
+    const t = e.target;
+    if (!t.classList.contains("heatmap-cell")){ tip.classList.remove("show"); return; }
+    const iso = t.dataset.iso;
+    const hrs = parseFloat(t.dataset.hours || 0);
+    tip.textContent = iso + (hrs ? " · " + hrs.toFixed(2) + "h" : " · 0h");
+    tip.classList.add("show");
+    tip.style.left = Math.min(e.clientX + 12, innerWidth - 180) + "px";
+    tip.style.top = Math.min(e.clientY + 12, innerHeight - 40) + "px";
+  };
+  grid.onmouseleave = () => tip.classList.remove("show");
+  // stats
+  const activeDays = Object.keys(byDate).length;
+  let longestStreak = 0, curStreak = 0;
+  const allDates = Object.keys(byDate).sort();
+  for (const dt of allDates){
+    if (byDate[dt] > 0){ curStreak++; longestStreak = Math.max(longestStreak, curStreak); }
+    else curStreak = 0;
+  }
+  if ($("hmDays")) $("hmDays").textContent = activeDays;
+  if ($("hmStreak")) $("hmStreak").textContent = longestStreak;
+  if ($("hmPeak")) $("hmPeak").textContent = max.toFixed(1) + "h";
+}
+
+function renderPerDay(){
   const body = $("perDayBody");
   if (!body) return;
   const d = data();
@@ -1948,6 +2078,9 @@ function v10_renderAll(){
     computeSp();
     buildTierRings();
     buildTierLadder();
+    renderGoal();
+    renderPerDay();
+    renderHeatmap();
     applyHeatmap();
     updateHorizon();
     updateCompass();
