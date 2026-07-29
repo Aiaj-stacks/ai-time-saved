@@ -84,3 +84,22 @@
 - Make the dashboard show "next achievement closest to unlock" prominently
 - Add export to Markdown summary (for sharing in PRs / notes)
 - Add an "Activity heatmap" widget (year-at-a-glance grid)
+
+- **2026-07-28T21:32:** v18 log.py bulk CSV import + tests/test_bulk.py (commit 9acc42d)
+- **2026-07-28T21:33:** v18.1 enhanced summary CLI shows rank/ach/artifacts/quests/goal (commit a806cc4)
+- **2026-07-28T21:34:** v18.2 README documents bulk + summary (commit 065ff14)
+
+## Test count
+- 20/20 unit tests pass (test_log: 9, test_dda: 7, test_bulk: 4)
+
+## Roadmap (priority-ordered, updated)
+1-11, #7 (refactor dashboard.html) - deferred; #10 (per-day breakdown) DONE in v17
+- Add stats-overview CLI command - merged into enhanced summary (v18.1)
+- Add log.py bulk to import entries from a CSV file - DONE (v18)
+- Other candidates:
+  - Make the dashboard show "next achievement closest to unlock" prominently
+  - Add export to Markdown summary (for sharing in PRs / notes)
+  - Add an "Activity heatmap" widget (year-at-a-glance grid)
+  - Add a tag system (so each entry can have multiple tags)
+  - Add `log.py import` (vs bulk which uses CSV - accept JSON arrays)
+  - Auto-detect daily summary cron (suggest via toast if no entry today)
