@@ -15,6 +15,10 @@ Commands
              log.py add "task" --hours 2.5 --cat TPM --invested 0.5
              (--invested = time YOU spent with the agent on it, for ROI)
   list     Show all logged entries
+  bulk     Append entries from a CSV file (header required)
+             log.py bulk path/to/entries.csv
+             log.py bulk entries.csv --dry-run
+             CSV columns: date,task,cat,hours[,invested,note]
   goal     Set, clear, or show the weekly velocity target (hours/week)
              log.py goal set 5.0           # aim for 5h/week
              log.py goal show              # show current goal + progress
@@ -34,6 +38,8 @@ import argparse
 import json
 import os
 import re
+import csv
+import io
 from datetime import date, timedelta
 
 BASE = os.environ.get(
@@ -197,6 +203,52 @@ def goal(action, hours=None):
         print(f"  weekly goal set to {hours}h")
         return
     print(f"  unknown goal action: {action}. Use: set|show|clear")
+
+
+def bulk(csv_path, dry_run=False):
+    """Append entries from a CSV file. Header required.
+    Required columns: date, task, cat, hours
+    Optional columns: invested, note
+    Returns the number of entries appended.
+    Refuses if CSV is malformed or any row is missing required fields."""
+    if not os.path.exists(csv_path):
+        die(f"CSV file not found: {csv_path}")
+    required = {"date", "task", "cat", "hours"}
+    with open(csv_path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        fieldnames = reader.fieldnames or []
+        missing = required - set(fieldnames)
+        if missing:
+            die(f"CSV missing required columns: {sorted(missing)} (have: {fieldnames})")
+        rows = list(reader)
+    if not rows:
+        print(f"  CSV is empty (header only); nothing to import")
+        return 0
+    appended = 0
+    for i, row in enumerate(rows, 1):
+        try:
+            d = row["date"].strip()
+            task = row["task"].strip()
+            cat = row["cat"].strip() or "General"
+            hours = round(float(row["hours"]), 2)
+            invested = round(float(row.get("invested") or 0), 2)
+            note = (row.get("note") or "").strip()
+            if not d or not task or hours <= 0:
+                raise ValueError(f"row {i}: date, task, and positive hours required")
+        except Exception as e:
+            die(f"row {i} parse failed: {e}")
+        if dry_run:
+            print(f"  [dry-run] {d} | {cat} | {hours}h | {task[:50]}")
+            continue
+        rec = {"date": d, "task": task, "cat": cat, "hours": hours,
+               "invested": invested, "note": note}
+        with open(LOG, "a", encoding="utf-8") as f:
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+        appended += 1
+    if not dry_run:
+        report(load())
+    print(f"  bulk import complete: {appended} entr{'y' if appended == 1 else 'ies'} appended from {csv_path}")
+    return appended
 
 
 # ---------------------------------------------------------------------------
@@ -654,6 +706,10 @@ def main():
 
     sub.add_parser("summary")
 
+    b = sub.add_parser("bulk")
+    b.add_argument("path", help="path to a CSV file with date,task,cat,hours[,invested,note]")
+    b.add_argument("--dry-run", action="store_true", help="validate only, do not append")
+
     g = sub.add_parser("goal")
     g.add_argument("goal_action", choices=["set", "show", "clear"])
     g.add_argument("hours", nargs="?", type=float, default=None)
@@ -710,6 +766,8 @@ def main():
         report(load())
     elif args.cmd == "goal":
         goal(args.goal_action, args.hours)
+    elif args.cmd == "bulk":
+        bulk(args.path, args.dry_run)
     elif args.cmd == "summary":
         entries = load()
         total, inv, wk, mo, by_cat = summarize(entries)
