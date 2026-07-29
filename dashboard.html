@@ -1990,9 +1990,12 @@ if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.body.classL
   // Date of the Saturday at the END of today's week:
   const endSat = new Date(today);
   endSat.setDate(today.getDate() + (6 - todayDow));
-  // Date of the Sunday at the START of the leftmost (week 0) column:
+  // Date of the Sunday at the START of the leftmost (week 0) column.
+  // endSat is the Saturday at the END of today's week, so the Sunday at the
+  // START of that same week is 6 days earlier. Then go back (totalWeeks-1) more
+  // weeks = totalWeeks*7 days total (with the +1 to land on Sunday, not Saturday).
   const startSun = new Date(endSat);
-  startSun.setDate(endSat.getDate() - totalWeeks * 7);
+  startSun.setDate(endSat.getDate() - totalWeeks * 7 + 1);
   // Build all 364 cells (col, row) and assign each a date + hours + level.
   const M = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
   const cells = [];
