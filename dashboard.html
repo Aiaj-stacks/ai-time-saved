@@ -1313,7 +1313,21 @@ const ALL_ACHIEVEMENTS=[
 ];
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function announce(s){$('sr').textContent=s}function polar(cx,cy,r,a){return[cx+r*Math.cos(a),cy+r*Math.sin(a)]}function arc(cx,cy,r,a0,a1){const p0=polar(cx,cy,r,a0),p1=polar(cx,cy,r,a1);return`M${p0[0]} ${p0[1]} A${r} ${r} 0 ${a1-a0>Math.PI?1:0} 1 ${p1[0]} ${p1[1]}`}
-function count(el,to,format){const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;if(reduced){el.textContent=format(to);return}const st=performance.now();function step(n){const p=Math.min((n-st)/700,1),v=to*(1-Math.pow(1-p,3));el.textContent=format(v);if(p<1)requestAnimationFrame(step)}requestAnimationFrame(step)}
+function count(el,to,format){
+  // If reduced motion is preferred OR target is 0 OR element is missing, set instantly
+  if(!el || to === 0 || matchMedia('(prefers-reduced-motion: reduce)').matches || typeof el.textContent === 'undefined'){
+    if(el) el.textContent = format(to);
+    return;
+  }
+  const st = performance.now();
+  function step(n){
+    const p = Math.min((n-st)/700, 1), v = to*(1-Math.pow(1-p,3));
+    el.textContent = format(v);
+    if(p < 1) requestAnimationFrame(step);
+    else el.textContent = format(to);  // ensure final value is exact
+  }
+  requestAnimationFrame(step);
+}
 function hot(el,label,kind,key){el.classList.add('hot');el.setAttribute('tabindex','0');el.setAttribute('role','button');el.setAttribute('aria-label',label);el.dataset.tip=label;['mousemove','focus'].forEach(ev=>el.addEventListener(ev,e=>{const t=$('tip');t.textContent=label;t.style.opacity=1;t.style.left=Math.min((e.clientX||20)+12,innerWidth-270)+'px';t.style.top=Math.min((e.clientY||20)+12,innerHeight-70)+'px'}));['mouseleave','blur'].forEach(ev=>el.addEventListener(ev,()=>{ $('tip').style.opacity=0}));el.addEventListener('click',()=>drill(kind,key));el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();drill(kind,key)}})}
 function drawCum(target){const g=$(target),d=DATA.cum||[];g.innerHTML='';if(!d.length)return;const W=620,H=250,p=34,max=Math.max(1,...d.map(x=>x[1])),x=i=>p+(W-p*2)*(i/Math.max(1,d.length-1)),y=v=>H-p-(H-p*2)*(v/max);const line=document.createElementNS(NS,'polyline');line.setAttribute('points',d.map((v,i)=>`${x(i)},${y(v[1])}`).join(' '));line.setAttribute('fill','none');line.setAttribute('stroke','#22d3ee');line.setAttribute('stroke-width','3');g.append(line);d.forEach((v,i)=>{const c=document.createElementNS(NS,'circle');c.setAttribute('cx',x(i));c.setAttribute('cy',y(v[1]));c.setAttribute('r','5');c.setAttribute('fill','#22d3ee');hot(c,`${v[0]}: ${v[1].toFixed(1)} cumulative hours`,'date',v[0]);g.append(c)});const targetLine=document.createElementNS(NS,'line');targetLine.setAttribute('x1',p);targetLine.setAttribute('x2',W-p);targetLine.setAttribute('y1',y(max*.8));targetLine.setAttribute('y2',y(max*.8));targetLine.setAttribute('stroke','#34d399');targetLine.setAttribute('stroke-dasharray','5 6');targetLine.setAttribute('opacity','.55');g.prepend(targetLine)}
 function drawDonut(){const g=$('donutPlot'),cats=Object.entries(DATA.byCat||{}).sort((a,b)=>b[1]-a[1]),total=cats.reduce((s,x)=>s+x[1],0);g.innerHTML='';let a=-Math.PI/2;cats.forEach((c,i)=>{const n=a+(c[1]/total)*Math.PI*2,p=document.createElementNS(NS,'path');p.setAttribute('d',arc(130,125,78,a,n));p.setAttribute('fill','none');p.setAttribute('stroke',COLORS[i%COLORS.length]);p.setAttribute('stroke-width','34');hot(p,`${c[0]}: ${c[1].toFixed(1)} hours`,'category',c[0]);g.append(p);a=n});g.insertAdjacentHTML('beforeend',`<text x="130" y="122" text-anchor="middle" fill="#f4f4f7" font-size="24" font-weight="600">${total.toFixed(1)}h</text><text x="130" y="142" text-anchor="middle" fill="#a4a8b8" font-size="11">total saved</text>`)}
@@ -1477,7 +1491,7 @@ function toggleAuto(){if(AUTO){clearInterval(AUTO);AUTO=null}else{AUTO=setInterv
 
   $('refreshBtn').addEventListener('click',refresh);$('autoBtn').addEventListener('click',toggleAuto);$('entryForm').addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.currentTarget),payload={task:fd.get('task'),hours:Number(fd.get('hours')),invested:Number(fd.get('invested')),cat:fd.get('cat')};try{const r=await fetch('/api/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw Error();e.currentTarget.reset();announce('Entry added');refresh()}catch(err){announce('Could not add entry. Start serve.py and retry.')}});$('dialogClose').addEventListener('click',()=>$('drillDialog').close());$('drillDialog').addEventListener('close',()=>lastFocus?.focus());$('drillDialog').addEventListener('keydown',e=>{if(e.key==='Escape')return;const f=[...e.currentTarget.querySelectorAll('button,[href],input,select,[tabindex]:not([tabindex="-1"])')];if(e.key==='Tab'&&f.length){if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f.at(-1).focus()}else if(!e.shiftKey&&document.activeElement===f.at(-1)){e.preventDefault();f[0].focus()}}});
 function bindTilt(root=document){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;root.querySelectorAll('.tilt:not([data-tilt])').forEach(card=>{card.dataset.tilt='1';let rx=0,ry=0,tx=0,ty=0;function frame(){rx+=(tx-rx)*.12;ry+=(ty-ry)*.12;card.style.transform=`perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;requestAnimationFrame(frame)}frame();card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();ty=((e.clientX-r.left)/r.width-.5)*8;tx=-((e.clientY-r.top)/r.height-.5)*8});card.addEventListener('mouseleave',()=>{tx=ty=0})})}
-if(DATA){window._v7_soundOn = false; render();v7_afterRender();$('updated').textContent='Embedded data loaded '+new Date().toLocaleTimeString()}refresh();bindTilt();
+if(DATA){window._v7_soundOn = false; window.DATA = DATA; render();v7_afterRender();$('updated').textContent='Embedded data loaded '+new Date().toLocaleTimeString()}refresh();bindTilt();
 
 </script>
 

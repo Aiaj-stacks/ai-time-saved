@@ -1,23 +1,23 @@
 {
-  "total": 51.27,
-  "value": 2563.5,
-  "streak": 0,
+  "total": 64.77,
+  "value": 3238.5,
+  "streak": 7,
   "rank": {
     "name": "Platinum",
     "glyph": "●",
     "color": "cyan",
     "min": 50,
     "max": 100,
-    "current": 51.267,
+    "current": 64.767,
     "next": "Diamond",
-    "progress": 2.5
+    "progress": 29.5
   },
   "next_rank": {
     "name": "Diamond",
     "glyph": "◆",
     "min": 100
   },
-  "rank_pct": 2.5,
+  "rank_pct": 29.5,
   "achievements": [
     {
       "id": "first",
@@ -95,15 +95,29 @@
       "desc": "Saved 10+ hours in a single task",
       "glyph": "🜞",
       "pct": 100
+    },
+    {
+      "id": "s3",
+      "name": "Triple Threat",
+      "desc": "3-day streak",
+      "glyph": "⌛",
+      "pct": 100
+    },
+    {
+      "id": "s7",
+      "name": "Week Streak",
+      "desc": "7-day streak",
+      "glyph": "✦",
+      "pct": 100
     }
   ],
   "artifacts": [
     {
       "id": "files",
       "name": "Files Salvaged",
-      "desc": "29 tasks logged",
+      "desc": "39 tasks logged",
       "glyph": "⎙",
-      "count": 29
+      "count": 39
     },
     {
       "id": "disk",
@@ -129,9 +143,9 @@
     {
       "id": "hours",
       "name": "Hours Crystallized",
-      "desc": "51.3h saved",
+      "desc": "64.8h saved",
       "glyph": "◈",
-      "count": 51.267
+      "count": 64.767
     },
     {
       "id": "domains",
@@ -148,7 +162,7 @@
       "desc": "Save 5h this week",
       "glyph": "⏵",
       "target": 5,
-      "current": 16.17,
+      "current": 29.67,
       "pct": 100
     },
     {
@@ -157,7 +171,7 @@
       "desc": "Save 20h in 30 days",
       "glyph": "◐",
       "target": 20,
-      "current": 51.27,
+      "current": 64.77,
       "pct": 100
     },
     {
@@ -166,7 +180,7 @@
       "desc": "Log 10 tasks",
       "glyph": "✓",
       "target": 10,
-      "current": 29,
+      "current": 39,
       "pct": 100
     },
     {
@@ -175,8 +189,8 @@
       "desc": "Hit a 7-day streak",
       "glyph": "✦",
       "target": 7,
-      "current": 0,
-      "pct": 0
+      "current": 7,
+      "pct": 100
     },
     {
       "id": "q_div",
@@ -188,13 +202,13 @@
       "pct": 100
     }
   ],
-  "invested": 0.0,
-  "week": 2.57,
-  "month": 51.27,
+  "invested": 5.3,
+  "week": 16.07,
+  "month": 64.77,
   "byCat": {
     "Maintenance": 5.566999999999999,
     "TPM": 26.5,
-    "Tooling": 17.3,
+    "Tooling": 30.8,
     "Research": 0.4,
     "Automation": 0.5,
     "Mixed": 1.0
@@ -227,6 +241,14 @@
     [
       "2026-07-27",
       51.27
+    ],
+    [
+      "2026-07-28",
+      55.27
+    ],
+    [
+      "2026-07-29",
+      64.77
     ]
   ],
   "weekly": [
@@ -240,7 +262,7 @@
     ],
     [
       "2026-W31",
-      2.567
+      16.067
     ]
   ],
   "entries": [
@@ -470,6 +492,86 @@
       "cat": "Tooling",
       "hours": 0.5,
       "invested": 0,
+      "note": ""
+    },
+    {
+      "date": "2026-07-28",
+      "task": "Dashboard v15: README + PROGRESS.md + initial commits",
+      "cat": "Tooling",
+      "hours": 0.5,
+      "invested": 0.2,
+      "note": ""
+    },
+    {
+      "date": "2026-07-28",
+      "task": "Dashboard v16: weekly velocity target + goal widget",
+      "cat": "Tooling",
+      "hours": 1.0,
+      "invested": 0.3,
+      "note": ""
+    },
+    {
+      "date": "2026-07-28",
+      "task": "Dashboard v17: per-day breakdown panel",
+      "cat": "Tooling",
+      "hours": 0.5,
+      "invested": 0.2,
+      "note": ""
+    },
+    {
+      "date": "2026-07-28",
+      "task": "Dashboard v18: bulk CSV import + test isolation (subagent fix)",
+      "cat": "Tooling",
+      "hours": 2.0,
+      "invested": 0.8,
+      "note": ""
+    },
+    {
+      "date": "2026-07-29",
+      "task": "Dashboard v19: activity heatmap (initial build)",
+      "cat": "Tooling",
+      "hours": 1.5,
+      "invested": 0.5,
+      "note": ""
+    },
+    {
+      "date": "2026-07-29",
+      "task": "Dashboard v20: fix 47 broken $(#id) calls + feat-tile unlocked bug",
+      "cat": "Tooling",
+      "hours": 2.0,
+      "invested": 1.0,
+      "note": ""
+    },
+    {
+      "date": "2026-07-29",
+      "task": "Dashboard v21: data accuracy audit (subagent) + heatmap GitHub-clone redesign",
+      "cat": "Tooling",
+      "hours": 3.0,
+      "invested": 1.2,
+      "note": ""
+    },
+    {
+      "date": "2026-07-29",
+      "task": "Dashboard v22: fix heatmap day-of-week alignment (Sun-start not Sat-start)",
+      "cat": "Tooling",
+      "hours": 0.5,
+      "invested": 0.2,
+      "note": ""
+    },
+    {
+      "date": "2026-07-29",
+      "task": "Dashboard v23: time-savings estimator on entry form (live updates)",
+      "cat": "Tooling",
+      "hours": 1.0,
+      "invested": 0.4,
+      "note": ""
+    },
+    {
+      "date": "2026-07-29",
+      "task": "Dashboard v24: discovered window.DATA never set bug, added real-time browser screenshot verification",
+      "cat": "Tooling",
+      "hours": 1.5,
+      "invested": 0.5,
       "note": ""
     }
   ],

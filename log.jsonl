@@ -27,3 +27,13 @@
 {"date": "2026-07-27", "task": "AURA watch landing build + 4D upgrade", "cat": "Tooling", "hours": 2.0, "invested": 0, "note": ""}
 {"date": "2026-07-27", "task": "Riot uninstall (~37.5GB / 4 min solo baseline)", "cat": "Maintenance", "hours": 0.067, "invested": 0, "note": ""}
 {"date": "2026-07-27", "task": "dashboard v4 spawn", "cat": "Tooling", "hours": 0.5, "invested": 0, "note": ""}
+{"date": "2026-07-28", "task": "Dashboard v15: README + PROGRESS.md + initial commits", "cat": "Tooling", "hours": 0.5, "invested": 0.2, "note": ""}
+{"date": "2026-07-28", "task": "Dashboard v16: weekly velocity target + goal widget", "cat": "Tooling", "hours": 1.0, "invested": 0.3, "note": ""}
+{"date": "2026-07-28", "task": "Dashboard v17: per-day breakdown panel", "cat": "Tooling", "hours": 0.5, "invested": 0.2, "note": ""}
+{"date": "2026-07-28", "task": "Dashboard v18: bulk CSV import + test isolation (subagent fix)", "cat": "Tooling", "hours": 2.0, "invested": 0.8, "note": ""}
+{"date": "2026-07-29", "task": "Dashboard v19: activity heatmap (initial build)", "cat": "Tooling", "hours": 1.5, "invested": 0.5, "note": ""}
+{"date": "2026-07-29", "task": "Dashboard v20: fix 47 broken $(#id) calls + feat-tile unlocked bug", "cat": "Tooling", "hours": 2.0, "invested": 1.0, "note": ""}
+{"date": "2026-07-29", "task": "Dashboard v21: data accuracy audit (subagent) + heatmap GitHub-clone redesign", "cat": "Tooling", "hours": 3.0, "invested": 1.2, "note": ""}
+{"date": "2026-07-29", "task": "Dashboard v22: fix heatmap day-of-week alignment (Sun-start not Sat-start)", "cat": "Tooling", "hours": 0.5, "invested": 0.2, "note": ""}
+{"date": "2026-07-29", "task": "Dashboard v23: time-savings estimator on entry form (live updates)", "cat": "Tooling", "hours": 1.0, "invested": 0.4, "note": ""}
+{"date": "2026-07-29", "task": "Dashboard v24: discovered window.DATA never set bug, added real-time browser screenshot verification", "cat": "Tooling", "hours": 1.5, "invested": 0.5, "note": ""}
