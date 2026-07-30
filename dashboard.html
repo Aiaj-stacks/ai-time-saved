@@ -2313,6 +2313,11 @@ function v10_renderAll(){
     setTimeout(() => { root.innerHTML = ''; }, 2000);
   }
   /* === MILESTONE TRIGGER on load === */
+  // v25.3: REMOVED auto-fireworks on load - they obscured the rank-hero panel
+  // (the user reported 'panels fade like the full Platinum text' because
+  // the fireworks burst at viewport center covered the rank-name at t=1.5s).
+  // User can still trigger manually with F key or command palette.
+  /*
   const d0 = data();
   const milestones = [25, 50, 75, 100, 150, 200, 300, 500, 1000];
   const total = d0.total || 0;
@@ -2325,6 +2330,7 @@ function v10_renderAll(){
       window.v9_toast && window.v9_toast('MILESTONE // ' + lastMilestone + 'h', 'success', 'hours reclaimed. new chapter begins.');
     }, 1500);
   }
+  */
   /* === TIME-TRAVEL === */
   const tt = $('#timetravel');
   const ttTrack = $('#ttTrack'), ttBars = $('#ttBars'), ttCursor = $('#ttCursor'), ttWhen = $('#ttWhen');
@@ -3228,6 +3234,9 @@ function v10_renderAll(){
   });
 })();
 </script>
+
+
+
 
 
 
