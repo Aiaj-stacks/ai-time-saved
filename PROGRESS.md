@@ -143,3 +143,21 @@
        v16 (goal CLI + widget), v17 (per-day panel), v18 (bulk + summary),
        v18.4 (test isolation fix), v19 (activity heatmap)
 - Refactor dashboard.html into separate JS files - still deferred (risk without real browser)
+
+- **2026-07-29T15:42: v21 — DATA ACCURACY + HEATMAP TOP-CENTER GITHUB-CLONE**
+  - User: "none of my data are accurately showing up" + heatmap in middle, GitHub-clone, reflects previous days.
+  - Spawned 3 parallel subagents (data accuracy, heatmap redesign, E2E verifier build).
+  - Bugs found and fixed:
+    - log.py rank_for tuple indices (glyph was reading max_hours = 100, now reads char = '●')
+    - log.py value float drift (51.27 * 50 = 2563.3499... → 2563.35; now rounds total first → 2563.50)
+    - Heatmap redesigned to GitHub-clone (52w x 7d, 5 green tiers, square cells, weekday/month labels)
+    - Heatmap moved to TOP-CENTER above KPI cards (no scroll required)
+    - 48 broken `$('#xxx')` calls in script 1 (its `$` is getElementById, no # prefix)
+    - Empty `<script>` tag at end of HTML (caused SyntaxError)
+    - Heatmap math off by 7 days (startSun used (totalWeeks-1)*7 instead of totalWeeks*7)
+    - rankTier render had tierNames outside function scope
+    - kpiValue Math.round(.5) shows $2,564 from $2563.50; changed to Math.floor → $2,563
+    - dda.py had no _safe_reason() for Windows-incompatible colon in snapshot reason
+  - Verification: **41/41 PASS, 0 FAIL** via headless jsdom verifier
+  - 20/20 unit tests pass; DDA verify PASS; all 7 scripts parse clean
+  - Live preview at http://127.0.0.1:8767/dashboard.html fully working

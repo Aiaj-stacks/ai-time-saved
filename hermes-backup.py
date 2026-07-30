@@ -38,7 +38,12 @@ try:
     except subprocess.CalledProcessError:
         gw_stopped = False  # no gateway running; tar anyway
 
-    cmd = ["tar", "czf", tmp] + excl_args + ["-C", HOME, ".hermes"]
+    # Direct tar with --warning=no-file-changed to ignore cron ticker writes.
+    # The cron ticker constantly updates ~/.hermes/cron/* which causes tar
+    # to fail with "file changed as we read it". Suppress that warning.
+    # Also extend the sleep so the gateway has time to flush.
+    time.sleep(3)
+    cmd = ["tar", "czf", tmp, "--warning=no-file-changed"] + excl_args + ["-C", HOME, ".hermes"]
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode != 0:
         print("BACKUP FAILED:\n" + r.stderr)
