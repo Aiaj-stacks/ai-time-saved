@@ -225,6 +225,67 @@ class H(http.server.BaseHTTPRequestHandler):
         except Exception as e:
             self._send(500, {"error": str(e)})
 
+    def _do_bulk(self):
+        """Accept CSV upload (text/csv body) and bulk-insert entries.
+        Expected columns: date,task,cat,hours[,invested,note]
+        First line is header. Returns inserted count + any errors."""
+        try:
+            n = int(self.headers.get("Content-Length", 0))
+            raw = self.rfile.read(n).decode("utf-8")
+            ctype = self.headers.get("Content-Type", "")
+            # Support both JSON {rows: [...]} and raw CSV text
+            rows = []
+            if "json" in ctype.lower():
+                import json as _json
+                payload = _json.loads(raw)
+                rows = payload.get("rows", [])
+            else:
+                import csv as _csv, io as _io
+                reader = _csv.DictReader(_io.StringIO(raw))
+                rows = [r for r in reader]
+            if not rows:
+                self._send(400, {"ok": False, "error": "no rows"})
+                return
+            inserted = []
+            errors = []
+            for i, r in enumerate(rows):
+                try:
+                    task = str(r.get("task", "")).strip()
+                    hours = float(r.get("hours", 0) or 0)
+                    if not task or hours <= 0:
+                        errors.append({"row": i+1, "error": "missing task or hours", "data": r})
+                        continue
+                    rec = {
+                        "date": str(r.get("date", "")).strip() or date.today().isoformat(),
+                        "task": task,
+                        "cat": str(r.get("cat", "General")).strip() or "General",
+                        "hours": round(hours, 2),
+                        "invested": round(float(r.get("invested", 0) or 0), 2),
+                        "note": str(r.get("note", "")).strip(),
+                    }
+                    with open(LOG, "a", encoding="utf-8") as f:
+                        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                    inserted.append(rec)
+                except Exception as e:
+                    errors.append({"row": i+1, "error": str(e), "data": r})
+            # Re-embed
+            try:
+                subprocess.run(
+                    [sys.executable, os.path.join(BASE, "log.py"), "report"],
+                    check=True, capture_output=True, text=True, timeout=30
+                )
+            except subprocess.CalledProcessError as e:
+                self._send(500, {"error": "appended but re-embed failed: " + e.stderr.strip()})
+                return
+            self._send(200, {
+                "ok": True,
+                "inserted_count": len(inserted),
+                "error_count": len(errors),
+                "errors": errors[:10],  # first 10 errors only
+            })
+        except Exception as e:
+            self._send(500, {"error": str(e)})
+
     def do_POST(self):
         if self.path in ("/api/add", "/api/log"):
             rec = self._do_add()
@@ -232,6 +293,8 @@ class H(http.server.BaseHTTPRequestHandler):
                 self._send(200, {"ok": True, "entry": rec, "agg": aggregate(load())})
         elif self.path == "/api/reembed":
             self._do_reembed()
+        elif self.path == "/api/bulk":
+            self._do_bulk()
         else:
             self._send(404, "not found", "text/plain")
 
