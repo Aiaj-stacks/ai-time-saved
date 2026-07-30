@@ -974,7 +974,7 @@ body.god .hex-grid-bg{opacity:.15}
 .stat-value.pulsed{animation:stat-pulse 900ms cubic-bezier(.2,1.2,.3,1)}
 @keyframes stat-pulse{0%{text-shadow:0 0 0 rgba(240,210,122,0)}30%{text-shadow:0 0 24px rgba(240,210,122,1),0 0 48px rgba(240,210,122,.5)}100%{text-shadow:0 0 12px rgba(212,169,66,.3)}}
 /* activity log stagger entrance */
-.activity-item{opacity:0;transform:translateX(-12px);animation:chronicle-in 600ms cubic-bezier(.2,.8,.2,1) forwards}
+.activity-item{opacity:1;transform:translateX(0);animation:chronicle-in 600ms cubic-bezier(.2,.8,.2,1) backwards;transform-origin:left center}
 .activity-item:nth-child(1){animation-delay:50ms}
 .activity-item:nth-child(2){animation-delay:100ms}
 .activity-item:nth-child(3){animation-delay:150ms}
@@ -985,16 +985,16 @@ body.god .hex-grid-bg{opacity:.15}
 .activity-item:nth-child(8){animation-delay:400ms}
 .activity-item:nth-child(9){animation-delay:450ms}
 .activity-item:nth-child(10){animation-delay:500ms}
-@keyframes chronicle-in{to{opacity:1;transform:translateX(0)}}
+@keyframes chronicle-in{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
 /* quest row stagger */
-.quest-row{opacity:0;transform:translateX(-8px);animation:quest-in 500ms cubic-bezier(.2,.8,.2,1) forwards}
+.quest-row{opacity:1;transform:translateX(0);animation:quest-in 500ms cubic-bezier(.2,.8,.2,1) backwards;transform-origin:left center}
 .quest-row:nth-child(1){animation-delay:100ms}
 .quest-row:nth-child(2){animation-delay:180ms}
 .quest-row:nth-child(3){animation-delay:260ms}
 .quest-row:nth-child(4){animation-delay:340ms}
 .quest-row:nth-child(5){animation-delay:420ms}
-@keyframes quest-in{to{opacity:1;transform:translateX(0)}}
-.feat-tile,.inv-item{opacity:0;animation:item-in 500ms cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes quest-in{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.feat-tile,.inv-item{opacity:1;animation:item-in 500ms cubic-bezier(.2,.8,.2,1) backwards}
 .feat-tile{animation-name:item-in}
 .feat-tile:nth-child(n){animation-delay:calc(var(--i,0) * 30ms)}
 @keyframes item-in{0%{opacity:0;transform:translateY(10px) scale(.92)}100%{opacity:1;transform:translateY(0) scale(1)}}
@@ -3230,93 +3230,10 @@ function v10_renderAll(){
 </script>
 
 
-<script>
-window.__testResult = null;
-(function(){
-  function runTest(){
-    try {
-      const cells = document.querySelectorAll('#hmGrid .heatmap-cell');
-      const target = [...cells].find(c => c.dataset.iso === '2026-07-17');
-      if (!target) {
-        window.__testResult = {error: 'no cell found'};
-        return;
-      }
-      const tip = document.querySelector('#hmTip');
-      // Fire mouseover with the cell as target via the grid
-      const grid = document.getElementById('hmGrid');
-      // Use dispatchEvent on the GRID (since handler is on grid) with the
-      // actual cell as event target
-      const rect = target.getBoundingClientRect();
-      // Scroll into view first
-      target.scrollIntoView({block: 'center'});
-      const ev = new MouseEvent('mouseover', {
-        bubbles: true, cancelable: true, view: window,
-        clientX: rect.left + 5, clientY: rect.top + 5
-      });
-      // Override target via the relatedTarget trick - dispatch on grid with cell as event
-      Object.defineProperty(ev, 'target', {value: target, writable: false});
-      // Since the handler uses e.target.closest(), it needs e.target to be the cell
-      // The grid handler listens on grid, so we dispatch on grid but with target=cell
-      // Actually let me just dispatch on the cell directly - that bubbles to grid
-      const ev2 = new MouseEvent('mouseover', {bubbles: true, cancelable: true, view: window, clientX: rect.left + 5, clientY: rect.top + 5});
-      target.dispatchEvent(ev2);
-      // Wait a tick then check
-      setTimeout(() => {
-        window.__testResult = {
-          iso: target.dataset.iso,
-          hours: target.dataset.hours,
-          tipShow: tip.classList.contains('show'),
-          tipText: tip.textContent,
-          tipHTML: tip.innerHTML,
-          tipStyle: tip.style.cssText,
-          tipPos: {left: tip.style.left, top: tip.style.top}
-        };
-      }, 100);
-    } catch(e) {
-      window.__testResult = {error: e.message};
-    }
-  }
-  if (document.readyState === 'complete') setTimeout(runTest, 1500);
-  else window.addEventListener('load', () => setTimeout(runTest, 1500));
-})();
-</script>
 
 
-<script>
-window.__testResult = null;
-(function(){
-  function runTest(){
-    try {
-      const cells = document.querySelectorAll('#hmGrid .heatmap-cell');
-      const target = [...cells].find(c => c.dataset.iso === '2026-07-17');
-      if (!target) {
-        window.__testResult = {error: 'no cell found'};
-        return;
-      }
-      const tip = document.querySelector('#hmTip');
-      const rect = target.getBoundingClientRect();
-      target.scrollIntoView({block: 'center'});
-      const ev = new MouseEvent('mouseover', {bubbles: true, cancelable: true, view: window, clientX: rect.left + 5, clientY: rect.top + 5});
-      target.dispatchEvent(ev);
-      setTimeout(() => {
-        window.__testResult = {
-          iso: target.dataset.iso,
-          hours: target.dataset.hours,
-          tipShow: tip.classList.contains('show'),
-          tipText: tip.textContent,
-          tipHTML: tip.innerHTML,
-          tipStyle: tip.style.cssText,
-          tipPos: {left: tip.style.left, top: tip.style.top}
-        };
-      }, 200);
-    } catch(e) {
-      window.__testResult = {error: e.message};
-    }
-  }
-  if (document.readyState === 'complete') setTimeout(runTest, 2000);
-  else window.addEventListener('load', () => setTimeout(runTest, 2000));
-})();
-</script>
+
+
 
 </body>
 </html>
