@@ -170,6 +170,25 @@ a:hover{color:var(--text-1)}
 .est-val{font-size:18px;font-weight:600;color:var(--text-1);font-family:'JetBrains Mono'}
 .est-val.net{color:var(--cyan)}
 .est-val.value{color:var(--green)}
+/* ===== CSV IMPORT (v26.2) ===== */
+.csv-import{margin-top:16px;padding:16px;background:var(--bg-elev);border:1px dashed var(--border);border-radius:var(--radius);position:relative}
+.csv-import::before{content:"// CSV INGRESS";position:absolute;top:-9px;left:20px;background:var(--bg-page);padding:0 10px;font-size:9px;font-weight:600;color:var(--cyan);text-transform:uppercase;letter-spacing:0.12em;font-family:'JetBrains Mono'}
+.csv-import-head{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--text-2);margin-bottom:10px}
+.csv-import-glyph{font-size:14px;color:var(--cyan)}
+.csv-sample-btn{margin-left:auto;padding:3px 10px;background:transparent;border:1px solid var(--border);color:var(--text-2);font:600 9px 'JetBrains Mono';text-transform:uppercase;letter-spacing:0.1em;border-radius:3px;cursor:pointer;transition:all .15s}
+.csv-sample-btn:hover{background:var(--bg-hover);color:var(--text-1)}
+.csv-import-help{margin-bottom:10px}
+.csv-import-help summary{cursor:pointer;font-size:11px;color:var(--text-3);font-family:'JetBrains Mono';padding:4px 0}
+.csv-import-help summary:hover{color:var(--text-2)}
+.csv-import-help p{margin-top:8px;padding:10px;background:rgba(0,0,0,.3);border-left:2px solid var(--accent);font-size:10px;color:var(--text-3);line-height:1.6}
+.csv-import-help a{color:var(--cyan);text-decoration:underline}
+.csv-import input[type="file"]{width:100%;padding:8px;background:rgba(0,0,0,.3);border:1px dashed var(--border);color:var(--text-2);font:11px 'JetBrains Mono';border-radius:3px;cursor:pointer}
+.csv-import input[type="file"]::file-selector-button{margin-right:10px;padding:5px 12px;background:var(--accent);border:none;color:#fff;font:600 10px 'JetBrains Mono';text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;border-radius:3px}
+.csv-import-status{margin-top:10px;font-size:11px;font-family:'JetBrains Mono';min-height:16px;color:var(--text-3)}
+.csv-import-status.ok{color:var(--green)}
+.csv-import-status.err{color:#ef4444}
+.csv-import-status.busy{color:var(--cyan);animation:status-pulse 1s ease-in-out infinite alternate}
+@keyframes status-pulse{0%{opacity:.5}100%{opacity:1}}
 
 /* ===== ACTIVITY LOG ===== */
 .activity-list{list-style:none;display:flex;flex-direction:column;gap:0;background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden}
@@ -507,6 +526,20 @@ a:hover{color:var(--text-1)}
         <span class="muted mono" style="font-size:11px">POST /api/add</span>
       </div>
     </form>
+      <!-- CSV Import (v26.2) -->
+      <div class="csv-import" id="csvImport">
+        <div class="csv-import-head">
+          <span class="csv-import-glyph">⬆</span>
+          <span>Bulk Import CSV</span>
+          <button type="button" id="csvSampleBtn" class="csv-sample-btn">sample</button>
+        </div>
+        <details class="csv-import-help">
+          <summary>columns: date, task, cat, hours[, invested, note]</summary>
+          <p>First line is the header. Empty task or hours will skip the row. <a href="/export.csv" download>download existing as CSV</a></p>
+        </details>
+        <input type="file" id="csvFile" accept=".csv,text/csv" aria-label="Choose CSV file">
+        <div class="csv-import-status" id="csvStatus" role="status" aria-live="polite"></div>
+      </div>
   </section>
 
 </div>
@@ -923,6 +956,59 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
       }
     } catch(e) {}
   }
+
+  /* ===== CSV IMPORT ===== */
+  function setupCsv(){
+    const fileInput = $('#csvFile');
+    const status = $('#csvStatus');
+    const sampleBtn = $('#csvSampleBtn');
+    if(!fileInput) return;
+    function setStatus(text, cls){
+      if(!status) return;
+      status.textContent = text;
+      status.className = 'csv-import-status' + (cls ? ' ' + cls : '');
+    }
+    sampleBtn?.addEventListener('click', () => {
+      const sample = 'date,task,cat,hours,invested,note\n2026-07-30,Sample task description,Tooling,1.5,0.5,Sample entry\n2026-07-29,Another task,TPM,2.0,0.8,From CSV import\n';
+      const blob = new Blob([sample], {type: 'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sample.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      setStatus('sample.csv downloaded', 'ok');
+    });
+    fileInput.addEventListener('change', async () => {
+      const f = fileInput.files[0];
+      if(!f) return;
+      setStatus('uploading ' + f.name + '...', 'busy');
+      try {
+        const text = await f.text();
+        const r = await fetch('/api/bulk', {
+          method: 'POST',
+          headers: {'Content-Type': 'text/csv'},
+          body: text
+        });
+        const data = await r.json();
+        if(!r.ok){
+          setStatus('error: ' + (data.error || 'upload failed'), 'err');
+          return;
+        }
+        const errs = data.error_count || 0;
+        const ins = data.inserted_count || 0;
+        let msg = 'inserted ' + ins + ' row' + (ins===1?'':'s');
+        if(errs > 0) msg += ' · skipped ' + errs;
+        setStatus(msg + ' · refreshing...', 'ok');
+        fileInput.value = '';
+        // refresh dashboard data
+        setTimeout(refresh, 500);
+      } catch(e) {
+        setStatus('error: ' + e.message, 'err');
+      }
+    });
+  }
+
   function renderAll(){
     renderHero();
     renderHeatmap();
@@ -990,6 +1076,7 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
   document.addEventListener('DOMContentLoaded', () => {
     renderAll();
     setupForm();
+    setupCsv();
     setupTabs();
     setupButtons();
     setupKeys();
