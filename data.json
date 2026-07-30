@@ -1,6 +1,6 @@
 {
-  "total": 67.27,
-  "value": 3363.5,
+  "total": 70.77,
+  "value": 3538.5,
   "streak": 8,
   "rank": {
     "name": "Platinum",
@@ -8,16 +8,16 @@
     "color": "cyan",
     "min": 50,
     "max": 100,
-    "current": 67.267,
+    "current": 70.767,
     "next": "Diamond",
-    "progress": 34.5
+    "progress": 41.5
   },
   "next_rank": {
     "name": "Diamond",
     "glyph": "◆",
     "min": 100
   },
-  "rank_pct": 34.5,
+  "rank_pct": 41.5,
   "achievements": [
     {
       "id": "first",
@@ -115,9 +115,9 @@
     {
       "id": "files",
       "name": "Files Salvaged",
-      "desc": "40 tasks logged",
+      "desc": "41 tasks logged",
       "glyph": "⎙",
-      "count": 40
+      "count": 41
     },
     {
       "id": "disk",
@@ -143,9 +143,9 @@
     {
       "id": "hours",
       "name": "Hours Crystallized",
-      "desc": "67.3h saved",
+      "desc": "70.8h saved",
       "glyph": "◈",
-      "count": 67.267
+      "count": 70.767
     },
     {
       "id": "domains",
@@ -162,7 +162,7 @@
       "desc": "Save 5h this week",
       "glyph": "⏵",
       "target": 5,
-      "current": 32.17,
+      "current": 35.67,
       "pct": 100
     },
     {
@@ -171,7 +171,7 @@
       "desc": "Save 20h in 30 days",
       "glyph": "◐",
       "target": 20,
-      "current": 67.27,
+      "current": 70.77,
       "pct": 100
     },
     {
@@ -180,7 +180,7 @@
       "desc": "Log 10 tasks",
       "glyph": "✓",
       "target": 10,
-      "current": 40,
+      "current": 41,
       "pct": 100
     },
     {
@@ -202,13 +202,13 @@
       "pct": 100
     }
   ],
-  "invested": 6.3,
-  "week": 18.57,
-  "month": 67.27,
+  "invested": 7.5,
+  "week": 22.07,
+  "month": 70.77,
   "byCat": {
     "Maintenance": 5.566999999999999,
     "TPM": 26.5,
-    "Tooling": 33.3,
+    "Tooling": 36.8,
     "Research": 0.4,
     "Automation": 0.5,
     "Mixed": 1.0
@@ -252,7 +252,7 @@
     ],
     [
       "2026-07-30",
-      67.27
+      70.77
     ]
   ],
   "weekly": [
@@ -266,7 +266,7 @@
     ],
     [
       "2026-W31",
-      18.567
+      22.067
     ]
   ],
   "entries": [
@@ -585,6 +585,14 @@
       "hours": 2.5,
       "invested": 1.0,
       "note": "Captain asked for auto-mode rub check"
+    },
+    {
+      "date": "2026-07-30",
+      "task": "Dashboard v26 redesigned for clean Linear-style look",
+      "cat": "Tooling",
+      "hours": 3.5,
+      "invested": 1.2,
+      "note": "Aggressive redesign 60KB down from 230KB"
     }
   ],
   "updated": "2026-07-30",

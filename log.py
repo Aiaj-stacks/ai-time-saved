@@ -709,9 +709,11 @@ def report(entries):
     # Use a regex so it matches whether DATA is null or already-populated.
     try:
         html = open(_dash_path(), encoding="utf-8").read()
-        new_block = "let DATA=" + json.dumps(data, ensure_ascii=False) + ", AUTO=null;"
-        if re.search(r"let DATA=.*?, AUTO=null;", html, re.S):
-            html = re.sub(r"let DATA=.*?, AUTO=null;", new_block, html, count=1, flags=re.S)
+        # Accept optional spaces around = and the , AUTO=null terminator
+        embed_re = re.compile(r"let\s+DATA\s*=\s*.*?,\s*AUTO\s*=\s*null\s*;", re.S)
+        new_block = "let DATA = " + json.dumps(data, ensure_ascii=False) + ", AUTO = null;"
+        if embed_re.search(html):
+            html = embed_re.sub(new_block, html, count=1)
             open(DASH, "w", encoding="utf-8").write(html)
             print(f"  > dashboard.html embedded DATA refreshed")
         else:

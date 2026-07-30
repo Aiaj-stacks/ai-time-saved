@@ -38,3 +38,4 @@
 {"date": "2026-07-29", "task": "Dashboard v23: time-savings estimator on entry form (live updates)", "cat": "Tooling", "hours": 1.0, "invested": 0.4, "note": ""}
 {"date": "2026-07-29", "task": "Dashboard v24: discovered window.DATA never set bug, added real-time browser screenshot verification", "cat": "Tooling", "hours": 1.5, "invested": 0.5, "note": ""}
 {"date": "2026-07-30", "task": "Dashboard v25.4 end-to-end verification test", "cat": "Tooling", "hours": 2.5, "invested": 1.0, "note": "Captain asked for auto-mode rub check"}
+{"date": "2026-07-30", "task": "Dashboard v26 redesigned for clean Linear-style look", "cat": "Tooling", "hours": 3.5, "invested": 1.2, "note": "Aggressive redesign 60KB down from 230KB"}
