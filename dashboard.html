@@ -45,7 +45,7 @@ a{color:var(--accent-hover);text-decoration:none}
 a:hover{color:var(--text-1)}
 
 /* ===== LAYOUT ===== */
-.app{max-width:1280px;margin:0 auto;padding:24px 32px 64px;display:flex;flex-direction:column;gap:24px;min-height:100vh}
+.app{max-width:1800px;margin:0 auto;padding:24px 40px 64px;display:flex;flex-direction:column;gap:24px;min-height:100vh}
 
 /* ===== HEADER ===== */
 .header{display:flex;align-items:center;justify-content:space-between;padding:0 4px}
@@ -64,27 +64,27 @@ a:hover{color:var(--text-1)}
 .btn-primary:hover{background:var(--accent-hover);box-shadow:0 0 16px var(--accent-glow)}
 
 /* ===== HERO ===== */
-.hero{background:linear-gradient(180deg,var(--bg-panel),var(--bg-page));border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:32px;display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center;position:relative;overflow:hidden}
+.hero{background:linear-gradient(180deg,var(--bg-panel),var(--bg-page));border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:48px 56px;display:grid;grid-template-columns:auto 2fr;gap:64px;align-items:center;position:relative;overflow:hidden;min-height:260px}
 .hero::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent-glow),transparent)}
-.rank-orb{position:relative;width:140px;height:140px}
+.rank-orb{position:relative;width:200px;height:200px}
 .rank-orb-ring{position:absolute;inset:0;border-radius:50%;border:1px solid var(--border)}
 .rank-orb-ring::before,.rank-orb-ring::after{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid transparent;border-top-color:var(--cyan)}
 .rank-orb-ring::before{transform:rotate(45deg);opacity:.6}
 .rank-orb-ring::after{transform:rotate(-30deg);opacity:.4;border-top-color:var(--accent)}
-.rank-orb-core{position:absolute;inset:8px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(90,214,255,.15),rgba(10,14,28,1) 60%);border:1px solid var(--border);display:grid;place-items:center;font-size:42px;font-weight:600;color:var(--cyan);text-shadow:0 0 24px var(--cyan-glow);font-family:'JetBrains Mono'}
+.rank-orb-core{position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(90,214,255,.2),rgba(10,14,28,1) 60%);border:1px solid var(--border);display:grid;place-items:center;font-size:64px;font-weight:600;color:var(--cyan);text-shadow:0 0 32px var(--cyan-glow);font-family:'JetBrains Mono';letter-spacing:-0.04em}
 .hero-body{display:flex;flex-direction:column;gap:8px;min-width:0}
 .hero-eyebrow{display:flex;align-items:center;gap:12px;font-size:11px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:0.12em}
 .hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan-glow)}
-.hero-title{font-size:42px;font-weight:600;letter-spacing:-0.04em;color:var(--text-1);line-height:1.05;display:flex;align-items:baseline;gap:12px}
+.hero-title{font-size:64px;font-weight:600;letter-spacing:-0.05em;color:var(--text-1);line-height:1.02;display:flex;align-items:baseline;gap:16px}
 .hero-title .glyph{color:var(--ember);font-size:28px}
 .hero-progress{display:flex;flex-direction:column;gap:6px;margin-top:12px}
 .hero-progress-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--text-2);font-family:'JetBrains Mono'}
 .hero-progress-bar{height:6px;background:var(--bg-elev);border-radius:999px;overflow:hidden;position:relative}
 .hero-progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--accent-hover));border-radius:999px;box-shadow:0 0 8px var(--cyan-glow);transition:width 900ms cubic-bezier(.2,.8,.2,1)}
-.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:20px;padding-top:20px;border-top:1px dashed var(--border-subtle)}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:24px;padding-top:24px;border-top:1px dashed var(--border-subtle)}
 .hero-stat{display:flex;flex-direction:column;gap:2px}
 .hero-stat-label{font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:0.1em}
-.hero-stat-value{font-size:20px;font-weight:600;color:var(--text-1);font-family:'JetBrains Mono';letter-spacing:-0.02em}
+.hero-stat-value{font-size:28px;font-weight:600;color:var(--text-1);font-family:'JetBrains Mono';letter-spacing:-0.03em}
 .hero-stat-value.cyan{color:var(--cyan)}
 .hero-stat-value.green{color:var(--green)}
 
@@ -94,7 +94,7 @@ a:hover{color:var(--text-1)}
 .stat-card:hover{background:var(--bg-elev)}
 .stat-card-label{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:0.08em}
 .stat-card-trend{font-size:10px;font-weight:600;color:var(--green);font-family:'JetBrains Mono';padding:1px 6px;background:rgba(16,185,129,0.1);border-radius:4px}
-.stat-card-value{font-size:28px;font-weight:600;color:var(--text-1);font-family:'JetBrains Mono';letter-spacing:-0.03em;line-height:1}
+.stat-card-value{font-size:42px;font-weight:600;color:var(--text-1);font-family:'JetBrains Mono';letter-spacing:-0.04em;line-height:1}
 .stat-card-sub{font-size:11px;color:var(--text-3);font-family:'JetBrains Mono'}
 
 /* ===== SECTION ===== */
@@ -104,18 +104,18 @@ a:hover{color:var(--text-1)}
 .section-meta{font-size:12px;color:var(--text-3);font-family:'JetBrains Mono'}
 
 /* ===== HEATMAP ===== */
-.heatmap-card{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:20px}
+.heatmap-card{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:32px 48px}
 .heatmap-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
 .heatmap-title{font-size:13px;font-weight:500;color:var(--text-2)}
 .heatmap-stats{display:flex;gap:20px;font-size:11px;color:var(--text-3);font-family:'JetBrains Mono'}
 .heatmap-stats b{color:var(--text-1);font-weight:500}
 .heatmap-container{display:flex;gap:8px;padding-top:18px;position:relative}
 .heatmap-rail{display:flex;flex-direction:column;gap:3px;font-size:9px;color:var(--text-3);font-family:'JetBrains Mono';padding-top:2px;flex-shrink:0}
-.heatmap-rail>span{height:11px;display:flex;align-items:center}
+.heatmap-rail>span{height:13px;display:flex;align-items:center}
 .heatmap-main{flex:1;overflow-x:auto;padding-bottom:4px}
 .heatmap-months{display:flex;height:14px;font-size:9px;color:var(--text-3);font-family:'JetBrains Mono';position:relative;margin-bottom:4px;padding-left:1px}
 .heatmap-grid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,11px);gap:3px;padding-left:1px}
-.hm-cell{width:11px;height:11px;border-radius:2px;background:var(--bg-elev);transition:all .12s;cursor:pointer;position:relative}
+.hm-cell{width:13px;height:13px;border-radius:2px;background:var(--bg-elev);transition:all .12s;cursor:pointer;position:relative}
 .hm-cell:hover{transform:scale(1.4);z-index:2}
 .hm-cell.lvl-1{background:#0e4429}
 .hm-cell.lvl-2{background:#006d32}
@@ -125,18 +125,18 @@ a:hover{color:var(--text-1)}
 .hm-cell.future{background:transparent;border:1px dashed var(--border-subtle)}
 .heatmap-legend{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text-3);font-family:'JetBrains Mono';margin-top:10px;justify-content:flex-end}
 .heatmap-legend-scale{display:flex;gap:3px}
-.heatmap-legend-scale span{width:11px;height:11px;border-radius:2px}
+.heatmap-legend-scale span{width:13px;height:13px;border-radius:2px}
 .heatmap-tip{position:fixed;z-index:9990;pointer-events:none;padding:6px 10px;background:#0d1117;border:1px solid #30363d;border-radius:6px;font:600 11px var(--font-mono);color:#e6edf3;opacity:0;transition:opacity .12s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.6)}
 .heatmap-tip.show{opacity:1}
 .heatmap-tip b{color:#39d353;font-weight:700}
 
 /* ===== CHARTS GRID ===== */
-.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
-.chart-card{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:20px;min-height:240px}
+.charts-grid{display:grid;grid-template-columns:3fr 2fr;gap:20px}
+.chart-card{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;min-height:280px}
 .chart-card-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}
 .chart-card-title{font-size:13px;font-weight:500;color:var(--text-2)}
 .chart-card-hint{font-size:11px;color:var(--text-3);font-family:'JetBrains Mono'}
-.chart-svg-wrap{position:relative;height:200px}
+.chart-svg-wrap{position:relative;height:240px}
 .chart-svg-wrap svg{width:100%;height:100%;overflow:visible}
 .chart-line{stroke:var(--cyan);stroke-width:2;fill:none;filter:drop-shadow(0 0 4px var(--cyan-glow))}
 .chart-line-area{fill:url(#chart-grad);opacity:.6}
@@ -144,7 +144,7 @@ a:hover{color:var(--text-1)}
 .chart-tick{font:11px 'JetBrains Mono';fill:var(--text-3)}
 .chart-dot{fill:var(--cyan);stroke:var(--bg-panel);stroke-width:2}
 .chart-dot:hover{filter:drop-shadow(0 0 6px var(--cyan-glow))}
-.donut-segment{fill:none;stroke-width:14;transition:stroke-dasharray .9s cubic-bezier(.2,.8,.2,1)}
+.donut-segment{fill:none;stroke-width:16;transition:stroke-dasharray .9s cubic-bezier(.2,.8,.2,1)}
 .donut-center{font-family:'JetBrains Mono';font-weight:600;fill:var(--text-1);text-anchor:middle}
 .donut-sub{font-family:'JetBrains Mono';fill:var(--text-3);text-anchor:middle}
 .bar{transition:all .9s cubic-bezier(.2,.8,.2,1)}
@@ -152,11 +152,11 @@ a:hover{color:var(--text-1)}
 
 /* ===== TWO-COL GRID ===== */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.three-col{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.three-col{display:grid;grid-template-columns:2fr 1fr;gap:20px}
 
 /* ===== ENTRY FORM ===== */
-.entry-card{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:20px}
-.entry-form{display:flex;flex-direction:column;gap:12px}
+.entry-card{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:32px 48px}
+.entry-form{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
 .field{display:flex;flex-direction:column;gap:6px}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .field-label{font-size:11px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em}
@@ -200,7 +200,7 @@ a:hover{color:var(--text-1)}
 .activity-hours{font-family:'JetBrains Mono';font-size:12px;font-weight:600;color:var(--cyan);padding:2px 8px;background:rgba(90,214,255,0.08);border-radius:4px}
 
 /* ===== FEATS ===== */
-.feats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.feats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
 .feat-tile{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;text-align:center;transition:all .15s;cursor:default}
 .feat-tile.unlocked{background:linear-gradient(180deg,var(--bg-elev),var(--bg-panel));border-color:rgba(90,214,255,0.2)}
 .feat-tile.unlocked:hover{border-color:var(--cyan);box-shadow:0 0 12px var(--cyan-glow)}
@@ -224,7 +224,7 @@ a:hover{color:var(--text-1)}
 .quest-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--cyan));border-radius:2px;transition:width 900ms cubic-bezier(.2,.8,.2,1)}
 
 /* ===== INVENTORY ===== */
-.inventory{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.inventory{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
 .inv-item{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;display:flex;flex-direction:column;gap:4px;transition:border-color .15s}
 .inv-item:hover{border-color:rgba(255,255,255,0.15)}
 .inv-icon{font-size:22px;line-height:1}
@@ -281,21 +281,26 @@ a:hover{color:var(--text-1)}
 ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.15)}
 
 /* ===== RESPONSIVE ===== */
+@media (max-width:1500px){
+  .charts-grid{grid-template-columns:1fr 1fr}
+  .three-col{grid-template-columns:1fr 1fr}
+}
 @media (max-width:1100px){
   .three-col{grid-template-columns:1fr}
   .charts-grid{grid-template-columns:1fr}
 }
 @media (max-width:900px){
   .app{padding:16px}
-  .hero{grid-template-columns:1fr;gap:20px;padding:24px}
-  .rank-orb{width:100px;height:100px;margin:0 auto}
-  .rank-orb-core{font-size:32px}
-  .hero-title{font-size:32px}
+  .hero{grid-template-columns:1fr;gap:24px;padding:28px}
+  .rank-orb{width:140px;height:140px;margin:0 auto}
+  .rank-orb-core{font-size:44px}
+  .hero-title{font-size:42px}
   .hero-stats{grid-template-columns:repeat(2,1fr)}
   .stat-strip{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:700px){
   .nav{display:none}
+  .hero-title{font-size:32px}
   .stat-strip{grid-template-columns:1fr}
   .two-col,.charts-grid{grid-template-columns:1fr}
   .header-actions .live-pill{display:none}
@@ -303,6 +308,7 @@ a:hover{color:var(--text-1)}
 @media (max-width:500px){
   .app{padding:12px}
   .hero{padding:20px}
+  .hero-title{font-size:28px}
   .hero-stats{grid-template-columns:1fr}
   .feats-grid{grid-template-columns:repeat(auto-fill,minmax(95px,1fr))}
   .header-actions .btn:not(.btn-primary){display:none}
@@ -313,6 +319,26 @@ a:hover{color:var(--text-1)}
   *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
 }
 
+
+
+/* ===== ANALYTICS STRIP (v27) ===== */
+.analytics-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border-subtle);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden}
+.analytics-card{background:var(--bg-panel);padding:24px 28px;display:flex;flex-direction:column;gap:8px;transition:background .15s}
+.analytics-card:hover{background:var(--bg-elev)}
+.analytics-label{font-size:11px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:0.08em}
+.analytics-value{font-size:36px;font-weight:600;color:var(--text-1);font-family:'JetBrains Mono';letter-spacing:-0.04em;line-height:1}
+.analytics-sub{font-size:11px;color:var(--text-3);font-family:'JetBrains Mono'}
+
+
+.form-right-col{display:flex;flex-direction:column;gap:16px}
+.submit-row{display:flex;gap:8px;align-items:center;padding-top:8px;border-top:1px dashed var(--border-subtle)}
+
+
+.donut-wrap{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap}
+.donut-legend{display:flex;flex-direction:column;gap:8px}
+.donut-legend-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);font-family:'JetBrains Mono'}
+.donut-legend-row span:first-child{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.donut-legend-row .v{color:var(--text-3);margin-left:auto}
 
 /* ===== AURA 4D EFFECTS (v26.6) ===== */
 .grid-bg{position:fixed;inset:0;z-index:-3;pointer-events:none;opacity:.35;background-image:linear-gradient(rgba(90,214,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(90,214,255,.04) 1px,transparent 1px);background-size:64px 64px;background-position:-1px -1px;animation:grid-drift 60s linear infinite}
@@ -538,7 +564,7 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
         <div class="chart-card-hint">cumulative · click to drill</div>
       </div>
       <div class="chart-svg-wrap">
-        <svg id="cumChart" viewBox="0 0 600 200" preserveAspectRatio="none"></svg>
+        <svg id="cumChart" viewBox="0 0 1000 240" preserveAspectRatio="none"></svg>
       </div>
     </article>
     <article class="chart-card">
@@ -546,8 +572,9 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
         <div class="chart-card-title">Discipline</div>
         <div class="chart-card-hint">by category</div>
       </div>
-      <div class="chart-svg-wrap" style="display:grid;place-items:center">
-        <svg id="donutChart" viewBox="0 0 120 120" width="180" height="180"></svg>
+      <div class="chart-svg-wrap donut-wrap">
+        <svg id="donutChart" viewBox="0 0 160 160" width="220" height="220"></svg>
+        <div class="donut-legend" id="donutLegend"></div>
       </div>
     </article>
   </section>
@@ -556,10 +583,10 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
     <article class="chart-card">
       <div class="chart-card-head">
         <div class="chart-card-title">Hour Detail</div>
-        <div class="chart-card-hint">daily</div>
+        <div class="chart-card-hint">daily hours by date</div>
       </div>
       <div class="chart-svg-wrap">
-        <svg id="hourChart" viewBox="0 0 600 200" preserveAspectRatio="none"></svg>
+        <svg id="hourChart" viewBox="0 0 1000 240" preserveAspectRatio="none"></svg>
       </div>
     </article>
     <article class="chart-card">
@@ -568,9 +595,43 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
         <div class="chart-card-hint">by ISO week</div>
       </div>
       <div class="chart-svg-wrap">
-        <svg id="barsChart" viewBox="0 0 600 200" preserveAspectRatio="none"></svg>
+        <svg id="barsChart" viewBox="0 0 1000 240" preserveAspectRatio="none"></svg>
       </div>
     </article>
+  </section>
+
+  <!-- BIG ANALYTICS STRIP -->
+  <section class="analytics-strip">
+    <div class="analytics-card">
+      <div class="analytics-label">Avg Hours/Day</div>
+      <div class="analytics-value" id="kpiAvgDay">--</div>
+      <div class="analytics-sub">across active days</div>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-label">Peak Day</div>
+      <div class="analytics-value" id="kpiPeakDay">--</div>
+      <div class="analytics-sub" id="kpiPeakDaySub">highest single day</div>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-label">Top Category</div>
+      <div class="analytics-value" id="kpiTopCat">--</div>
+      <div class="analytics-sub" id="kpiTopCatSub">most time saved</div>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-label">Days Since Start</div>
+      <div class="analytics-value" id="kpiDaysSince">--</div>
+      <div class="analytics-sub" id="kpiDaysSinceSub">since first entry</div>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-label">Avg ROI</div>
+      <div class="analytics-value" id="kpiAvgRoi">--</div>
+      <div class="analytics-sub" id="kpiAvgRoiSub">saved / invested</div>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-label">Categories</div>
+      <div class="analytics-value" id="kpiCats">--</div>
+      <div class="analytics-sub" id="kpiCatsSub">workstreams touched</div>
+    </div>
   </section>
 
   <!-- THREE COL: PER-DAY | ACTIVITY -->
@@ -648,15 +709,17 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
           <option>Writing</option><option>General</option>
         </select>
       </div>
-      <div class="estimator" id="estimator" aria-live="polite">
-        <div class="est-row"><div class="est-label">Manual</div><div class="est-val" id="estManual">--</div></div>
-        <div class="est-row"><div class="est-label">Invested</div><div class="est-val" id="estInvested">--</div></div>
-        <div class="est-row"><div class="est-label">NET SAVED</div><div class="est-val net" id="estNet">--</div></div>
-        <div class="est-row"><div class="est-label">Value @ $50</div><div class="est-val value" id="estValue">--</div></div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-primary" type="submit">Inscribe</button>
-        <span class="muted mono" style="font-size:11px">POST /api/add</span>
+      <div class="form-right-col">
+        <div class="estimator" id="estimator" aria-live="polite">
+          <div class="est-row"><div class="est-label">Manual</div><div class="est-val" id="estManual">--</div></div>
+          <div class="est-row"><div class="est-label">Invested</div><div class="est-val" id="estInvested">--</div></div>
+          <div class="est-row"><div class="est-label">NET SAVED</div><div class="est-val net" id="estNet">--</div></div>
+          <div class="est-row"><div class="est-label">Value @ $50</div><div class="est-val value" id="estValue">--</div></div>
+        </div>
+        <div class="submit-row">
+          <button class="btn btn-primary" type="submit">Inscribe</button>
+          <span class="muted mono">POST /api/add</span>
+        </div>
       </div>
     </form>
       <!-- CSV Import (v26.2) -->
@@ -779,12 +842,12 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
         label.style.gridRow = 1;
         label.textContent = monthNames[m];
         label.style.position = 'absolute';
-        label.style.left = (col * 14) + 'px';
+        label.style.left = (col * 17) + 'px';
         label.style.top = '0';
         // Use a simpler approach: just append to months
         months.appendChild(document.createElement('span'));
         months.lastChild.style.position = 'absolute';
-        months.lastChild.style.left = (col * 14) + 'px';
+        months.lastChild.style.left = (col * 17) + 'px';
         months.lastChild.textContent = monthNames[m];
         lastMonth = m;
       }
@@ -841,7 +904,7 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     if(!svg) return;
     const cum = DATA.cum || [];
     if (cum.length < 2) { svg.innerHTML = ''; return; }
-    const W = 600, H = 200, P = 28;
+    const W = 1000, H = 240, P = 36;
     const xs = cum.map((_,i) => P + (i/(cum.length-1)) * (W - P*2));
     const ys = cum.map(([_,v]) => H - P - (v / cum[cum.length-1][1]) * (H - P*2));
     const linePath = xs.map((x,i) => (i===0?'M':'L') + x + ',' + ys[i]).join(' ');
@@ -866,7 +929,7 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     if (!entries.length) { svg.innerHTML = '<text class="donut-sub" x="60" y="65">no data</text>'; return; }
     const total = entries.reduce((s,[k,v]) => s+v, 0);
     const colors = ['#5ad6ff','#5e6ad2','#10b981','#f0c14b','#ff7a2e','#ef4444','#7170ff','#39d353'];
-    const R = 48, C = 2*Math.PI*R;
+    const R = 64, C = 2*Math.PI*R;
     let offset = 0;
     const segs = entries.map(([k,v],i) => {
       const len = (v/total) * C;
@@ -882,19 +945,18 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
         <span class="muted">${fmt(v,1)}h</span>
       </div>`).join('');
     svg.innerHTML = segs + `
-      <text class="donut-center" x="60" y="58" font-size="20">${fmt(total,1)}h</text>
-      <text class="donut-sub" x="60" y="76" font-size="9">${entries.length} categories</text>
+      <text class="donut-center" x="80" y="78" font-size="28">${fmt(total,1)}h</text>
+      <text class="donut-sub" x="80" y="100" font-size="11">${entries.length} categories</text>
     `;
-    // Update parent to include legend
-    const wrap = svg.parentElement;
-    if (wrap && !wrap.querySelector('.donut-legend')) {
-      const leg = document.createElement('div');
-      leg.className = 'donut-legend';
-      leg.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:12px;justify-content:center';
-      leg.innerHTML = legend;
-      wrap.appendChild(leg);
-    } else if (wrap) {
-      wrap.querySelector('.donut-legend').innerHTML = legend;
+    // Populate the side legend
+    const legendEl = document.getElementById('donutLegend');
+    if (legendEl) {
+      legendEl.innerHTML = entries.map(([k,v],i) => `
+        <div class="donut-legend-row">
+          <span style="background:${colors[i%colors.length]}"></span>
+          <span>${esc(k)}</span>
+          <span class="v">${fmt(v,1)}h</span>
+        </div>`).join('');
     }
   }
   function renderHourDetail(){
@@ -907,7 +969,7 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
       if (i === 0) dailyHours.push([cum[0][0], cum[0][1]]);
       else dailyHours.push([cum[i][0], +(cum[i][1] - cum[i-1][1]).toFixed(2)]);
     }
-    const W = 600, H = 200, P = 28;
+    const W = 1000, H = 240, P = 36;
     const maxH = Math.max(...dailyHours.map(d=>d[1]), 1);
     const xs = dailyHours.map((_,i) => P + (i/(dailyHours.length-1)) * (W - P*2));
     const ys = dailyHours.map(([_,v]) => H - P - (v/maxH) * (H - P*2));
@@ -925,7 +987,7 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     if(!svg) return;
     const wk = DATA.weekly || [];
     if (!wk.length) { svg.innerHTML = ''; return; }
-    const W = 600, H = 200, P = 28;
+    const W = 1000, H = 240, P = 36;
     const maxV = Math.max(...wk.map(w=>w[1]), 1);
     const bw = (W - P*2) / wk.length - 12;
     const bars = wk.map((w,i) => {
@@ -1144,6 +1206,48 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     });
   }
 
+  function renderAnalytics(){
+    const entries = DATA.entries || [];
+    if (!entries.length) return;
+    // Avg hours/day across active days
+    const byDate = {};
+    entries.forEach(e => { byDate[e.date] = (byDate[e.date]||0) + Number(e.hours||0); });
+    const dates = Object.keys(byDate);
+    const totalHrs = entries.reduce((s,e) => s + Number(e.hours||0), 0);
+    const avgPerDay = totalHrs / dates.length;
+    // Peak day
+    let peakDate = '', peakHrs = 0;
+    for (const [d, h] of Object.entries(byDate)) {
+      if (h > peakHrs) { peakHrs = h; peakDate = d; }
+    }
+    // Top category
+    const cats = DATA.byCat || {};
+    const topCat = Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
+    // Days since first entry
+    const sorted = entries.map(e => e.date).sort();
+    const first = sorted[0];
+    const last = sorted[sorted.length-1];
+    const daysSince = first ? Math.ceil((Date.now() - new Date(first).getTime()) / 86400000) : 0;
+    // ROI
+    const invested = DATA.invested || 0;
+    const roi = invested > 0 ? (totalHrs / invested) : 0;
+    // Categories
+    const catCount = Object.keys(cats).length;
+    const fmtDate = iso => { const d = new Date(iso); return d.toLocaleDateString('en-US', {month:'short', day:'numeric'}); };
+    const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+    setEl('kpiAvgDay', avgPerDay.toFixed(1) + 'h');
+    setEl('kpiPeakDay', peakHrs.toFixed(1) + 'h');
+    setEl('kpiPeakDaySub', peakDate ? ('on ' + fmtDate(peakDate)) : '');
+    setEl('kpiTopCat', topCat ? topCat[0] : '--');
+    setEl('kpiTopCatSub', topCat ? (topCat[1].toFixed(1) + 'h') : '');
+    setEl('kpiDaysSince', daysSince + 'd');
+    setEl('kpiDaysSinceSub', first ? ('since ' + fmtDate(first)) : '');
+    setEl('kpiAvgRoi', roi.toFixed(1) + 'x');
+    setEl('kpiAvgRoiSub', invested > 0 ? (invested.toFixed(1) + 'h invested') : 'no invested tracked');
+    setEl('kpiCats', catCount + '');
+    setEl('kpiCatsSub', Object.keys(cats).join(', '));
+  }
+
   function renderAll(){
     renderHero();
     renderHeatmap();
@@ -1156,6 +1260,7 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     renderFeats();
     renderQuests();
     renderInventory();
+    renderAnalytics();
   }
 
   /* ===== NAV TABS ===== */
