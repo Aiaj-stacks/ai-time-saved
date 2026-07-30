@@ -366,6 +366,19 @@ a:hover{color:var(--text-1)}
   .massive-total-usd{font-size:22px}
 }
 
+
+.feat-progress{width:100%;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-top:8px}
+.feat-progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.feat-tile.locked .feat-progress-fill{background:linear-gradient(90deg,rgba(255,255,255,.1),rgba(255,255,255,.2))}
+.feat-pct{font-family:'JetBrains Mono';font-size:9px;color:var(--text-3);margin-top:2px;text-align:right}
+.feat-tile.unlocked .feat-pct{color:var(--cyan)}
+
+
+.analytics-progress{width:100%;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-top:6px}
+.analytics-progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:3px;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.analytics-goal-card{position:relative;overflow:hidden}
+.analytics-goal-card::after{content:"";position:absolute;top:0;right:0;bottom:0;width:30%;background:linear-gradient(90deg,transparent,rgba(90,214,255,.04));pointer-events:none}
+
 /* ===== AURA 4D EFFECTS (v26.6) ===== */
 .grid-bg{position:fixed;inset:0;z-index:-3;pointer-events:none;opacity:.35;background-image:linear-gradient(rgba(90,214,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(90,214,255,.04) 1px,transparent 1px);background-size:64px 64px;background-position:-1px -1px;animation:grid-drift 60s linear infinite}
 @keyframes grid-drift{to{background-position:63px 63px}}
@@ -637,6 +650,12 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
 
   <!-- BIG ANALYTICS STRIP -->
   <section class="analytics-strip">
+    <div class="analytics-card analytics-goal-card">
+      <div class="analytics-label">Weekly Goal</div>
+      <div class="analytics-value" id="kpiWeekGoal">--</div>
+      <div class="analytics-sub" id="kpiWeekGoalSub">--</div>
+      <div class="analytics-progress"><div class="analytics-progress-fill" id="kpiWeekGoalFill"></div></div>
+    </div>
     <div class="analytics-card">
       <div class="analytics-label">Avg Hours/Day</div>
       <div class="analytics-value" id="kpiAvgDay">--</div>
@@ -1192,10 +1211,13 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     $('#achCount').textContent = unlocked.size + ' / ' + all.length;
     grid.innerHTML = all.map(a => {
       const ok = unlocked.has(a.id);
+      const pct = a.pct || 0;
       return `<div class="feat-tile ${ok?'unlocked':'locked'}" title="${esc(a.desc)}">
         <div class="feat-rune">${esc(a.glyph||'◯')}</div>
         <div class="feat-name">${esc(a.name)}</div>
         <div class="feat-desc">${esc(a.desc)}</div>
+        <div class="feat-progress"><div class="feat-progress-fill" style="width:${pct}%"></div></div>
+        <div class="feat-pct">${pct.toFixed(0)}%</div>
       </div>`;
     }).join('');
   }
@@ -1371,6 +1393,12 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     const roi = invested > 0 ? (totalHrs / invested) : 0;
     // Categories
     const catCount = Object.keys(cats).length;
+    // Weekly goal
+    const goal = DATA.goal || {};
+    const goalHrs = goal.hours || 0;
+    const weekHrs = DATA.week || 0;
+    const goalPct = goalHrs > 0 ? Math.min(100, (weekHrs / goalHrs) * 100) : 0;
+
     const fmtDate = iso => { const d = new Date(iso); return d.toLocaleDateString('en-US', {month:'short', day:'numeric'}); };
     const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
     setEl('kpiAvgDay', avgPerDay.toFixed(1) + 'h');
@@ -1384,6 +1412,11 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     setEl('kpiAvgRoiSub', invested > 0 ? (invested.toFixed(1) + 'h invested') : 'no invested tracked');
     setEl('kpiCats', catCount + '');
     setEl('kpiCatsSub', Object.keys(cats).join(', '));
+    // Weekly goal
+    setEl('kpiWeekGoal', weekHrs.toFixed(1) + ' / ' + goalHrs.toFixed(1) + 'h');
+    setEl('kpiWeekGoalSub', goalPct >= 100 ? 'GOAL MET! 🎉' : (goalPct.toFixed(0) + '% complete'));
+    const goalFill = document.getElementById('kpiWeekGoalFill');
+    if (goalFill) goalFill.style.width = goalPct + '%';
   }
 
   function renderAll(){
