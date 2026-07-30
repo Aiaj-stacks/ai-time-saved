@@ -1,23 +1,23 @@
 {
-  "total": 64.77,
-  "value": 3238.5,
-  "streak": 7,
+  "total": 67.27,
+  "value": 3363.5,
+  "streak": 8,
   "rank": {
     "name": "Platinum",
     "glyph": "●",
     "color": "cyan",
     "min": 50,
     "max": 100,
-    "current": 64.767,
+    "current": 67.267,
     "next": "Diamond",
-    "progress": 29.5
+    "progress": 34.5
   },
   "next_rank": {
     "name": "Diamond",
     "glyph": "◆",
     "min": 100
   },
-  "rank_pct": 29.5,
+  "rank_pct": 34.5,
   "achievements": [
     {
       "id": "first",
@@ -115,9 +115,9 @@
     {
       "id": "files",
       "name": "Files Salvaged",
-      "desc": "39 tasks logged",
+      "desc": "40 tasks logged",
       "glyph": "⎙",
-      "count": 39
+      "count": 40
     },
     {
       "id": "disk",
@@ -143,9 +143,9 @@
     {
       "id": "hours",
       "name": "Hours Crystallized",
-      "desc": "64.8h saved",
+      "desc": "67.3h saved",
       "glyph": "◈",
-      "count": 64.767
+      "count": 67.267
     },
     {
       "id": "domains",
@@ -162,7 +162,7 @@
       "desc": "Save 5h this week",
       "glyph": "⏵",
       "target": 5,
-      "current": 29.67,
+      "current": 32.17,
       "pct": 100
     },
     {
@@ -171,7 +171,7 @@
       "desc": "Save 20h in 30 days",
       "glyph": "◐",
       "target": 20,
-      "current": 64.77,
+      "current": 67.27,
       "pct": 100
     },
     {
@@ -180,7 +180,7 @@
       "desc": "Log 10 tasks",
       "glyph": "✓",
       "target": 10,
-      "current": 39,
+      "current": 40,
       "pct": 100
     },
     {
@@ -189,7 +189,7 @@
       "desc": "Hit a 7-day streak",
       "glyph": "✦",
       "target": 7,
-      "current": 7,
+      "current": 8,
       "pct": 100
     },
     {
@@ -202,13 +202,13 @@
       "pct": 100
     }
   ],
-  "invested": 5.3,
-  "week": 16.07,
-  "month": 64.77,
+  "invested": 6.3,
+  "week": 18.57,
+  "month": 67.27,
   "byCat": {
     "Maintenance": 5.566999999999999,
     "TPM": 26.5,
-    "Tooling": 30.8,
+    "Tooling": 33.3,
     "Research": 0.4,
     "Automation": 0.5,
     "Mixed": 1.0
@@ -249,6 +249,10 @@
     [
       "2026-07-29",
       64.77
+    ],
+    [
+      "2026-07-30",
+      67.27
     ]
   ],
   "weekly": [
@@ -262,7 +266,7 @@
     ],
     [
       "2026-W31",
-      16.067
+      18.567
     ]
   ],
   "entries": [
@@ -573,9 +577,17 @@
       "hours": 1.5,
       "invested": 0.5,
       "note": ""
+    },
+    {
+      "date": "2026-07-30",
+      "task": "Dashboard v25.4 end-to-end verification test",
+      "cat": "Tooling",
+      "hours": 2.5,
+      "invested": 1.0,
+      "note": "Captain asked for auto-mode rub check"
     }
   ],
-  "updated": "2026-07-29",
+  "updated": "2026-07-30",
   "goal": {
     "hours": 3.0,
     "set_at": "2026-07-28"

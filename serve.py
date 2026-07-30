@@ -54,36 +54,52 @@ def load():
 
 
 def aggregate(entries):
-    total = sum(e["hours"] for e in entries)
-    inv = sum(e.get("invested", 0) for e in entries)
-    today = date.today()
-    ws = today - timedelta(days=today.weekday())
-    ms = today.replace(day=1)
-    wk = sum(e["hours"] for e in entries if date.fromisoformat(e["date"]) >= ws)
-    mo = sum(e["hours"] for e in entries if date.fromisoformat(e["date"]) >= ms)
-    by_cat = {}
-    for e in entries:
-        by_cat[e["cat"]] = by_cat.get(e["cat"], 0) + e["hours"]
-    d = {}
-    for e in entries:
-        d[e["date"]] = d.get(e["date"], 0) + e["hours"]
-    d = dict(sorted(d.items()))
-    cum, run = [], 0
-    for k, v in d.items():
-        run += v
-        cum.append([k, round(run, 2)])
-    wkmap = {}
-    for e in entries:
-        dt = date.fromisoformat(e["date"])
-        key = f"{dt.isocalendar()[0]}-W{dt.isocalendar()[1]:02d}"
-        wkmap[key] = wkmap.get(key, 0) + e["hours"]
-    weekly = [list(x) for x in sorted(wkmap.items())]
-    return {
-        "total": round(total, 2), "invested": round(inv, 2),
-        "week": round(wk, 2), "month": round(mo, 2),
-        "byCat": by_cat, "cum": cum, "weekly": weekly,
-        "entries": entries, "updated": date.today().isoformat(),
-    }
+    # Mirror log.py report() so /api/data serves the same shape as the embedded
+    # DATA block (so auto-refresh doesn't wipe rank/achievements/etc.)
+    try:
+        import log as _log
+        total, inv, wk, mo, by_cat = _log.summarize(entries)
+        cum = _log.daily_cum(entries)
+        wkdata = _log.weekly(entries)
+        streak = _log.entry_streak(entries)
+        rank, next_rank, rank_pct = _log.rank_for(total)
+        achievements = _log.compute_achievements(entries, by_cat, total)
+        artifacts = _log.compute_artifacts(entries, total, by_cat)
+        quests = _log.compute_quests(entries, by_cat, total, streak)
+        value = round(round(total, 2) * 50, 2)
+        # preserve user fields (e.g. goal)
+        preserved = {}
+        try:
+            dp = os.path.join(BASE, "data.json")
+            if os.path.exists(dp):
+                preserved = json.loads(open(dp, encoding="utf-8").read())
+        except Exception:
+            pass
+        preserved_user_fields = {k: v for k, v in preserved.items() if k not in {
+            "total","value","streak","rank","next_rank","rank_pct","achievements",
+            "artifacts","quests","invested","week","month","byCat","cum","weekly",
+            "entries","updated"
+        }}
+        return {
+            "total": round(total, 2), "value": value,
+            "streak": streak, "rank": rank, "next_rank": next_rank,
+            "rank_pct": rank_pct, "achievements": achievements,
+            "artifacts": artifacts, "quests": quests,
+            "invested": round(inv, 2), "week": round(wk, 2),
+            "month": round(mo, 2), "byCat": by_cat,
+            "cum": cum, "weekly": wkdata, "entries": entries,
+            "updated": date.today().isoformat(),
+            **preserved_user_fields,
+        }
+    except Exception as e:
+        # Fallback: minimal aggregate if log.py import fails
+        total = sum(e["hours"] for e in entries)
+        return {
+            "total": round(total, 2), "value": round(round(total, 2) * 50, 2),
+            "byCat": {}, "cum": [], "weekly": [],
+            "entries": entries, "updated": date.today().isoformat(),
+            "_warning": f"aggregate fallback: {e}",
+        }
 
 
 # ---------------------------------------------------------------------------
