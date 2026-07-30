@@ -340,6 +340,16 @@ a:hover{color:var(--text-1)}
 .donut-legend-row span:first-child{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 .donut-legend-row .v{color:var(--text-3);margin-left:auto}
 
+
+.log-filter-input{width:100%;padding:8px 12px;margin:0 0 12px;background:var(--bg-elev);border:1px solid var(--border-subtle);color:var(--text-1);font:12px 'JetBrains Mono';border-radius:var(--radius-sm);outline:none;transition:border-color .15s}
+.log-filter-input:focus{border-color:var(--accent);background:var(--bg-elev2)}
+.log-filter-input::placeholder{color:var(--text-4)}
+
+
+.log-scope-select{background:var(--bg-elev);border:1px solid var(--border-subtle);color:var(--text-2);font:11px 'JetBrains Mono';padding:4px 8px;border-radius:var(--radius-sm);cursor:pointer;outline:none}
+.log-scope-select:focus{border-color:var(--accent)}
+.log-scope-select option{background:var(--bg-page);color:var(--text-1)}
+
 /* ===== AURA 4D EFFECTS (v26.6) ===== */
 .grid-bg{position:fixed;inset:0;z-index:-3;pointer-events:none;opacity:.35;background-image:linear-gradient(rgba(90,214,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(90,214,255,.04) 1px,transparent 1px);background-size:64px 64px;background-position:-1px -1px;animation:grid-drift 60s linear infinite}
 @keyframes grid-drift{to{background-position:63px 63px}}
@@ -646,8 +656,17 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
     <article class="chart-card" style="min-height:auto">
       <div class="chart-card-head">
         <div class="chart-card-title">Recent Log</div>
-        <div class="chart-card-hint" id="logCount">10 latest</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="logScope" class="log-scope-select">
+            <option value="10">last 10</option>
+            <option value="30">last 30d</option>
+            <option value="90">last 90d</option>
+            <option value="0">all time</option>
+          </select>
+          <div class="chart-card-hint" id="logCount">10 latest</div>
+        </div>
       </div>
+      <input type="text" id="logFilter" class="log-filter-input" placeholder="filter by task or category...">
       <ul class="activity-list" id="activityList" style="border:none;background:transparent"></ul>
     </article>
   </section>
@@ -1033,8 +1052,37 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
   function renderActivity(){
     const list = $('#activityList');
     if(!list) return;
-    const entries = (DATA.entries||[]).slice(-10).reverse();
-    $('#logCount').textContent = entries.length + ' latest';
+    let entries = DATA.entries || [];
+    // Apply scope
+    const scopeEl = $('#logScope');
+    const scope = scopeEl ? Number(scopeEl.value) : 10;
+    if (scope === 0) {
+      entries = entries.slice().reverse();
+    } else if (scope >= 100) {
+      entries = entries.slice(-scope).reverse();
+    } else {
+      // scope is days back
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - scope);
+      const cutoffStr = cutoff.toISOString().slice(0,10);
+      entries = entries.filter(e => e.date >= cutoffStr).reverse();
+    }
+    // Apply filter if any
+    const filterEl = $('#logFilter');
+    const q = filterEl ? filterEl.value.trim().toLowerCase() : '';
+    if (q) {
+      entries = entries.filter(e =>
+        (e.task||'').toLowerCase().includes(q) ||
+        (e.cat||'').toLowerCase().includes(q) ||
+        (e.date||'').toLowerCase().includes(q)
+      );
+    }
+    const label = scope === 0 ? 'all' : (scope >= 100 ? `last ${scope}` : `last ${scope}d`);
+    $('#logCount').textContent = entries.length + (q ? ' match' : ' ' + label);
+    if (!entries.length) {
+      list.innerHTML = '<li class="activity-item" style="opacity:.5">no entries match</li>';
+      return;
+    }
     list.innerHTML = entries.map(e => `
       <li class="activity-item">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
@@ -1043,6 +1091,20 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
         </div>
         <span class="activity-task">${esc(e.task)}</span>
       </li>`).join('');
+  }
+
+  // Wire up filter input + scope selector
+  function setupLogFilter(){
+    const filterEl = $('#logFilter');
+    if (filterEl && !filterEl.dataset.wired) {
+      filterEl.dataset.wired = '1';
+      filterEl.addEventListener('input', () => renderActivity());
+    }
+    const scopeEl = $('#logScope');
+    if (scopeEl && !scopeEl.dataset.wired) {
+      scopeEl.dataset.wired = '1';
+      scopeEl.addEventListener('change', () => renderActivity());
+    }
   }
 
   /* ===== FEATS ===== */
@@ -1375,6 +1437,8 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     renderAll();
     setupForm();
     setupCsv();
+    setupLogFilter();
+    setupLogFilter();
     setupTabs();
     setupButtons();
     setupKeys();
