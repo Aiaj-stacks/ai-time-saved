@@ -312,9 +312,94 @@ a:hover{color:var(--text-1)}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
 }
+
+
+/* ===== AURA 4D EFFECTS (v26.6) ===== */
+.grid-bg{position:fixed;inset:0;z-index:-3;pointer-events:none;opacity:.35;background-image:linear-gradient(rgba(90,214,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(90,214,255,.04) 1px,transparent 1px);background-size:64px 64px;background-position:-1px -1px;animation:grid-drift 60s linear infinite}
+@keyframes grid-drift{to{background-position:63px 63px}}
+.vignette{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 30%,transparent 30%,rgba(5,8,16,.7) 100%)}
+.ash-layer{position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.5}
+.ash-layer canvas{width:100%;height:100%;display:block}
+.hex-grid-bg{position:fixed;inset:0;z-index:-4;pointer-events:none;opacity:.04;background-image:radial-gradient(circle at 1px 1px,var(--cyan) 1px,transparent 0);background-size:32px 32px}
+
+/* Custom cursor */
+.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);will-change:transform;mix-blend-mode:difference}
+.cursor-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan-glow);transition:width .15s,height .15s,background .15s}
+.cursor-ring{width:36px;height:36px;border:1px solid rgba(255,255,255,.18);border-radius:50%;transition:width .2s,height .2s,border-color .2s}
+.cursor-dot.hover{width:6px;height:6px;background:var(--ember);box-shadow:0 0 16px var(--ember)}
+.cursor-ring.hover{width:48px;height:48px;border-color:var(--ember)}
+
+/* Mouse trail */
+.mouse-trail-canvas{position:fixed;inset:0;pointer-events:none;z-index:9997}
+.mouse-trail{position:fixed;top:0;left:0;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle,var(--cyan),transparent 70%);pointer-events:none;z-index:9997;transform:translate(-50%,-50%);opacity:0;transition:opacity .2s}
+
+/* God mode overlay */
+.god-mode{position:fixed;inset:0;z-index:999;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(94,106,210,.08),transparent 70%);opacity:0;transition:opacity .4s}
+.god-mode.on{opacity:1}
+@keyframes god-pulse{0%,100%{opacity:.6}50%{opacity:1}}
+body.god .cursor-ring{width:80px;height:80px;border-color:var(--gold);border-width:2px;box-shadow:0 0 24px rgba(240,193,75,.4)}
+body.god .rank-orb-core{box-shadow:0 0 32px rgba(240,193,75,.5),inset 0 0 24px rgba(240,193,75,.3)}
+
+/* Focus mode */
+.focus-pill{position:fixed;top:80px;left:50%;transform:translateX(-50%);padding:6px 16px;background:var(--accent);color:#fff;font:600 11px 'JetBrains Mono';border-radius:999px;text-transform:uppercase;letter-spacing:0.1em;display:none;z-index:200;box-shadow:0 0 16px var(--accent-glow)}
+.focus-pill.show{display:block;animation:tt-in 200ms ease}
+body.focus-mode .hero,.hero,.stat-strip,.heatmap-card,.chart-card,.entry-card{transition:opacity .4s,filter .4s}
+body.focus-mode .app>section:not(.focus-keep){opacity:.18;filter:saturate(.4)}
+body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gold),0 0 32px rgba(240,193,75,.2);transform:scale(1.005)}
+
+/* Magnetic buttons */
+.magnetic{transition:transform .15s}
+.magnetic:hover{will-change:transform}
+
+/* Card top accent (hex-stream) */
+.hex-stream{position:relative;overflow:hidden}
+.hex-stream::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan-dark) 20%,var(--cyan) 50%,var(--cyan-dark) 80%,transparent);opacity:.4}
+
+/* Ascii-noise top label */
+.ascii-noise{position:relative}
+.ascii-noise::before{content:"AURA::SYS01  STATUS:ONLINE  POWER:PLATINUM  TARGET:DIAMOND";position:absolute;top:-9px;left:12px;background:var(--bg-page);padding:0 10px;font:600 9px 'JetBrains Mono';letter-spacing:0.1em;color:var(--cyan);opacity:.55;pointer-events:none;white-space:nowrap;z-index:2}
+
+/* Scanline on rank-orb */
+.orb-scan{position:absolute;inset:0;border-radius:50%;pointer-events:none;overflow:hidden}
+.orb-scan::after{content:"";position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 8px var(--cyan);top:0;animation:orb-scan-sweep 4.5s linear infinite}
+@keyframes orb-scan-sweep{0%{top:0;opacity:0}10%{opacity:.8}90%{opacity:.8}100%{top:100%;opacity:0}}
+
+/* Torch flicker on rank orb */
+@keyframes torch-flicker{0%,100%{opacity:.85;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
+.rank-orb-core{animation:torch-flicker 2.4s ease-in-out infinite alternate;transform-origin:center}
+
+/* Torch shake on hero */
+@keyframes torch-shake{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(.4px,-.3px) rotate(.15deg)}50%{transform:translate(-.3px,.4px) rotate(-.1deg)}75%{transform:translate(.3px,.2px) rotate(.08deg)}}
+.hero{animation:torch-shake 7s ease-in-out infinite}
+.hero:hover{animation-play-state:paused}
+
+/* Slide-in for cmd palette */
+@keyframes tt-in{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* Focus state on cards when clicked */
+.stat-card,.feat-tile,.inv-item,.quest-row{cursor:pointer;transition:transform .12s,border-color .12s}
+.stat-card:hover,.feat-tile:hover,.inv-item:hover,.quest-row:hover{transform:translateY(-1px);border-color:rgba(255,255,255,0.15)}
+
+/* Hide on reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .grid-bg,.vignette,.ash-layer,.hex-grid-bg,.cursor-dot,.cursor-ring,.mouse-trail-canvas,.mouse-trail,.orb-scan::after,.rank-orb-core,.hero{animation:none!important}
+}
 </style>
 </head>
 <body>
+
+<!-- ===== AURA 4D LAYER (v26.6) ===== -->
+<div class="grid-bg" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="ash-layer" aria-hidden="true"><canvas id="ashCanvas"></canvas></div>
+<div class="hex-grid-bg" aria-hidden="true"></div>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+<canvas id="mouseTrail" class="mouse-trail-canvas" aria-hidden="true"></canvas>
+<div class="god-mode" id="godMode" aria-hidden="true"></div>
+<div class="mouse-trail" id="mouseTrailDot" aria-hidden="true"></div>
+<div class="focus-pill" id="focusPill" aria-hidden="true">FOCUS MODE</div>
+
 <div class="app">
 
   <!-- HEADER -->
@@ -338,9 +423,10 @@ a:hover{color:var(--text-1)}
   </header>
 
   <!-- HERO -->
-  <section class="hero">
+  <section class="hero ascii-noise hex-stream">
     <div class="rank-orb">
       <div class="rank-orb-ring"></div>
+      <div class="orb-scan"></div>
       <div class="rank-orb-core" id="heroGlyph">P</div>
     </div>
     <div class="hero-body">
@@ -411,7 +497,7 @@ a:hover{color:var(--text-1)}
   </section>
 
   <!-- HEATMAP -->
-  <section class="heatmap-card">
+  <section class="heatmap-card hex-stream ascii-noise">
     <div class="heatmap-head">
       <div class="heatmap-title">Activity Heatmap</div>
       <div class="heatmap-stats">
@@ -531,7 +617,7 @@ a:hover{color:var(--text-1)}
   </section>
 
   <!-- ENTRY FORM -->
-  <section class="entry-card">
+  <section class="entry-card hex-stream ascii-noise">
     <div class="chart-card-head">
       <div class="chart-card-title">Deploy New Entry</div>
       <div class="chart-card-hint">Live server required</div>
@@ -1222,5 +1308,161 @@ document.addEventListener('keydown', e => {
   }
 });
 </script>
-</body>
+<script>
+/* ===== AURA 4D ENGINE (v26.6) ===== */
+(function(){
+  // Skip if reduced motion is preferred
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.body.classList.add('reduced-motion');
+    return;
+  }
+
+  const $ = (s,r=document) => r.querySelector(s);
+  const $$ = (s,r=document) => Array.from(r.querySelectorAll(s));
+  const lerp = (a,b,t) => a + (b-a) * t;
+
+  // ===== CUSTOM CURSOR =====
+  const dot = $('#cursorDot'), ring = $('#cursorRing');
+  if (dot && ring) {
+    const mouse = {x: innerWidth/2, y: innerHeight/2};
+    const ringPos = {x: mouse.x, y: mouse.y};
+    let mouseActive = false;
+    let isTouch = matchMedia('(hover:none)').matches;
+    addEventListener('mousemove', e => {
+      mouse.x = e.clientX; mouse.y = e.clientY;
+      mouseActive = true;
+    }, {passive:true});
+    addEventListener('mouseleave', () => mouseActive = false);
+    function renderCursor(){
+      if (isTouch) return;
+      dot.style.transform = `translate(${mouse.x}px, ${mouse.y}px) translate(-50%,-50%)`;
+      ringPos.x = lerp(ringPos.x, mouse.x, .14);
+      ringPos.y = lerp(ringPos.y, mouse.y, .14);
+      ring.style.transform = `translate(${ringPos.x}px, ${ringPos.y}px) translate(-50%,-50%)`;
+      requestAnimationFrame(renderCursor);
+    }
+    renderCursor();
+    $$('a,button,.stat-card,.feat-tile,.inv-item,.quest-row,.kpi-card').forEach(el => {
+      el.addEventListener('mouseenter', () => { dot.classList.add('hover'); ring.classList.add('hover'); });
+      el.addEventListener('mouseleave', () => { dot.classList.remove('hover'); ring.classList.remove('hover'); });
+    });
+  }
+
+  // ===== MOUSE TRAIL =====
+  const trail = $('#mouseTrailDot');
+  if (trail) {
+    const trailPositions = [];
+    const maxTrail = 20;
+    document.addEventListener('mousemove', e => {
+      trailPositions.unshift({x: e.clientX, y: e.clientY, t: Date.now()});
+      if (trailPositions.length > maxTrail) trailPositions.pop();
+    });
+    function renderTrail(){
+      const now = Date.now();
+      for (let i = trailPositions.length - 1; i >= 0; i--){
+        if (now - trailPositions[i].t > 500) trailPositions.splice(i, 1);
+      }
+      if (trailPositions.length) {
+        const t = trailPositions[0];
+        trail.style.opacity = '1';
+        trail.style.transform = `translate(${t.x}px, ${t.y}px) translate(-50%,-50%)`;
+      } else {
+        trail.style.opacity = '0';
+      }
+      requestAnimationFrame(renderTrail);
+    }
+    renderTrail();
+  }
+
+  // ===== ASH MOTES =====
+  const canvas = $('#ashCanvas');
+  if (canvas) {
+    const cctx = canvas.getContext('2d');
+    let W, H;
+    function resize(){
+      W = innerWidth; H = innerHeight;
+      canvas.width = W * devicePixelRatio;
+      canvas.height = H * devicePixelRatio;
+      cctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    }
+    resize();
+    addEventListener('resize', resize);
+    const isTouchDevice = matchMedia('(hover:none)').matches;
+    const N = isTouchDevice ? 40 : 90;
+    const motes = Array.from({length: N}, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random()-.5) * .15,
+      vy: -.10 - Math.random() * .22,
+      r: .4 + Math.random() * 1.6,
+      tw: Math.random() * Math.PI * 2,
+      life: 0
+    }));
+    function drawAsh(){
+      cctx.clearRect(0,0,W,H);
+      cctx.globalCompositeOperation = 'lighter';
+      for (const m of motes) {
+        m.x += m.vx; m.y += m.vy; m.tw += .04; m.life += 1;
+        if (m.y < -10) { m.y = H + 10; m.x = Math.random() * W; m.life = 0; }
+        if (m.x < -10) m.x = W + 10;
+        if (m.x > W + 10) m.x = -10;
+        const flicker = 0.5 + Math.sin(m.tw) * 0.5;
+        const alpha = Math.min(1, m.life / 60) * flicker;
+        cctx.fillStyle = `rgba(90,214,255,${alpha * 0.6})`;
+        cctx.beginPath();
+        cctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+        cctx.fill();
+      }
+      requestAnimationFrame(drawAsh);
+    }
+    drawAsh();
+  }
+
+  // ===== MAGNETIC BUTTONS =====
+  $$('.magnetic').forEach(b => {
+    b.addEventListener('mousemove', e => {
+      const r = b.getBoundingClientRect();
+      const mx = e.clientX - (r.left + r.width/2);
+      const my = e.clientY - (r.top + r.height/2);
+      b.style.transform = `translate(${mx * .15}px, ${my * .18}px)`;
+    });
+    b.addEventListener('mouseleave', () => { b.style.transform = ''; });
+  });
+
+  // ===== GOD MODE (G key) =====
+  let godMode = false;
+  function toggleGod(){
+    godMode = !godMode;
+    document.body.classList.toggle('god', godMode);
+    $('#godMode')?.classList.toggle('on', godMode);
+  }
+
+  // ===== FOCUS MODE (. key) =====
+  let focusMode = false;
+  function toggleFocus(){
+    focusMode = !focusMode;
+    document.body.classList.toggle('focus-mode', focusMode);
+    if (focusMode) {
+      $('#focusPill')?.classList.add('show');
+    } else {
+      $('#focusPill')?.classList.remove('show');
+      $$('.focus-keep').forEach(e => e.classList.remove('focus-keep'));
+    }
+  }
+  document.addEventListener('click', e => {
+    if (!focusMode) return;
+    const target = e.target.closest('.stat-card,.chart-card,.entry-card,.heatmap-card');
+    if (!target) return;
+    $$('.focus-keep').forEach(e => e.classList.remove('focus-keep'));
+    target.classList.add('focus-keep');
+  });
+
+  // ===== KEYBOARD SHORTCUTS =====
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+    if (e.key === 'g' || e.key === 'G') toggleGod();
+    else if (e.key === '.') toggleFocus();
+  });
+})();
+</script></body>
 </html>
