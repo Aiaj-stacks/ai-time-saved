@@ -330,7 +330,7 @@ a:hover{color:var(--text-1)}
       <button class="nav-item" data-tab="quests">Quests</button>
     </nav>
     <div class="header-actions">
-      <div class="live-pill"><span class="live-dot"></span>LIVE</div>
+      <div class="live-pill"><span class="live-dot"></span><span id="lastUpdate">LIVE</span></div>
       <button class="btn" id="refreshBtn">Refresh</button>
       <button class="btn" id="autoBtn">Auto: OFF</button>
       <button class="btn btn-primary" id="deployBtn">+ New entry</button>
@@ -994,6 +994,8 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
   async function refresh(){
     try {
       const r = await fetch('/api/data', {cache:'no-store'});
+      const upd = document.getElementById('lastUpdate');
+      if(upd) upd.textContent = 'LIVE · ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
       if (r.ok) {
         const d = await r.json();
         if (d && d.total !== undefined) {
