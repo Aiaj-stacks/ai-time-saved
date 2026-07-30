@@ -261,6 +261,34 @@ a:hover{color:var(--text-1)}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:4px}
 ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.15)}
 
+/* ===== RESPONSIVE ===== */
+@media (max-width:1100px){
+  .three-col{grid-template-columns:1fr}
+  .charts-grid{grid-template-columns:1fr}
+}
+@media (max-width:900px){
+  .app{padding:16px}
+  .hero{grid-template-columns:1fr;gap:20px;padding:24px}
+  .rank-orb{width:100px;height:100px;margin:0 auto}
+  .rank-orb-core{font-size:32px}
+  .hero-title{font-size:32px}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .stat-strip{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:700px){
+  .nav{display:none}
+  .stat-strip{grid-template-columns:1fr}
+  .two-col,.charts-grid{grid-template-columns:1fr}
+  .header-actions .live-pill{display:none}
+}
+@media (max-width:500px){
+  .app{padding:12px}
+  .hero{padding:20px}
+  .hero-stats{grid-template-columns:1fr}
+  .feats-grid{grid-template-columns:repeat(auto-fill,minmax(95px,1fr))}
+  .header-actions .btn:not(.btn-primary){display:none}
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
