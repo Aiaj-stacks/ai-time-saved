@@ -448,7 +448,78 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
 /* Hide on reduced motion */
 @media (prefers-reduced-motion: reduce){
   .grid-bg,.vignette,.ash-layer,.hex-grid-bg,.cursor-dot,.cursor-ring,.mouse-trail-canvas,.mouse-trail,.orb-scan::after,.rank-orb-core,.hero{animation:none!important}
+  .space-stars,.space-city,.space-orbs,.space-beams,.wireframe-orb{display:none!important}
 }
+
+/* ===== AURA SPACE / 3D CITY LAYER (v28) ===== */
+.space-stars,.space-city,.space-orbs,.space-beams{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.space-stars{z-index:-5;opacity:.9}
+.space-stars canvas{width:100%;height:100%;display:block}
+.space-city{z-index:-4;opacity:.55;mix-blend-mode:screen}
+.space-city canvas{width:100%;height:100%;display:block}
+.space-orbs{z-index:-3;opacity:.85}
+.space-orbs canvas{width:100%;height:100%;display:block}
+.space-beams{z-index:-2;opacity:.7;mix-blend-mode:screen}
+.space-beams canvas{width:100%;height:100%;display:block}
+
+/* Wireframe icosahedron that orbits the rank orb */
+.wireframe-orb{position:absolute;inset:0;pointer-events:none;z-index:1}
+.wireframe-orb canvas{width:100%;height:100%;display:block}
+
+/* ===== INTERACTIVE FEEDBACK (v28) ===== */
+/* Achievement tile: 360 rotation + glow on hover (unlocked only) */
+.feat-tile.unlocked{position:relative;overflow:visible}
+.feat-tile.unlocked > *{position:relative;z-index:1}
+.feat-tile.unlocked > .feat-rune{display:inline-block;will-change:transform;transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.feat-tile.unlocked:hover > .feat-rune{transform:rotate(360deg) scale(1.18)}
+.feat-tile.unlocked::after{content:"";position:absolute;inset:0;border-radius:var(--radius-md);background:radial-gradient(circle at 50% 50%,rgba(90,214,255,.15),transparent 70%);opacity:0;transition:opacity .35s;pointer-events:none;z-index:0}
+
+/* Achievement particle burst (12 cyan stars shooting outward) */
+.feat-particle{position:absolute;top:50%;left:50%;width:8px;height:8px;pointer-events:none;z-index:10;will-change:transform,opacity}
+.feat-particle::before{content:"";position:absolute;inset:0;background:var(--cyan);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);box-shadow:0 0 6px var(--cyan-glow),0 0 12px var(--cyan-glow);transform:scale(var(--s,.6));opacity:var(--o,1)}
+@keyframes feat-burst{0%{transform:translate(-50%,-50%) translate(0,0) scale(1);opacity:1}100%{transform:translate(-50%,-50%) translate(var(--tx),var(--ty)) scale(.2);opacity:0}}
+
+/* Quest row: progress bar wave fill + complete glow */
+.quest-row .quest-bar-fill{position:relative;overflow:hidden}
+.quest-row .quest-bar-fill::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);transform:translateX(-100%);animation:quest-wave 2.4s ease-in-out infinite}
+.quest-row.done .quest-bar-fill::after{display:none}
+.quest-row.done{animation:quest-glow 2.4s ease-in-out infinite}
+.quest-row.done .quest-bar-fill{box-shadow:0 0 10px rgba(16,185,129,.6)}
+@keyframes quest-wave{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+@keyframes quest-glow{0%,100%{box-shadow:0 0 0 rgba(16,185,129,0)}50%{box-shadow:0 0 12px rgba(16,185,129,.35),inset 0 0 0 1px rgba(16,185,129,.4)}}
+
+/* Heatmap cell: cyan ring pulse + expand on hover (override existing) */
+.hm-cell{position:relative}
+.hm-cell::before{content:"";position:absolute;inset:-3px;border-radius:3px;opacity:0;transition:opacity .25s;pointer-events:none}
+.hm-cell:not(.future):hover::before{opacity:1;animation:hm-ring-pulse 1.2s ease-in-out infinite}
+.hm-cell:not(.future):hover{transform:scale(1.5);z-index:3;box-shadow:0 0 10px var(--cyan-glow),0 0 18px rgba(90,214,255,.4)}
+@keyframes hm-ring-pulse{0%,100%{box-shadow:inset 0 0 0 1px var(--cyan),0 0 0 0 var(--cyan-glow)}50%{box-shadow:inset 0 0 0 1px var(--cyan),0 0 0 3px rgba(90,214,255,.2)}}
+
+/* Activity log: slide-in stagger */
+.activity-item{opacity:0;transform:translateX(40px);transition:opacity .35s cubic-bezier(.2,.8,.2,1),transform .35s cubic-bezier(.2,.8,.2,1),background .15s}
+.activity-item.activity-in{opacity:1;transform:translateX(0)}
+
+/* Command console (status messages, bottom-center) */
+.cmd-console{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);z-index:250;padding:10px 20px;background:rgba(13,13,16,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:999px;font:600 11px 'JetBrains Mono';color:var(--cyan);letter-spacing:.08em;text-transform:uppercase;box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 16px rgba(90,214,255,.2);opacity:0;pointer-events:none;transition:opacity .25s,transform .35s cubic-bezier(.2,.8,.2,1);display:flex;align-items:center;gap:8px;white-space:nowrap;max-width:90vw}
+.cmd-console.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.cmd-console .cc-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan-glow);animation:cc-dot-pulse 1.2s ease-in-out infinite alternate}
+@keyframes cc-dot-pulse{from{opacity:.5;transform:scale(.85)}to{opacity:1;transform:scale(1.1)}}
+.cmd-console .cc-prefix{color:var(--text-3)}
+
+/* Session clock (top-right, time-since-session-start) */
+.session-clock{position:fixed;top:18px;right:24px;z-index:240;padding:8px 14px;background:rgba(13,13,16,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:var(--radius);font:500 11px 'JetBrains Mono';color:var(--text-2);box-shadow:0 4px 16px rgba(0,0,0,.4);display:flex;align-items:center;gap:8px;letter-spacing:.04em;user-select:none;pointer-events:none}
+.session-clock .sc-label{color:var(--text-3);text-transform:uppercase;font-size:9px;letter-spacing:.12em}
+.session-clock .sc-value{color:var(--cyan);font-weight:600;font-variant-numeric:tabular-nums}
+.session-clock .sc-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan-glow);animation:sc-blink 1s ease-in-out infinite alternate}
+@keyframes sc-blink{from{opacity:.5}to{opacity:1}}
+
+/* Reduced motion: short-circuit our animations */
+body.reduced-motion .feat-particle,body.reduced-motion .feat-particle::before,body.reduced-motion .feat-tile.unlocked > .feat-rune{animation:none!important;transition:none!important}
+body.reduced-motion .quest-row .quest-bar-fill::after,body.reduced-motion .quest-row.done{animation:none!important}
+body.reduced-motion .hm-cell:not(.future):hover::before{animation:none!important}
+body.reduced-motion .activity-item{opacity:1!important;transform:none!important;transition:background .15s!important}
+body.reduced-motion .cmd-console{transition:opacity .15s!important}
+body.reduced-motion .session-clock .sc-dot{animation:none!important;opacity:1!important}
 </style>
 </head>
 <body>
@@ -458,6 +529,12 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
 <div class="vignette" aria-hidden="true"></div>
 <div class="ash-layer" aria-hidden="true"><canvas id="ashCanvas"></canvas></div>
 <div class="hex-grid-bg" aria-hidden="true"></div>
+
+<!-- ===== AURA SPACE / 3D CITY LAYER (v28) ===== -->
+<div class="space-stars" aria-hidden="true"><canvas id="starsCanvas"></canvas></div>
+<div class="space-city" aria-hidden="true"><canvas id="cityCanvas"></canvas></div>
+<div class="space-orbs" aria-hidden="true"><canvas id="orbsCanvas"></canvas></div>
+<div class="space-beams" aria-hidden="true"><canvas id="beamsCanvas"></canvas></div>
 <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
 <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
 <canvas id="mouseTrail" class="mouse-trail-canvas" aria-hidden="true"></canvas>
@@ -488,7 +565,7 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
   </header>
 
   <!-- MASSIVE TOTAL -->
-  <section class="massive-total ascii-noise hex-stream">
+  <section id="sec-massive" class="massive-total ascii-noise hex-stream" data-section="massive" aria-label="Total time saved">
     <div class="massive-total-label">TOTAL TIME SAVED</div>
     <div class="massive-total-value" id="massiveTotal">0.0</div>
     <div class="massive-total-unit">HOURS</div>
@@ -497,10 +574,11 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
   </section>
 
   <!-- HERO -->
-  <section class="hero ascii-noise hex-stream">
+  <section id="sec-hero" class="hero ascii-noise hex-stream" data-section="hero" aria-label="Rank and progress">
     <div class="rank-orb">
       <div class="rank-orb-ring"></div>
       <div class="orb-scan"></div>
+      <div class="wireframe-orb" aria-hidden="true"><canvas id="wireCanvas"></canvas></div>
       <div class="rank-orb-core" id="heroGlyph">P</div>
     </div>
     <div class="hero-body">
@@ -547,7 +625,7 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
   </section>
 
   <!-- KPI STRIP -->
-  <section class="stat-strip">
+  <section id="sec-kpi" class="stat-strip" data-section="kpi" aria-label="Key performance indicators">
     <div class="stat-card">
       <div class="stat-card-label"><span>Power Hours</span><span class="stat-card-trend">+34.5%</span></div>
       <div class="stat-card-value" id="kpiHours">0.0</div>
@@ -571,7 +649,7 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
   </section>
 
   <!-- HEATMAP -->
-  <section class="heatmap-card hex-stream ascii-noise">
+  <section id="sec-heatmap" class="heatmap-card hex-stream ascii-noise" data-section="heatmap" aria-label="Activity heatmap">
     <div class="heatmap-head">
       <div class="heatmap-title">Activity Heatmap</div>
       <div class="heatmap-stats">
@@ -605,7 +683,7 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
   </section>
 
   <!-- CHARTS -->
-  <section class="charts-grid">
+  <section id="sec-charts" class="charts-grid" data-section="charts" aria-label="Cumulative and discipline charts">
     <article class="chart-card">
       <div class="chart-card-head">
         <div class="chart-card-title">Hours Ascending</div>
@@ -649,7 +727,7 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
   </section>
 
   <!-- BIG ANALYTICS STRIP -->
-  <section class="analytics-strip">
+  <section id="sec-analytics" class="analytics-strip" data-section="analytics" aria-label="Weekly goal and headline analytics">
     <div class="analytics-card analytics-goal-card">
       <div class="analytics-label">Weekly Goal</div>
       <div class="analytics-value" id="kpiWeekGoal">--</div>
@@ -689,7 +767,7 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
   </section>
 
   <!-- THREE COL: PER-DAY | ACTIVITY -->
-  <section class="three-col">
+  <section id="sec-perday" class="three-col" data-section="perday" aria-label="Per-day breakdown and recent log">
     <article class="chart-card" style="min-height:auto">
       <div class="chart-card-head">
         <div class="chart-card-title">Per-Day Breakdown</div>
@@ -726,7 +804,7 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
   </section>
 
   <!-- FEATS + QUESTS + INVENTORY -->
-  <section class="three-col">
+  <section id="sec-feats" class="three-col" data-section="feats" aria-label="Greatest feats, side quests, and inventory">
     <article class="chart-card" style="min-height:auto">
       <div class="chart-card-head">
         <div class="chart-card-title">Greatest Feats</div>
@@ -751,7 +829,7 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
   </section>
 
   <!-- ENTRY FORM -->
-  <section class="entry-card hex-stream ascii-noise">
+  <section id="sec-form" class="entry-card hex-stream ascii-noise" data-section="form" aria-label="Deploy new entry and CSV import">
     <div class="chart-card-head">
       <div class="chart-card-title">Deploy New Entry</div>
       <div class="chart-card-hint">Live server required</div>
@@ -855,6 +933,10 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     $('#kpiCredits').textContent = '$' + fmt(DATA.value, 0);
     $('#kpiDeeds').textContent = (DATA.entries||[]).length;
     $('#kpiStreak').textContent = (DATA.streak||0) + 'd';
+
+    // ===== INTERACTIVE FEEDBACK HOOK =====
+    // Animate the hero + KPI strip numbers counting up from 0 on load (and on refresh).
+    if (typeof window.__auraCountup === 'function') window.__auraCountup();
   }
   function tierIndex(name){
     const tiers = ['Novice','Bronze','Silver','Gold','Platinum','Diamond','Master','Grandmaster','Sage','AI Grandmaster'];
@@ -1186,6 +1268,10 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
         </div>
         <span class="activity-task">${esc(e.task)}</span>
       </li>`).join('');
+
+    // ===== INTERACTIVE FEEDBACK HOOK =====
+    // Slide-in stagger on activity items (50ms between each).
+    if (typeof window.__auraStaggerActivity === 'function') window.__auraStaggerActivity();
   }
 
   // Wire up filter input + scope selector
@@ -1576,6 +1662,20 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
 <div class="shortcuts-help" id="shortcutsHelp" role="tooltip">
   <kbd>R</kbd> refresh · <kbd>⌘K</kbd> command palette · <kbd>Esc</kbd> close · <kbd>?</kbd> this help
 </div>
+
+<!-- Session Clock (v28) -->
+<div class="session-clock" id="sessionClock" aria-label="Session time">
+  <span class="sc-dot" aria-hidden="true"></span>
+  <span class="sc-label">SESSION</span>
+  <span class="sc-value" id="sessionClockValue">00:00:00</span>
+</div>
+
+<!-- Command Console (v28) -->
+<div class="cmd-console" id="cmdConsole" role="status" aria-live="polite" aria-hidden="true">
+  <span class="cc-dot" aria-hidden="true"></span>
+  <span class="cc-prefix">SYS::</span>
+  <span class="cc-msg" id="cmdConsoleMsg">READY</span>
+</div>
 <script>
 document.addEventListener('keydown', e => {
   if (e.key === '?' && !e.target.matches('input,textarea,select')) {
@@ -1741,6 +1841,1057 @@ document.addEventListener('keydown', e => {
     if (e.key === 'g' || e.key === 'G') toggleGod();
     else if (e.key === '.') toggleFocus();
   });
+})();
+</script>
+
+<!-- ===== AURA SPACE / 3D CITY ENGINE (v28) ===== -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(function(){
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const cyan = '#5ad6ff';
+  const accent = '#5e6ad2';
+  const green = '#10b981';
+  const ember = '#ff7a2e';
+
+  function fitCanvas(canvas){
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    const wantW = Math.max(1, Math.floor(w * dpr));
+    const wantH = Math.max(1, Math.floor(h * dpr));
+    if (canvas.width !== wantW || canvas.height !== wantH){
+      canvas.width = wantW;
+      canvas.height = wantH;
+    }
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, w, h };
+  }
+
+  function hexA(hex, a){
+    const hh = hex.replace('#','');
+    const r = parseInt(hh.substring(0,2),16);
+    const g = parseInt(hh.substring(2,4),16);
+    const b = parseInt(hh.substring(4,6),16);
+    return 'rgba('+r+','+g+','+b+','+a+')';
+  }
+
+  // ============================================================
+  //  STARS — 3 parallax layers, twinkling
+  // ============================================================
+  const starsCanvas = document.getElementById('starsCanvas');
+  const starsLayers = [
+    { depth: 0.15, count: 140, size: 0.6, stars: [] },
+    { depth: 0.35, count: 90,  size: 1.0, stars: [] },
+    { depth: 0.60, count: 45,  size: 1.6, stars: [] }
+  ];
+  let starsW = 0, starsH = 0, starsMouseX = 0, starsMouseY = 0;
+  function initStars(w, h){
+    starsW = w; starsH = h;
+    starsLayers.forEach((L, i) => {
+      L.stars = [];
+      for (let k = 0; k < L.count; k++){
+        L.stars.push({
+          x: Math.random() * w,
+          y: Math.random() * h * 0.78,
+          r: L.size * (0.6 + Math.random()*0.8),
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.4 + Math.random()*0.9,
+          hue: i === 2 ? cyan : (Math.random() < 0.15 ? '#cfe9ff' : '#ffffff'),
+          alpha: 0.35 + Math.random()*0.55
+        });
+      }
+    });
+  }
+  function drawStars(t){
+    if (!starsCanvas) return;
+    const { ctx, w, h } = fitCanvas(starsCanvas);
+    if (w !== starsW || h !== starsH) initStars(w, h);
+    ctx.clearRect(0,0,w,h);
+    const bg = ctx.createRadialGradient(w*0.5, h*0.35, 0, w*0.5, h*0.5, Math.max(w,h));
+    bg.addColorStop(0, 'rgba(20,30,60,0.18)');
+    bg.addColorStop(1, 'rgba(8,9,10,0)');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0,0,w,h);
+    for (let i = 0; i < starsLayers.length; i++){
+      const L = starsLayers[i];
+      const offsetX = starsMouseX * L.depth * 18;
+      const offsetY = starsMouseY * L.depth * 10;
+      ctx.save();
+      ctx.translate(offsetX, offsetY);
+      for (let s of L.stars){
+        const tw = 0.55 + 0.45 * Math.sin(t * 0.001 * s.speed + s.phase);
+        ctx.globalAlpha = s.alpha * tw;
+        ctx.fillStyle = s.hue;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        ctx.fill();
+        if (s.r > 1.2){
+          ctx.globalAlpha = s.alpha * tw * 0.35;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r * 2.4, 0, Math.PI*2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ============================================================
+  //  CITY — 2.5D skyline parallax, neon windows
+  // ============================================================
+  const cityCanvas = document.getElementById('cityCanvas');
+  let cityW = 0, cityH = 0, cityMouseX = 0;
+  let buildings = [];
+  function buildCity(w, h){
+    cityW = w; cityH = h;
+    buildings = [];
+    const baseY = h * 0.62;
+    const totalBuildings = Math.floor(w / 26) + 6;
+    let x = -20;
+    for (let i = 0; i < totalBuildings; i++){
+      const depth = Math.random() < 0.35 ? 0.4 : (Math.random() < 0.7 ? 0.7 : 1.0);
+      const bw = (depth === 0.4) ? (50 + Math.random()*90) : (24 + Math.random()*48);
+      const bh = (depth === 0.4) ? (90 + Math.random()*140) : (60 + Math.random()*240);
+      const winSize = depth === 0.4 ? 1.5 : 2;
+      const litProb = depth === 0.4 ? 0.18 : (depth === 0.7 ? 0.32 : 0.55);
+      const winCols = Math.max(2, Math.floor(bw / 8));
+      const winRows = Math.max(3, Math.floor(bh / 12));
+      const accentCol = Math.random() < 0.25 ? cyan : (Math.random() < 0.5 ? accent : green);
+      const windows = [];
+      for (let r = 0; r < winRows; r++){
+        for (let c = 0; c < winCols; c++){
+          windows.push(Math.random() < litProb);
+        }
+      }
+      buildings.push({
+        x, y: baseY, w: bw, h: bh, depth, accent: accentCol,
+        windows, winCols, winRows, winSize,
+        flicker: Math.random() * Math.PI * 2,
+        flickerSpeed: 0.5 + Math.random()*1.5
+      });
+      x += bw + 2 + Math.random()*4;
+    }
+  }
+  function drawCity(t){
+    if (!cityCanvas) return;
+    const { ctx, w, h } = fitCanvas(cityCanvas);
+    if (w !== cityW || h !== cityH) buildCity(w, h);
+    ctx.clearRect(0,0,w,h);
+    const haze = ctx.createLinearGradient(0, h*0.55, 0, h);
+    haze.addColorStop(0, 'rgba(94,106,210,0.0)');
+    haze.addColorStop(0.5, 'rgba(94,106,210,0.08)');
+    haze.addColorStop(1, 'rgba(8,9,10,0.7)');
+    ctx.fillStyle = haze;
+    ctx.fillRect(0, h*0.55, w, h*0.45);
+    ctx.save();
+    ctx.translate(cityMouseX * 0.4 * 8, 0);
+    drawCityLayer(ctx, w, h, buildings.filter(b => b.depth === 0.4), 0.35);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(cityMouseX * 0.7 * 14, 0);
+    drawCityLayer(ctx, w, h, buildings.filter(b => b.depth === 0.7), 0.7);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(cityMouseX * 1.0 * 22, 0);
+    drawCityLayer(ctx, w, h, buildings.filter(b => b.depth === 1.0), 1.0);
+    ctx.restore();
+  }
+  function drawCityLayer(ctx, w, h, layer, alpha){
+    ctx.globalAlpha = alpha;
+    const now = performance.now();
+    for (let b of layer){
+      ctx.fillStyle = 'rgba(8,9,10,' + alpha + ')';
+      ctx.fillRect(b.x, b.y - b.h, b.w, b.h);
+      ctx.fillStyle = b.accent;
+      ctx.globalAlpha = alpha * 0.5;
+      ctx.fillRect(b.x, b.y - b.h, b.w, 1);
+      ctx.globalAlpha = alpha;
+      if (b.h > 200){
+        const seed = (b.x * 13 + b.y) % 100;
+        if (seed < 4){
+          ctx.fillStyle = b.accent;
+          ctx.fillRect(b.x + b.w/2 - 0.5, b.y - b.h - 18, 1, 18);
+          ctx.globalAlpha = alpha * (0.6 + 0.4*Math.sin(b.flicker + now*0.003*b.flickerSpeed));
+          ctx.beginPath();
+          ctx.arc(b.x + b.w/2, b.y - b.h - 18, 2.4, 0, Math.PI*2);
+          ctx.fill();
+          ctx.globalAlpha = alpha;
+        }
+      }
+      const cellW = (b.w - 6) / b.winCols;
+      const cellH = (b.h - 10) / b.winRows;
+      let idx = 0;
+      for (let r = 0; r < b.winRows; r++){
+        for (let c = 0; c < b.winCols; c++){
+          if (!b.windows[idx]) { idx++; continue; }
+          const wx = b.x + 3 + c * cellW + cellW/2 - b.winSize/2;
+          const wy = b.y - b.h + 5 + r * cellH + cellH/2 - b.winSize/2;
+          let flick = 1;
+          if (b.depth === 1.0){
+            const fseed = (idx * 37 + r * 7 + c * 13) % 997;
+            if (fseed < 1) flick = 0.3 + ((fseed*13) % 7)/10;
+          }
+          ctx.globalAlpha = alpha * (b.depth === 1.0 ? 0.9 : (b.depth === 0.7 ? 0.6 : 0.35)) * flick;
+          const col = ((idx + r + c) % 11) < 9 ? b.accent : (((idx + c) % 3) === 0 ? cyan : accent);
+          ctx.fillStyle = col;
+          ctx.fillRect(wx, wy, b.winSize, b.winSize);
+          idx++;
+        }
+      }
+      ctx.globalAlpha = alpha;
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ============================================================
+  //  HOLOGRAPHIC ORBS / RINGS — parallax drift
+  // ============================================================
+  const orbsCanvas = document.getElementById('orbsCanvas');
+  let orbsW = 0, orbsH = 0, orbsMx = 0, orbsMy = 0;
+  let orbs = [];
+  function initOrbs(w, h){
+    orbsW = w; orbsH = h;
+    orbs = [];
+    const palette = [cyan, accent, green, ember];
+    for (let i = 0; i < 16; i++){
+      const depth = 0.2 + Math.random()*0.8;
+      orbs.push({
+        x: Math.random()*w,
+        y: h * (0.15 + Math.random()*0.7),
+        r: 14 + Math.random()*28,
+        depth,
+        vx: (Math.random()-0.5) * 0.25,
+        vy: (Math.random()-0.5) * 0.18,
+        phase: Math.random()*Math.PI*2,
+        speed: 0.3 + Math.random()*0.7,
+        color: palette[Math.floor(Math.random()*palette.length)],
+        kind: Math.random() < 0.45 ? 'ring' : 'orb',
+        ringCount: 1 + Math.floor(Math.random()*3)
+      });
+    }
+  }
+  function drawOrbs(t){
+    if (!orbsCanvas) return;
+    const { ctx, w, h } = fitCanvas(orbsCanvas);
+    if (w !== orbsW || h !== orbsH) initOrbs(w, h);
+    ctx.clearRect(0,0,w,h);
+    orbs.sort((a,b) => a.depth - b.depth);
+    for (let o of orbs){
+      o.x += o.vx;
+      o.y += o.vy;
+      if (o.x < -50) o.x = w + 50;
+      if (o.x > w + 50) o.x = -50;
+      if (o.y < -50) o.y = h + 50;
+      if (o.y > h + 50) o.y = -50;
+      const offsetX = -orbsMx * o.depth * 22;
+      const offsetY = -orbsMy * o.depth * 14;
+      const pulse = 0.7 + 0.3 * Math.sin(t * 0.001 * o.speed + o.phase);
+      const px = o.x + offsetX;
+      const py = o.y + offsetY;
+      const alpha = (0.18 + 0.5 * o.depth) * pulse;
+      if (o.kind === 'orb'){
+        const g = ctx.createRadialGradient(px, py, 0, px, py, o.r * 2.4);
+        g.addColorStop(0, hexA(o.color, alpha));
+        g.addColorStop(0.5, hexA(o.color, alpha*0.25));
+        g.addColorStop(1, hexA(o.color, 0));
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(px, py, o.r*2.4, 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = hexA(o.color, alpha*1.4);
+        ctx.beginPath();
+        ctx.arc(px, py, o.r*0.35, 0, Math.PI*2);
+        ctx.fill();
+      } else {
+        for (let k = 0; k < o.ringCount; k++){
+          const rr = o.r * (0.5 + k*0.4);
+          ctx.strokeStyle = hexA(o.color, alpha * (1 - k*0.25));
+          ctx.lineWidth = 1 + (1 - k*0.3);
+          ctx.beginPath();
+          ctx.arc(px, py, rr, 0, Math.PI*2);
+          ctx.stroke();
+        }
+        ctx.fillStyle = hexA(o.color, alpha*1.6);
+        ctx.beginPath();
+        ctx.arc(px, py, 2.2, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+  }
+
+  // ============================================================
+  //  VOLUMETRIC LIGHT BEAMS — sweep across the scene
+  // ============================================================
+  const beamsCanvas = document.getElementById('beamsCanvas');
+  let beamsW = 0, beamsH = 0;
+  let beams = [];
+  function initBeams(w, h){
+    beamsW = w; beamsH = h;
+    beams = [];
+    for (let i = 0; i < 5; i++){
+      beams.push({
+        x: Math.random()*w,
+        angle: -0.15 + Math.random()*0.3,
+        width: 80 + Math.random()*160,
+        speed: 0.06 + Math.random()*0.14,
+        phase: Math.random()*Math.PI*2,
+        color: i % 2 === 0 ? cyan : accent
+      });
+    }
+  }
+  function drawBeams(t){
+    if (!beamsCanvas) return;
+    const { ctx, w, h } = fitCanvas(beamsCanvas);
+    if (w !== beamsW || h !== beamsH) initBeams(w, h);
+    ctx.clearRect(0,0,w,h);
+    ctx.globalCompositeOperation = 'lighter';
+    for (let b of beams){
+      b.x += b.speed;
+      if (b.x > w + 200) b.x = -200;
+      const pulse = 0.55 + 0.45 * Math.sin(t * 0.0007 + b.phase);
+      const len = h * 1.6;
+      const x2 = b.x + Math.sin(b.angle) * len;
+      const y2 = Math.cos(b.angle) * len;
+      const grad = ctx.createLinearGradient(b.x, 0, x2, y2);
+      grad.addColorStop(0, hexA(b.color, 0));
+      grad.addColorStop(0.2, hexA(b.color, 0.18 * pulse));
+      grad.addColorStop(0.55, hexA(b.color, 0.08 * pulse));
+      grad.addColorStop(1, hexA(b.color, 0));
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(b.x - b.width/2, 0);
+      ctx.lineTo(b.x + b.width/2, 0);
+      ctx.lineTo(x2 + b.width/4, y2);
+      ctx.lineTo(x2 - b.width/4, y2);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // ============================================================
+  //  WIREFRAME — Three.js icosahedron + torus knot inside rank orb
+  // ============================================================
+  const wireCanvas = document.getElementById('wireCanvas');
+  let wireScene = null, wireCam = null, wireRenderer = null, wireIco = null, wireKnot = null;
+  function initWire(){
+    if (!wireCanvas || !window.THREE) return;
+    const w = wireCanvas.clientWidth;
+    const h = wireCanvas.clientHeight;
+    wireScene = new THREE.Scene();
+    wireCam = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+    wireCam.position.z = 4.5;
+    wireRenderer = new THREE.WebGLRenderer({ canvas: wireCanvas, alpha: true, antialias: true });
+    wireRenderer.setPixelRatio(dpr);
+    wireRenderer.setSize(w, h, false);
+    const icoGeo = new THREE.IcosahedronGeometry(1.55, 0);
+    const icoMat = new THREE.MeshBasicMaterial({
+      color: 0x5ad6ff, wireframe: true, transparent: true, opacity: 0.55
+    });
+    wireIco = new THREE.Mesh(icoGeo, icoMat);
+    wireScene.add(wireIco);
+    const knotGeo = new THREE.TorusKnotGeometry(0.85, 0.18, 80, 12);
+    const knotMat = new THREE.MeshBasicMaterial({
+      color: 0x5e6ad2, wireframe: true, transparent: true, opacity: 0.75
+    });
+    wireKnot = new THREE.Mesh(knotGeo, knotMat);
+    wireScene.add(wireKnot);
+  }
+  function drawWire(t){
+    if (!wireRenderer || !wireScene) return;
+    const w = wireCanvas.clientWidth;
+    const h = wireCanvas.clientHeight;
+    if (wireRenderer.domElement.width !== w*dpr || wireRenderer.domElement.height !== h*dpr){
+      wireRenderer.setSize(w, h, false);
+      wireCam.aspect = w/h;
+      wireCam.updateProjectionMatrix();
+    }
+    if (wireIco){
+      wireIco.rotation.x = t * 0.00035;
+      wireIco.rotation.y = t * 0.0005;
+    }
+    if (wireKnot){
+      wireKnot.rotation.x = t * -0.0004;
+      wireKnot.rotation.y = t *  0.0006;
+      const s = 1 + 0.04 * Math.sin(t * 0.002);
+      wireKnot.scale.set(s, s, s);
+    }
+    wireRenderer.render(wireScene, wireCam);
+  }
+
+  // ============================================================
+  //  GLOBAL MOUSE — drive parallax
+  // ============================================================
+  document.addEventListener('mousemove', function(e){
+    const nx = (e.clientX / window.innerWidth)  - 0.5;
+    const ny = (e.clientY / window.innerHeight) - 0.5;
+    starsMouseX = nx; starsMouseY = ny;
+    cityMouseX  = nx;
+    orbsMx = nx; orbsMy = ny;
+  }, { passive: true });
+
+  // ============================================================
+  //  MAIN LOOP
+  // ============================================================
+  initWire();
+  function loop(t){
+    drawStars(t);
+    drawCity(t);
+    drawOrbs(t);
+    drawBeams(t);
+    drawWire(t);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'visible') requestAnimationFrame(loop);
+  });
+})();
+</script>
+
+<!-- ===== AURA HOLOGRAPHIC INTERACTIONS (v28) ===== -->
+<style>
+  :root{--aura-pointer-x:50vw;--aura-pointer-y:50vh}
+  .aura-spotlight{position:fixed;inset:0;z-index:40;pointer-events:none;background:radial-gradient(circle 360px at var(--aura-pointer-x) var(--aura-pointer-y),rgba(90,214,255,.105),rgba(94,106,210,.035) 38%,transparent 72%);mix-blend-mode:screen;opacity:.9}
+  [data-tilt]{--tilt-glow:var(--cyan);transform-style:preserve-3d;will-change:transform;backface-visibility:hidden;isolation:isolate;transition:box-shadow .28s ease,border-color .28s ease,filter .28s ease}
+  [data-tilt]>*{transform:translateZ(1px)}
+  [data-tilt]::after{content:"";position:absolute;inset:-1px;z-index:6;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(115deg,transparent 12%,rgba(90,214,255,.15) 32%,rgba(255,255,255,.9) 48%,rgba(113,112,255,.5) 60%,transparent 82%);background-size:240% 100%;opacity:0;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+  [data-tilt]:hover{border-color:color-mix(in srgb,var(--tilt-glow) 68%,transparent)!important;box-shadow:0 18px 45px rgba(0,0,0,.48),0 0 0 1px rgba(90,214,255,.23),0 0 28px rgba(90,214,255,.2);filter:brightness(1.045)}
+  [data-tilt]:hover::after{opacity:1;animation:aura-border-shimmer 1.65s linear infinite}
+  .stat-card[data-tilt],.analytics-card[data-tilt]{--tilt-glow:var(--accent-hover)}
+  @keyframes aura-border-shimmer{from{background-position:160% 0}to{background-position:-80% 0}}
+  .aura-tooltip{position:fixed;z-index:10002;max-width:290px;padding:9px 12px;border:1px solid rgba(90,214,255,.4);border-radius:7px;background:rgba(8,12,18,.94);box-shadow:0 0 26px rgba(90,214,255,.2),inset 0 0 18px rgba(90,214,255,.045);color:var(--text-2);font-size:11px;line-height:1.45;letter-spacing:.01em;pointer-events:none;opacity:0;transform:translate3d(0,8px,0) scale(.97);transition:opacity .15s,transform .15s;backdrop-filter:blur(14px)}
+  .aura-tooltip.show{opacity:1;transform:translate3d(0,0,0) scale(1)}
+  .aura-tooltip strong{display:block;margin-bottom:2px;color:var(--cyan);font:600 10px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
+  .aura-minimap{position:fixed;left:16px;bottom:16px;z-index:90;width:78px;padding:8px;border:1px solid rgba(90,214,255,.2);border-radius:9px;background:rgba(8,10,14,.78);box-shadow:0 8px 28px rgba(0,0,0,.42),inset 0 0 18px rgba(90,214,255,.025);backdrop-filter:blur(12px);color:var(--text-3)}
+  .aura-minimap-label{font:600 8px 'JetBrains Mono',monospace;letter-spacing:.14em;text-align:center;color:rgba(90,214,255,.72);margin-bottom:4px}
+  .aura-minimap svg{display:block;width:100%;height:116px;overflow:visible}
+  .aura-minimap .map-line{stroke:rgba(90,214,255,.18);stroke-width:1}.aura-minimap .map-node{fill:#111923;stroke:rgba(90,214,255,.55);stroke-width:1}.aura-minimap .map-dot{fill:var(--cyan);filter:drop-shadow(0 0 4px var(--cyan));transition:cy .12s linear}
+  .aura-actions{position:fixed;right:18px;bottom:18px;z-index:91;display:flex;flex-direction:column;gap:8px}
+  .aura-action{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(90,214,255,.24);border-radius:9px;background:rgba(10,13,19,.84);color:var(--cyan);font:600 15px 'JetBrains Mono',monospace;cursor:pointer;box-shadow:0 7px 22px rgba(0,0,0,.36);backdrop-filter:blur(12px);transition:transform .18s,border-color .18s,box-shadow .18s}
+  .aura-action:hover,.aura-action:focus-visible{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 0 20px var(--cyan-glow);outline:none}.aura-action:active{transform:translateY(0)}
+  @media(max-width:700px){.aura-minimap{display:none}.aura-actions{right:10px;bottom:10px}.aura-action{width:36px;height:36px}}
+  @media(prefers-reduced-motion:reduce){.aura-spotlight{display:none}[data-tilt]{transform:none!important;will-change:auto}[data-tilt]:hover::after{animation:none;background-position:50% 0}.aura-tooltip,.aura-minimap .map-dot,.aura-action{transition:none!important}}
+</style>
+<div class="aura-spotlight" id="auraSpotlight" aria-hidden="true"></div>
+<div class="aura-tooltip" id="auraTooltip" role="tooltip" aria-hidden="true"></div>
+<aside class="aura-minimap" id="auraMinimap" aria-label="Dashboard minimap">
+  <div class="aura-minimap-label">AURA MAP</div>
+  <svg viewBox="0 0 60 116" role="img" aria-label="Dashboard sections and current scroll position"><line class="map-line" x1="30" y1="5" x2="30" y2="111"/><g id="auraMapNodes"></g><circle class="map-dot" id="auraMapDot" cx="30" cy="5" r="3"/></svg>
+</aside>
+<nav class="aura-actions" aria-label="Quick actions">
+  <button class="aura-action" id="auraTop" type="button" aria-label="Scroll to top" title="Scroll to top">↑</button>
+  <button class="aura-action" id="auraRefresh" type="button" aria-label="Refresh dashboard" title="Refresh dashboard">↻</button>
+  <button class="aura-action" id="auraEffects" type="button" aria-label="Toggle holographic effects" title="Toggle holographic effects">◇</button>
+</nav>
+<script>
+/* Holographic cards, contextual tooltips, minimap and spotlight */
+(function(){
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hoverable=matchMedia('(hover:hover) and (pointer:fine)').matches;
+  const cards=[...document.querySelectorAll('.chart-card,.stat-card,.hero,.heatmap-card,.analytics-card')];
+  cards.forEach(card=>card.dataset.tilt='');
+
+  let effectsOn=!reduced,active=null,raf=0,pointerX=innerWidth/2,pointerY=innerHeight/2;
+  const states=new WeakMap();
+  function stateFor(el){if(!states.has(el))states.set(el,{rx:0,ry:0,tx:0,ty:0,lift:0,targetLift:0});return states.get(el)}
+  function frame(){
+    raf=0;
+    document.documentElement.style.setProperty('--aura-pointer-x',pointerX+'px');
+    document.documentElement.style.setProperty('--aura-pointer-y',pointerY+'px');
+    let moving=false;
+    cards.forEach(el=>{const s=stateFor(el);s.rx+=(s.tx-s.rx)*.16;s.ry+=(s.ty-s.ry)*.16;s.lift+=(s.targetLift-s.lift)*.16;if(Math.abs(s.tx-s.rx)+Math.abs(s.ty-s.ry)+Math.abs(s.targetLift-s.lift)>.025)moving=true;el.style.transform=effectsOn?`perspective(900px) rotateX(${s.rx.toFixed(2)}deg) rotateY(${s.ry.toFixed(2)}deg) rotateZ(${(s.ry*.035).toFixed(2)}deg) translateZ(${s.lift.toFixed(2)}px)`:''});
+    if(moving)raf=requestAnimationFrame(frame);
+  }
+  function schedule(){if(!raf)raf=requestAnimationFrame(frame)}
+  addEventListener('pointermove',e=>{pointerX=e.clientX;pointerY=e.clientY;if(!effectsOn)return;const el=e.target.closest?.('[data-tilt]');if(el&&hoverable){if(active&&active!==el){const old=stateFor(active);old.tx=old.ty=old.targetLift=0}active=el;const r=el.getBoundingClientRect(),s=stateFor(el);s.tx=((r.top+r.height/2-e.clientY)/r.height)*7;s.ty=((e.clientX-r.left-r.width/2)/r.width)*9;s.targetLift=12}schedule()},{passive:true});
+  document.addEventListener('pointerout',e=>{const el=e.target.closest?.('[data-tilt]');if(el&&!el.contains(e.relatedTarget)){const s=stateFor(el);s.tx=s.ty=s.targetLift=0;if(active===el)active=null;schedule()}},{passive:true});
+
+  const tip=document.getElementById('auraTooltip');let tipTarget=null;
+  function tooltipText(el){const name=el.querySelector('.feat-name,.quest-name,.inv-name')?.textContent?.trim()||'AURA INTEL';const desc=el.querySelector('.feat-desc,.quest-desc,.inv-desc')?.textContent?.trim()||el.getAttribute('data-description')||'Inspect this dashboard item for more details.';return {name,desc}}
+  function placeTip(e){const gap=16,w=tip.offsetWidth||240,h=tip.offsetHeight||60;let x=e.clientX+gap,y=e.clientY+gap;if(x+w>innerWidth-8)x=e.clientX-w-gap;if(y+h>innerHeight-8)y=e.clientY-h-gap;tip.style.left=Math.max(8,x)+'px';tip.style.top=Math.max(8,y)+'px'}
+  document.addEventListener('pointerover',e=>{const el=e.target.closest?.('.feat-tile,.quest-row,.inv-item');if(!el||!hoverable)return;tipTarget=el;const t=tooltipText(el);tip.innerHTML='<strong>'+t.name.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))+'</strong>'+t.desc.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));tip.classList.add('show');tip.setAttribute('aria-hidden','false');placeTip(e)},{passive:true});
+  document.addEventListener('pointermove',e=>{if(tipTarget)placeTip(e)},{passive:true});
+  document.addEventListener('pointerout',e=>{const el=e.target.closest?.('.feat-tile,.quest-row,.inv-item');if(el&&!el.contains(e.relatedTarget)){tipTarget=null;tip.classList.remove('show');tip.setAttribute('aria-hidden','true')}},{passive:true});
+
+  const nodeGroup=document.getElementById('auraMapNodes'),dot=document.getElementById('auraMapDot');
+  function buildMap(){const sections=[...document.querySelectorAll('.app>section,.app>.hero,.app>.stats-grid,.app>.analytics-strip')];nodeGroup.textContent='';const count=Math.max(sections.length,2);sections.forEach((section,i)=>{const y=5+i*(106/(count-1)),node=document.createElementNS('http://www.w3.org/2000/svg','circle');node.setAttribute('class','map-node');node.setAttribute('cx',i%2?34:26);node.setAttribute('cy',y.toFixed(1));node.setAttribute('r','2.2');nodeGroup.appendChild(node)});}
+  function updateMap(){const max=Math.max(1,document.documentElement.scrollHeight-innerHeight),p=Math.min(1,scrollY/max);dot.setAttribute('cy',(5+p*106).toFixed(1))}
+  buildMap();updateMap();addEventListener('scroll',updateMap,{passive:true});addEventListener('resize',()=>{buildMap();updateMap()},{passive:true});
+  document.getElementById('auraTop').addEventListener('click',()=>scrollTo({top:0,behavior:reduced?'auto':'smooth'}));
+  document.getElementById('auraRefresh').addEventListener('click',()=>location.reload());
+  document.getElementById('auraEffects').addEventListener('click',e=>{effectsOn=!effectsOn&&!reduced;document.body.classList.toggle('aura-effects-off',!effectsOn);e.currentTarget.setAttribute('aria-pressed',String(!effectsOn));cards.forEach(el=>{const s=stateFor(el);s.tx=s.ty=s.targetLift=0;if(!effectsOn)el.style.transform=''});schedule()});
+  if(!effectsOn)document.body.classList.add('aura-effects-off');
+  schedule();
+})();
+</script>
+<!-- ===== INTERACTIVE FEEDBACK ENGINE (v28) ===== -->
+<script>
+(function(){
+  // Respect reduced motion
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) document.body.classList.add('reduced-motion');
+
+  const $  = (s,r=document) => r.querySelector(s);
+  const $$ = (s,r=document) => Array.from(r.querySelectorAll(s));
+
+  // ===========================================================
+  //  COMMAND CONSOLE — status messages, fades after 2s
+  // ===========================================================
+  const consoleEl = $('#cmdConsole');
+  const consoleMsg = $('#cmdConsoleMsg');
+  let consoleHideT = null;
+  function consoleLog(msg){
+    if (!consoleEl || !consoleMsg) return;
+    if (consoleHideT) { clearTimeout(consoleHideT); consoleHideT = null; }
+    consoleMsg.textContent = msg;
+    consoleEl.classList.add('show');
+    consoleEl.setAttribute('aria-hidden', 'false');
+    consoleHideT = setTimeout(() => {
+      consoleEl.classList.remove('show');
+      consoleEl.setAttribute('aria-hidden', 'true');
+      consoleHideT = null;
+    }, 2000);
+  }
+  // Expose globally so other modules can fire status messages
+  window.__auraLog = consoleLog;
+  // First-run ready message (give the page a moment to settle)
+  setTimeout(() => consoleLog('SYSTEM ONLINE'), 600);
+
+  // ===========================================================
+  //  SESSION CLOCK — hours:minutes:seconds since page load
+  // ===========================================================
+  const sessionStart = performance.now();
+  const clockVal = $('#sessionClockValue');
+  function pad2(n){ return n < 10 ? '0' + n : '' + n; }
+  function tickClock(){
+    if (!clockVal) return;
+    const ms = performance.now() - sessionStart;
+    const totalSec = Math.floor(ms / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    clockVal.textContent = pad2(h) + ':' + pad2(m) + ':' + pad2(s);
+  }
+  tickClock();
+  function clockLoop(){
+    tickClock();
+    requestAnimationFrame(clockLoop);
+  }
+  requestAnimationFrame(clockLoop);
+
+  // ===========================================================
+  //  KPI COUNT-UP — requestAnimationFrame, easeOutQuart, 1500ms
+  // ===========================================================
+  const kpiTargets = {
+    'kpiHours':    v => v.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1}),
+    'kpiCredits':  v => '$' + Math.round(v).toLocaleString('en-US'),
+    'kpiDeeds':    v => Math.round(v).toLocaleString('en-US'),
+    'kpiStreak':   v => Math.round(v) + 'd',
+    'massiveTotal': v => v.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1}),
+    'massiveUsd':  v => '$' + Math.round(v).toLocaleString('en-US')
+  };
+  // easeOutQuart
+  const easeOutQuart = t => 1 - Math.pow(1 - t, 4);
+
+  // Track which numeric values we're animating. We read the final text
+  // from each element as the target (already populated by renderHero()).
+  function snapshotKpis(){
+    const snaps = {};
+    Object.keys(kpiTargets).forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const txt = (el.textContent || '').trim();
+      // Parse numeric part (handle $ prefix, "d" suffix, commas)
+      const m = txt.match(/-?[\d,]+(\.\d+)?/);
+      if (!m) return;
+      const num = parseFloat(m[0].replace(/,/g, ''));
+      if (isNaN(num)) return;
+      snaps[id] = { el, target: num, fmt: kpiTargets[id] };
+    });
+    return snaps;
+  }
+  let countupActive = null;
+  window.__auraCountup = function(){
+    if (reduced) return; // text already populated by renderHero; skip animation
+    const snaps = snapshotKpis();
+    const ids = Object.keys(snaps);
+    if (!ids.length) return;
+    const start = performance.now();
+    const dur = 1500;
+    // Cancel any in-flight animation
+    if (countupActive) countupActive.cancelled = true;
+    const ticket = { cancelled: false };
+    countupActive = ticket;
+    // Reset all to 0 first
+    ids.forEach(id => {
+      const s = snaps[id];
+      s.el.textContent = s.fmt(0);
+    });
+    function step(now){
+      if (ticket.cancelled) return;
+      const t = Math.min(1, (now - start) / dur);
+      const e = easeOutQuart(t);
+      ids.forEach(id => {
+        const s = snaps[id];
+        s.el.textContent = s.fmt(s.target * e);
+      });
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        // Snap to exact final formatted value to avoid rounding drift
+        ids.forEach(id => {
+          const s = snaps[id];
+          s.el.textContent = s.fmt(s.target);
+        });
+      }
+    }
+    requestAnimationFrame(step);
+  };
+
+  // ===========================================================
+  //  ACHIEVEMENT TILE — 360° rotation (CSS) + 12-star particle burst
+  // ===========================================================
+  function spawnParticleBurst(tile){
+    if (reduced) return;
+    if (!tile.classList.contains('unlocked')) return;
+    // Prevent re-trigger while existing particles are still spawning
+    if (tile.dataset.bursting === '1') return;
+    tile.dataset.bursting = '1';
+    setTimeout(() => { tile.dataset.bursting = ''; }, 700);
+
+    const COUNT = 12;
+    const radius = 80; // px outward
+    for (let i = 0; i < COUNT; i++){
+      const p = document.createElement('div');
+      p.className = 'feat-particle';
+      // Even angular distribution + small jitter
+      const angle = (i / COUNT) * Math.PI * 2 + (Math.random() - .5) * .35;
+      const dist = radius * (0.7 + Math.random() * .6);
+      const tx = Math.cos(angle) * dist;
+      const ty = Math.sin(angle) * dist;
+      const s = 0.5 + Math.random() * .9;
+      const o = 0.6 + Math.random() * .4;
+      p.style.setProperty('--tx', tx.toFixed(1) + 'px');
+      p.style.setProperty('--ty', ty.toFixed(1) + 'px');
+      p.style.setProperty('--s', s.toFixed(2));
+      p.style.setProperty('--o', o.toFixed(2));
+      p.style.animation = 'feat-burst 600ms cubic-bezier(.18,.78,.34,1) forwards';
+      tile.appendChild(p);
+      // Clean up after the burst finishes
+      setTimeout(() => { if (p.parentNode) p.parentNode.removeChild(p); }, 700);
+    }
+  }
+
+  // Use mouseover delegation so newly rendered tiles still pick up the listener
+  function wireFeatTiles(){
+    const grid = $('#achGrid');
+    if (!grid) return;
+    grid.addEventListener('mouseover', e => {
+      const tile = e.target.closest('.feat-tile');
+      if (!tile) return;
+      spawnParticleBurst(tile);
+    });
+  }
+  wireFeatTiles();
+
+  // ===========================================================
+  //  ACTIVITY LOG — slide-in stagger (50ms per item)
+  // ===========================================================
+  window.__auraStaggerActivity = function(){
+    const items = $$('#activityList .activity-item');
+    if (!items.length) return;
+    if (reduced){
+      items.forEach(it => it.classList.add('activity-in'));
+      return;
+    }
+    items.forEach((it, i) => {
+      // Stagger via animation-delay; class toggles the transition target.
+      it.style.animationDelay = (i * 50) + 'ms';
+      it.classList.add('activity-in');
+    });
+  };
+
+  // ===========================================================
+  //  COMMAND CONSOLE — wire common user actions to status messages
+  // ===========================================================
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[id],button,a,input,select');
+    if (!t) return;
+    if (t.id === 'refreshBtn')                                consoleLog('DATA REFRESHED');
+    else if (t.id === 'deployBtn')                            consoleLog('NEW ENTRY READY');
+    else if (t.id === 'csvSampleBtn')                          consoleLog('SAMPLE DOWNLOADED');
+    else if (t.id === 'autoBtn')                              consoleLog('AUTO-REFRESH TOGGLED');
+    else if (t.id === 'auraTop')                              consoleLog('SCROLL TO TOP');
+    else if (t.id === 'auraEffects')                          consoleLog('HOLOGRAPHIC EFFECTS TOGGLED');
+    else if (t.classList && t.classList.contains('nav-item')) consoleLog('NAV: ' + (t.textContent||'').trim().toUpperCase());
+  });
+  document.addEventListener('change', e => {
+    if (e.target && e.target.id === 'csvFile' && e.target.files && e.target.files[0]) {
+      consoleLog('UPLOADING ' + e.target.files[0].name.toUpperCase());
+    }
+  });
+  document.addEventListener('submit', e => {
+    if (e.target && e.target.id === 'entryForm') consoleLog('ENTRY ADDED');
+  });
+})();
+</script>
+
+<!-- ===== AURA DATA FLOW + SCROLL RAIL + LEVEL-UP (v29) ===== -->
+<style>
+/* Section connectors + scroll progress rail sit between the 4D background
+   layer (z-index -5 .. -1) and the dashboard content (auto / 0+).  The
+   fixed overlay is pointer-events:none so the cards above it stay clickable. */
+.aura-dataflow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.aura-dataflow svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.aura-flow-line{fill:none;stroke-width:1.2;stroke-linecap:round;opacity:.35;mix-blend-mode:screen;filter:drop-shadow(0 0 4px rgba(90,214,255,.45));animation:aura-flow 5.5s linear infinite}
+.aura-flow-line.alt{stroke:rgba(16,185,129,.7);filter:drop-shadow(0 0 4px rgba(16,185,129,.45));animation-duration:7.5s;animation-direction:reverse;opacity:.28}
+.aura-flow-line.cyan{stroke:rgba(90,214,255,.85)}
+.aura-flow-dot{fill:var(--cyan);filter:drop-shadow(0 0 6px var(--cyan-glow))}
+.aura-flow-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen}
+
+/* ===== Scroll progress rail (right edge) ===== */
+.aura-scroll-rail{position:fixed;right:14px;top:50%;transform:translateY(-50%);width:4px;height:min(58vh,520px);z-index:85;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:999px;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;padding:6px 0;pointer-events:auto;backdrop-filter:blur(6px)}
+.aura-scroll-rail::before{content:"";position:absolute;left:1px;right:1px;top:6px;bottom:6px;background:linear-gradient(180deg,rgba(90,214,255,.55),rgba(94,106,210,.45) 60%,rgba(16,185,129,.45));border-radius:inherit;transform-origin:top;transform:scaleY(var(--aura-rail-pct,0));transition:transform .35s cubic-bezier(.2,.8,.2,1);opacity:.7}
+.aura-scroll-dot{position:relative;width:10px;height:10px;margin-left:-3px;border-radius:50%;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);transition:background .2s,border-color .2s,transform .2s,box-shadow .2s;cursor:pointer;pointer-events:auto}
+.aura-scroll-dot:hover{transform:scale(1.25);background:rgba(90,214,255,.4);border-color:var(--cyan)}
+.aura-scroll-dot.active{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 10px var(--cyan-glow),0 0 18px rgba(90,214,255,.35)}
+.aura-scroll-dot.passed{background:rgba(16,185,129,.5);border-color:rgba(16,185,129,.65)}
+.aura-scroll-dot::after{content:attr(data-label);position:absolute;right:18px;top:50%;transform:translateY(-50%);padding:3px 8px;background:rgba(8,10,14,.92);border:1px solid rgba(90,214,255,.3);border-radius:4px;color:var(--text-2);font:600 9px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;opacity:0;transition:opacity .15s,transform .15s;pointer-events:none}
+.aura-scroll-dot:hover::after{opacity:1;transform:translateY(-50%) translateX(-2px)}
+.aura-scroll-dot.active::after{opacity:1;color:var(--cyan)}
+
+/* ===== Rank-orb level-up pulse ===== */
+@keyframes aura-levelup-ring{0%{transform:scale(.9);opacity:.95}100%{transform:scale(2.4);opacity:0}}
+@keyframes aura-levelup-flash{0%{box-shadow:0 0 0 0 rgba(90,214,255,.65),0 0 32px rgba(90,214,255,.45);filter:brightness(1)}40%{box-shadow:0 0 0 14px rgba(90,214,255,0),0 0 64px rgba(90,214,255,.7);filter:brightness(1.35)}100%{box-shadow:0 0 0 0 rgba(90,214,255,0),0 0 32px rgba(90,214,255,0);filter:brightness(1)}}
+.rank-orb.level-up{position:relative}
+.rank-orb.level-up::before{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--cyan);box-shadow:0 0 24px var(--cyan-glow);animation:aura-levelup-flash 1.6s cubic-bezier(.2,.8,.2,1) forwards;pointer-events:none}
+.rank-orb.level-up::after{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid var(--cyan);animation:aura-levelup-ring 1.6s ease-out forwards;pointer-events:none}
+.rank-orb-core.level-up{animation:aura-levelup-flash 1.6s cubic-bezier(.2,.8,.2,1) forwards}
+
+@media(prefers-reduced-motion:reduce){
+  .aura-dataflow{display:none}
+  .aura-scroll-rail{opacity:.6}
+  .aura-scroll-rail::before{transition:none}
+  .aura-scroll-dot{transition:none}
+  .rank-orb.level-up::before,.rank-orb.level-up::after,.rank-orb-core.level-up{animation:none}
+}
+</style>
+
+<!-- Section connector overlay (between 4D layer and content) -->
+<div class="aura-dataflow" id="auraDataflow" aria-hidden="true">
+  <svg id="auraFlowSvg" preserveAspectRatio="none"></svg>
+  <canvas class="aura-flow-canvas" id="auraFlowCanvas"></canvas>
+</div>
+
+<!-- Right-edge scroll progress rail -->
+<nav class="aura-scroll-rail" id="auraScrollRail" aria-label="Section progress"></nav>
+
+<script>
+/* ===== AURA DATA FLOW + SCROLL RAIL + LEVEL-UP ENGINE (v29) ===== */
+(function(){
+  'use strict';
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hoverable = matchMedia('(hover:hover) and (pointer:fine)').matches;
+
+  /* ============= 1. SECTION ANCHORS + SCROLL RAIL ============= */
+  const SECTIONS = [
+    { id: 'sec-massive',   label: 'Total' },
+    { id: 'sec-hero',      label: 'Rank' },
+    { id: 'sec-kpi',       label: 'KPI' },
+    { id: 'sec-heatmap',   label: 'Heatmap' },
+    { id: 'sec-charts',    label: 'Charts' },
+    { id: 'sec-analytics', label: 'Analytics' },
+    { id: 'sec-perday',    label: 'Per-Day' },
+    { id: 'sec-feats',     label: 'Feats' },
+    { id: 'sec-form',      label: 'Deploy' }
+  ];
+  const rail = document.getElementById('auraScrollRail');
+  const railPct = () => {
+    const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    return Math.min(1, scrollY / max);
+  };
+  const setRailProgress = () => {
+    if (rail) rail.style.setProperty('--aura-rail-pct', railPct().toFixed(4));
+  };
+
+  if (rail) {
+    SECTIONS.forEach((s, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'aura-scroll-dot';
+      dot.setAttribute('aria-label', 'Scroll to ' + s.label);
+      dot.dataset.sectionId = s.id;
+      dot.dataset.index = String(i);
+      dot.dataset.label = s.label;
+      dot.addEventListener('click', () => {
+        const target = document.getElementById(s.id);
+        if (target) target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+      });
+      rail.appendChild(dot);
+    });
+  }
+  setRailProgress();
+  addEventListener('scroll', setRailProgress, { passive: true });
+  addEventListener('resize', setRailProgress, { passive: true });
+
+  /* IntersectionObserver: highlight section in view + passed sections. */
+  let activeIdx = 0;
+  const observer = ('IntersectionObserver' in window)
+    ? new IntersectionObserver((entries) => {
+        // Pick the entry with the largest intersection ratio that is intersecting
+        let best = null;
+        entries.forEach(e => {
+          if (e.isIntersecting && (!best || e.intersectionRatio > best.intersectionRatio)) {
+            best = e;
+          }
+        });
+        if (best) {
+          const idx = Number(best.target.dataset.sectionIndex);
+          if (Number.isFinite(idx)) setActive(idx);
+        }
+      }, { rootMargin: '-35% 0px -45% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] })
+    : null;
+
+  const dots = rail ? Array.from(rail.querySelectorAll('.aura-scroll-dot')) : [];
+  function setActive(idx) {
+    activeIdx = idx;
+    dots.forEach((d, i) => {
+      d.classList.toggle('active', i === idx);
+      d.classList.toggle('passed', i < idx);
+    });
+  }
+
+  SECTIONS.forEach((s, i) => {
+    const el = document.getElementById(s.id);
+    if (!el) return;
+    el.dataset.sectionIndex = String(i);
+    el.style.scrollMarginTop = '80px';
+    if (observer) observer.observe(el);
+  });
+
+  /* ============= 2. SVG CONNECTION LINES ============= */
+  const flowSvg = document.getElementById('auraFlowSvg');
+  const flowCanvas = document.getElementById('auraFlowCanvas');
+  if (flowSvg) {
+    const SVGNS = 'http://www.w3.org/2000/svg';
+    SECTIONS.slice(0, -1).forEach((s, i) => {
+      const next = SECTIONS[i + 1];
+      const line = document.createElementNS(SVGNS, 'path');
+      line.setAttribute('class', 'aura-flow-line ' + (i % 2 === 0 ? 'cyan' : 'alt'));
+      line.setAttribute('data-from', s.id);
+      line.setAttribute('data-to', next.id);
+      line.setAttribute('d', 'M0,0 L0,0');
+      flowSvg.appendChild(line);
+    });
+  }
+
+  function getCenters() {
+    const rects = SECTIONS.map(s => {
+      const el = document.getElementById(s.id);
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      // Connection point: right edge of source, left edge of destination.
+      return { id: s.id, top: r.top + r.height * 0.5, bottom: r.top + r.height, x: r.left + r.width * 0.5 };
+    }).filter(Boolean);
+    return rects;
+  }
+
+  function rebuildLines() {
+    if (!flowSvg) return;
+    const centers = getCenters();
+    const lines = flowSvg.querySelectorAll('path.aura-flow-line');
+    lines.forEach((line) => {
+      const fromId = line.getAttribute('data-from');
+      const toId = line.getAttribute('data-to');
+      const a = centers.find(c => c.id === fromId);
+      const b = centers.find(c => c.id === toId);
+      if (!a || !b) { line.setAttribute('d', 'M0,0 L0,0'); return; }
+      // Source exits the bottom of the section; target enters at the top.
+      // Bias toward the right side so the lines run on the right margin.
+      const rightBias = Math.min(80, innerWidth * 0.04);
+      const x1 = Math.min(innerWidth - 24, Math.max(24, a.x + rightBias));
+      const y1 = a.bottom;
+      const x2 = Math.min(innerWidth - 24, Math.max(24, b.x + rightBias));
+      const y2 = b.top;
+      const midY = (y1 + y2) / 2;
+      // S-curve for organic flow.
+      const d = 'M' + x1.toFixed(1) + ',' + y1.toFixed(1) +
+                ' C' + x1.toFixed(1) + ',' + midY.toFixed(1) +
+                ' ' + x2.toFixed(1) + ',' + midY.toFixed(1) +
+                ' ' + x2.toFixed(1) + ',' + y2.toFixed(1);
+      line.setAttribute('d', d);
+      // Total path length for dasharray + dashoffset animation.
+      const len = line.getTotalLength();
+      if (Number.isFinite(len) && len > 0) {
+        line.style.strokeDasharray = '4 18';
+        line.style.strokeDashoffset = '0';
+        line.dataset.len = String(len);
+      }
+    });
+  }
+
+  /* ============= 3. PARTICLE STREAM ALONG LINES ============= */
+  const ctx = flowCanvas ? flowCanvas.getContext('2d', { alpha: true }) : null;
+  let particles = [];
+  let lastTs = 0;
+
+  function seedParticles() {
+    particles = [];
+    if (!ctx || reduced) return;
+    const lineEls = flowSvg ? flowSvg.querySelectorAll('path.aura-flow-line') : [];
+    const N = lineEls.length;
+    if (!N) return;
+    // 2-3 particles per line, staggered along the path.
+    lineEls.forEach((line) => {
+      const isAlt = line.classList.contains('alt');
+      const count = 2 + (Math.random() < 0.5 ? 0 : 1);
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          line: line,
+          t: i / count + Math.random() * 0.2,
+          speed: 0.04 + Math.random() * 0.05, // path-per-second
+          size: 0.8 + Math.random() * 1.4,
+          color: isAlt ? '16,185,129' : '90,214,255',
+          alpha: 0.55 + Math.random() * 0.35
+        });
+      }
+    });
+  }
+
+  function resizeCanvas() {
+    if (!flowCanvas) return;
+    flowCanvas.width = innerWidth * devicePixelRatio;
+    flowCanvas.height = innerHeight * devicePixelRatio;
+    flowCanvas.style.width = innerWidth + 'px';
+    flowCanvas.style.height = innerHeight + 'px';
+    if (ctx) ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  }
+
+  function stepParticles(ts) {
+    if (!ctx) return;
+    const dt = lastTs ? Math.min(0.1, (ts - lastTs) / 1000) : 0.016;
+    lastTs = ts;
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    if (reduced) return;
+    for (const p of particles) {
+      p.t = (p.t + p.speed * dt) % 1;
+      const path = p.line;
+      const len = Number(path.dataset.len || 0);
+      if (!len) continue;
+      try {
+        const pt = path.getPointAtLength(p.t * len);
+        const x = pt.x;
+        const y = pt.y;
+        // Soft cyan/green glow with a hot center.
+        const grad = ctx.createRadialGradient(x, y, 0, x, y, p.size * 6);
+        grad.addColorStop(0, 'rgba(' + p.color + ',' + p.alpha + ')');
+        grad.addColorStop(0.4, 'rgba(' + p.color + ',' + (p.alpha * 0.35) + ')');
+        grad.addColorStop(1, 'rgba(' + p.color + ',0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, p.size * 6, 0, Math.PI * 2);
+        ctx.fill();
+        // Hot core
+        ctx.fillStyle = 'rgba(' + p.color + ',' + Math.min(1, p.alpha + 0.2) + ')';
+        ctx.beginPath();
+        ctx.arc(x, y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      } catch (_e) { /* getPointAtLength can throw if the path is empty mid-resize */ }
+    }
+    if (!cancelled) requestAnimationFrame(stepParticles);
+  }
+  let cancelled = false;
+
+  function debounce(fn, ms) {
+    let t = 0;
+    return function() {
+      const args = arguments, ctx2 = this;
+      clearTimeout(t);
+      t = setTimeout(() => fn.apply(ctx2, args), ms);
+    };
+  }
+
+  const onResize = debounce(() => {
+    rebuildLines();
+    resizeCanvas();
+    seedParticles();
+  }, 120);
+  addEventListener('resize', onResize);
+  addEventListener('scroll', () => { setRailProgress(); }, { passive: true });
+
+  // Init canvas + lines + particles after layout settles.
+  function init() {
+    if (!flowCanvas) return;
+    resizeCanvas();
+    rebuildLines();
+    seedParticles();
+    if (!reduced) requestAnimationFrame(stepParticles);
+  }
+  // Run after DOMContentLoaded + a frame so the layout has final values.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(init));
+  } else {
+    requestAnimationFrame(init);
+  }
+  // Also re-run once after full load in case fonts/icons change layout.
+  addEventListener('load', () => requestAnimationFrame(() => { rebuildLines(); seedParticles(); }));
+
+  /* ============= 4. RANK-ORB LEVEL-UP PULSE ============= */
+  // Detect rank changes and fire a 1.6s pulse on the rank orb.
+  const rankOrb = document.querySelector('.rank-orb');
+  const rankCore = document.querySelector('.rank-orb-core');
+  let lastRankName = null;
+  let lastValue = null;
+
+  function fireLevelUp() {
+    if (!rankOrb && !rankCore) return;
+    if (rankOrb) {
+      rankOrb.classList.remove('level-up');
+      // force reflow so the animation can replay
+      // eslint-disable-next-line no-unused-expressions
+      rankOrb.offsetWidth;
+      rankOrb.classList.add('level-up');
+      setTimeout(() => rankOrb.classList.remove('level-up'), 1700);
+    }
+    if (rankCore) {
+      rankCore.classList.remove('level-up');
+      // eslint-disable-next-line no-unused-expressions
+      rankCore.offsetWidth;
+      rankCore.classList.add('level-up');
+      setTimeout(() => rankCore.classList.remove('level-up'), 1700);
+    }
+  }
+
+  // Listen for the explicit event a sibling may dispatch, plus a polling
+  // fallback that reads window.DATA so the pulse fires without code edits
+  // to renderAll().
+  window.addEventListener('aura:levelup', fireLevelUp);
+  window.addEventListener('aura:rankchange', fireLevelUp);
+
+  function pollRank() {
+    const data = window.DATA || (typeof DATA !== 'undefined' ? DATA : null);
+    if (data && data.rank) {
+      const name = data.rank.name;
+      const total = Number(data.total || 0);
+      if (lastRankName !== null) {
+        if (name && name !== lastRankName) fireLevelUp();
+        else if (lastValue !== null && total - lastValue >= 1) {
+          // Significant value bump within the same rank also qualifies.
+          fireLevelUp();
+        }
+      }
+      lastRankName = name;
+      lastValue = total;
+    }
+    setTimeout(pollRank, 1500);
+  }
+  // Start polling shortly after load (only if DATA exists).
+  setTimeout(pollRank, 800);
 })();
 </script></body>
 </html>
