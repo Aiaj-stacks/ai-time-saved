@@ -350,6 +350,22 @@ a:hover{color:var(--text-1)}
 .log-scope-select:focus{border-color:var(--accent)}
 .log-scope-select option{background:var(--bg-page);color:var(--text-1)}
 
+
+/* ===== MASSIVE TOTAL (v27.2) ===== */
+.massive-total{background:linear-gradient(180deg,var(--bg-panel),var(--bg-page));border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px 56px;display:grid;grid-template-columns:1fr auto 80px;grid-template-rows:auto auto;gap:0 24px;align-items:end;position:relative;overflow:hidden;min-height:180px}
+.massive-total::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--accent),var(--cyan),transparent);opacity:.6}
+.massive-total-label{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.2em;grid-column:1;grid-row:1}
+.massive-total-value{font-size:96px;font-weight:700;color:var(--cyan);font-family:'JetBrains Mono';letter-spacing:-0.06em;line-height:0.95;grid-column:1;grid-row:2;text-shadow:0 0 32px var(--cyan-glow)}
+.massive-total-unit{font-size:24px;font-weight:500;color:var(--text-2);letter-spacing:0.15em;grid-column:2;grid-row:2;align-self:end;padding-bottom:8px}
+.massive-total-usd{font-size:32px;font-weight:600;color:var(--green);font-family:'JetBrains Mono';grid-column:3;grid-row:1;text-shadow:0 0 16px rgba(16,185,129,.3)}
+.massive-total-rate{font-size:11px;font-weight:500;color:var(--text-3);font-family:'JetBrains Mono';text-align:right;grid-column:3;grid-row:2;align-self:end;padding-bottom:8px}
+@media (max-width:900px){
+  .massive-total{padding:24px 28px;grid-template-columns:1fr auto 60px}
+  .massive-total-value{font-size:64px}
+  .massive-total-unit{font-size:16px}
+  .massive-total-usd{font-size:22px}
+}
+
 /* ===== AURA 4D EFFECTS (v26.6) ===== */
 .grid-bg{position:fixed;inset:0;z-index:-3;pointer-events:none;opacity:.35;background-image:linear-gradient(rgba(90,214,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(90,214,255,.04) 1px,transparent 1px);background-size:64px 64px;background-position:-1px -1px;animation:grid-drift 60s linear infinite}
 @keyframes grid-drift{to{background-position:63px 63px}}
@@ -457,6 +473,15 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
       <button class="btn btn-primary" id="deployBtn">+ New entry</button>
     </div>
   </header>
+
+  <!-- MASSIVE TOTAL -->
+  <section class="massive-total ascii-noise hex-stream">
+    <div class="massive-total-label">TOTAL TIME SAVED</div>
+    <div class="massive-total-value" id="massiveTotal">0.0</div>
+    <div class="massive-total-unit">HOURS</div>
+    <div class="massive-total-usd" id="massiveUsd">$0</div>
+    <div class="massive-total-rate">at $50/hr</div>
+  </section>
 
   <!-- HERO -->
   <section class="hero ascii-noise hex-stream">
@@ -649,7 +674,17 @@ body.focus-mode .app>section.focus-keep{opacity:1;box-shadow:0 0 0 1px var(--gol
     <article class="chart-card" style="min-height:auto">
       <div class="chart-card-head">
         <div class="chart-card-title">Per-Day Breakdown</div>
-        <div class="chart-card-hint">9 active days</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="perdayFilter" class="log-scope-select">
+            <option value="all">all categories</option>
+          </select>
+          <select id="perdaySort" class="log-scope-select">
+            <option value="date-desc">newest first</option>
+            <option value="date-asc">oldest first</option>
+            <option value="hours-desc">most hours first</option>
+          </select>
+          <div class="chart-card-hint" id="perdayCount">9 active days</div>
+        </div>
       </div>
       <div class="perday-list" id="perdayList"></div>
     </article>
@@ -780,6 +815,11 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     $('#heroGlyph').textContent = (r.name||'?')[0];
     $('#heroGlyphMark').textContent = '//';
     $('#heroTier').textContent = `Tier ${tierIndex(r.name)+1} of 10`;
+    // Massive total at top
+    const massive = $('#massiveTotal');
+    const massiveUsd = $('#massiveUsd');
+    if (massive) massive.textContent = fmt(DATA.total||0, 1);
+    if (massiveUsd) massiveUsd.textContent = '$' + fmt(DATA.value||0, 0);
     $('#heroNext').textContent = DATA.next_rank ? DATA.next_rank.name : 'MAX';
     $('#heroPct').textContent = (r.progress||0).toFixed(1);
     $('#heroHours').textContent = fmt(r.current||0);
@@ -1023,13 +1063,49 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
   function renderPerDay(){
     const list = $('#perdayList');
     if(!list) return;
-    const entries = DATA.entries || [];
+    let entries = DATA.entries || [];
+    // Populate category filter options (only once)
+    const filterEl = $('#perdayFilter');
+    if (filterEl && !filterEl.dataset.populated) {
+      filterEl.dataset.populated = '1';
+      const cats = [...new Set(entries.map(e => e.cat).filter(Boolean))].sort();
+      cats.forEach(c => {
+        const o = document.createElement('option');
+        o.value = c;
+        o.textContent = c;
+        filterEl.appendChild(o);
+      });
+      filterEl.addEventListener('change', () => renderPerDay());
+      const sortEl = $('#perdaySort');
+      if (sortEl && !sortEl.dataset.wired) {
+        sortEl.dataset.wired = '1';
+        sortEl.addEventListener('change', () => renderPerDay());
+      }
+    }
+    // Apply category filter
+    const selectedCat = filterEl ? filterEl.value : 'all';
+    if (selectedCat !== 'all') {
+      entries = entries.filter(e => e.cat === selectedCat);
+    }
     const byDate = {};
     entries.forEach(e => {
       if (!byDate[e.date]) byDate[e.date] = [];
       byDate[e.date].push(e);
     });
-    const sorted = Object.keys(byDate).sort().reverse().slice(0, 10);
+    // Sort according to user selection
+    const sortEl = $('#perdaySort');
+    const sortKey = sortEl ? sortEl.value : 'date-desc';
+    let sorted = Object.keys(byDate);
+    if (sortKey === 'date-asc') sorted.sort();
+    else if (sortKey === 'date-desc') sorted.sort().reverse();
+    else if (sortKey === 'hours-desc') sorted.sort((a,b) => byDate[b].reduce((s,e)=>s+Number(e.hours||0),0) - byDate[a].reduce((s,e)=>s+Number(e.hours||0),0));
+    sorted = sorted.slice(0, 10);
+    const countEl = $('#perdayCount');
+    if (countEl) countEl.textContent = sorted.length + ' active day' + (sorted.length===1?'':'s');
+    if (!sorted.length) {
+      list.innerHTML = '<div class="perday-day" style="opacity:.5">no entries for this category</div>';
+      return;
+    }
     list.innerHTML = sorted.map(date => {
       const dayEntries = byDate[date].sort((a,b)=>b.hours-a.hours);
       const total = dayEntries.reduce((s,e) => s + Number(e.hours||0), 0);
