@@ -255,6 +255,25 @@ a:hover{color:var(--text-1)}
 .dot-pulse{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green-glow);animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
+/* ===== COMMAND PALETTE (v26.4) ===== */
+.cmd-palette{position:fixed;top:80px;left:50%;transform:translate(-50%,-10px) scale(0.98);z-index:300;width:min(560px,90vw);background:rgba(13,13,16,.98);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:0 0 0 1px rgba(0,0,0,.4),0 32px 64px rgba(0,0,0,.6),0 0 32px rgba(94,106,210,.2);opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
+.cmd-palette.open{opacity:1;transform:translate(-50%,0) scale(1);pointer-events:auto}
+.cmd-palette-input{width:100%;padding:16px 18px;background:transparent;border:0;border-bottom:1px solid var(--border);color:var(--text-1);font-size:14px;font-family:inherit;outline:none}
+.cmd-palette-input::placeholder{color:var(--text-4)}
+.cmd-palette-results{max-height:340px;overflow-y:auto;padding:6px}
+.cmd-palette-item{padding:10px 14px;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;transition:background .12s}
+.cmd-palette-item:hover,.cmd-palette-item.selected{background:var(--bg-hover)}
+.cmd-palette-item-title{font-size:13px;color:var(--text-1);font-weight:500}
+.cmd-palette-item-hint{font-size:11px;color:var(--text-3);font-family:'JetBrains Mono'}
+.cmd-palette-empty{padding:20px;text-align:center;color:var(--text-3);font-size:12px}
+.cmd-palette-footer{padding:8px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--text-4);font-family:'JetBrains Mono';display:flex;justify-content:space-between}
+.cmd-palette-hint{display:inline-flex;align-items:center;gap:4px;padding:1px 6px;background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:3px;color:var(--text-2)}
+
+/* ===== SHORTCUTS HELP (v26.4) ===== */
+.shortcuts-help{position:fixed;bottom:80px;right:24px;z-index:90;padding:10px 14px;background:rgba(13,13,16,.92);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:var(--radius);font:10px 'JetBrains Mono';color:var(--text-3);opacity:0;transition:opacity .2s;pointer-events:none}
+.shortcuts-help.show{opacity:.85;pointer-events:auto}
+.shortcuts-help kbd{display:inline-block;padding:1px 5px;background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:3px;color:var(--text-2);margin:0 2px}
+
 /* Scrollbars */
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -1095,6 +1114,64 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     });
   }
 
+  /* ===== COMMAND PALETTE ===== */
+  function setupCmdPalette(){
+    const palette = $('#cmdPalette');
+    const input = $('#cmdInput');
+    const results = $('#cmdResults');
+    if(!palette) return;
+    const cmds = [
+      {title:'Refresh data', hint:'R', action: () => { refresh(); close(); }},
+      {title:'Toggle auto-refresh', hint:'A', action: () => { $('#autoBtn')?.click(); close(); }},
+      {title:'Scroll to: Hero', hint:'/', action: () => { scrollTo('.hero'); close(); }},
+      {title:'Scroll to: Heatmap', hint:'#', action: () => { scrollTo('.heatmap-card'); close(); }},
+      {title:'Scroll to: Charts', hint:'C', action: () => { scrollTo('.charts-grid'); close(); }},
+      {title:'Scroll to: Per-Day', hint:'P', action: () => { scrollTo('#perdayList'); close(); }},
+      {title:'Scroll to: Feats', hint:'F', action: () => { scrollTo('#achGrid'); close(); }},
+      {title:'Scroll to: Quests', hint:'Q', action: () => { scrollTo('#questList'); close(); }},
+      {title:'Scroll to: Entry Form', hint:'E', action: () => { scrollTo('#entryForm'); close(); }},
+      {title:'Scroll to: CSV Import', hint:'I', action: () => { scrollTo('#csvImport'); close(); }},
+      {title:'Download CSV export', hint:'/', action: () => { window.open('/export.csv', '_blank'); close(); }},
+      {title:'Download JSON export', hint:'/', action: () => { window.open('/export.json', '_blank'); close(); }},
+    ];
+    let selected = 0;
+    function open(){ palette.classList.add('open'); input.value=''; selected=0; render(input.value); setTimeout(()=>input.focus(), 50); }
+    function close(){ palette.classList.remove('open'); }
+    function scrollTo(sel){ const el = document.querySelector(sel); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }
+    function render(q){
+      const filtered = q ? cmds.filter(c => c.title.toLowerCase().includes(q.toLowerCase())) : cmds;
+      if(!filtered.length){ results.innerHTML = '<div class="cmd-palette-empty">No matching commands</div>'; return; }
+      selected = Math.min(selected, filtered.length - 1);
+      results.innerHTML = filtered.map((c, i) =>
+        `<div class="cmd-palette-item ${i===selected?'selected':''}" data-idx="${i}">
+          <span class="cmd-palette-item-title">${esc(c.title)}</span>
+          <span class="cmd-palette-item-hint">${esc(c.hint)}</span>
+        </div>`).join('');
+      // wire actions
+      $$('.cmd-palette-item').forEach((el, i) => {
+        el.addEventListener('click', () => filtered[i].action());
+        el.addEventListener('mouseenter', () => { selected = i; render(input.value); });
+      });
+    }
+    input?.addEventListener('input', e => { selected = 0; render(e.target.value); });
+    input?.addEventListener('keydown', e => {
+      if(e.key === 'Escape') close();
+      else if(e.key === 'ArrowDown'){ e.preventDefault(); selected = Math.min(selected+1, cmds.length-1); render(input.value); }
+      else if(e.key === 'ArrowUp'){ e.preventDefault(); selected = Math.max(selected-1, 0); render(input.value); }
+      else if(e.key === 'Enter'){
+        const q = input.value;
+        const filtered = q ? cmds.filter(c => c.title.toLowerCase().includes(q.toLowerCase())) : cmds;
+        if(filtered[selected]) filtered[selected].action();
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if((e.metaKey || e.ctrlKey) && e.key === 'k'){ e.preventDefault(); open(); }
+      else if(e.key === 'Escape' && palette.classList.contains('open')){ close(); }
+      else if(e.key === '/' && !e.target.matches('input,textarea,select')){ e.preventDefault(); open(); }
+    });
+    palette.addEventListener('click', e => { if(e.target === palette) close(); });
+  }
+
   /* ===== INIT ===== */
   if (typeof DATA === 'undefined' || !DATA) {
     console.warn('DATA not embedded');
@@ -1108,6 +1185,7 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     setupTabs();
     setupButtons();
     setupKeys();
+    setupCmdPalette();
   });
   if (document.readyState !== 'loading') {
     renderAll();
@@ -1117,6 +1195,30 @@ let DATA = {"total": 70.77, "value": 3538.5, "streak": 8, "rank": {"name": "Plat
     setupKeys();
   }
 })();
+</script>
+<!-- Command Palette (v26.4) -->
+<div class="cmd-palette" id="cmdPalette" role="dialog" aria-label="Command palette">
+  <input type="text" class="cmd-palette-input" id="cmdInput" placeholder="Type a command or section..." autocomplete="off">
+  <div class="cmd-palette-results" id="cmdResults"></div>
+  <div class="cmd-palette-footer">
+    <span>↑↓ navigate · ↵ select · esc close</span>
+    <span><span class="cmd-palette-hint">⌘K</span></span>
+  </div>
+</div>
+
+<!-- Shortcuts Help (v26.4) -->
+<div class="shortcuts-help" id="shortcutsHelp" role="tooltip">
+  <kbd>R</kbd> refresh · <kbd>⌘K</kbd> command palette · <kbd>Esc</kbd> close · <kbd>?</kbd> this help
+</div>
+<script>
+document.addEventListener('keydown', e => {
+  if (e.key === '?' && !e.target.matches('input,textarea,select')) {
+    e.preventDefault();
+    const h = document.getElementById('shortcutsHelp');
+    h.classList.toggle('show');
+    setTimeout(() => h.classList.remove('show'), 4000);
+  }
+});
 </script>
 </body>
 </html>
