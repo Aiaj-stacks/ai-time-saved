@@ -2,3 +2,9 @@ __pycache__/
 *.pyc
 .DS_Store
 *.log
+
+# Self-gitignored directories - never auto-commit
+.dda/
+
+# Empty record files
+records/
